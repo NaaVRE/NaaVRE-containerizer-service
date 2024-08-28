@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "naavre-containerizer-service.fullname" . }}
+  labels:
+    {{- include "naavre-containerizer-service.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "naavre-containerizer-service.selectorLabels" . | nindent 4 }}
