@@ -12,4 +12,6 @@ ingress:
 
 conf:
   rootPath: /my-root-path
-  oidcConfigurationUrl: "https://<keycloak-host>/<keycloak-base-path>/realms/<realm>/.well-known/openid-configuration"
+
+env:
+  OIDC_CONFIGURATION_URL: "https://<keycloak-host>/<keycloak-base-path>/realms/<realm>/.well-known/openid-configuration"

@@ -108,5 +108,8 @@ affinity: {}
 
 conf:
   rootPath: /
-  oidcConfigurationUrl: ""
-  verifySSL: "true"
+
+env:
+  DEBUG: "false"
+  OIDC_CONFIGURATION_URL: ""
+  VERIFY_SSL: "true"

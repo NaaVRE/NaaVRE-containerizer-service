@@ -39,10 +39,10 @@ spec:
           env:
             - name: ROOT_PATH
               value: "{{ .Values.conf.rootPath }}"
-            - name: OIDC_CONFIGURATION_URL
-              value: "{{ .Values.conf.oidcConfigurationUrl }}"
-            - name: VERIFY_SSL
-              value: "{{ .Values.conf.verifySSL }}"
+            {{- range $k, $v := .Values.env }}
+            - name: {{ $k | quote }}
+              value: {{ $v | quote }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
