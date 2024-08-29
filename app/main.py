@@ -1,19 +1,27 @@
 from typing import Annotated
+import logging
+import os
 
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
 from .utils.openid import OpenIDValidator
+from .services.base_image_tags import BaseImageTags
 
 app = FastAPI()
 security = HTTPBearer()
 token_validator = OpenIDValidator()
 
+base_image_tags = BaseImageTags()
+
+if os.getenv('DEBUG', 'false').lower() == 'true':
+    logging.basicConfig(level=10)
+
 
 def valid_access_token(
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        credentials: Annotated[
+            HTTPAuthorizationCredentials, Depends(security)],
         ):
     try:
         return token_validator.validate(credentials.credentials)
@@ -21,11 +29,8 @@ def valid_access_token(
         raise HTTPException(status_code=401, detail="Not authenticated")
 
 
-@app.get("/")
-def get_root():
-    return {"Hello": "World"}
-
-
-@app.get("/private", )
-def get_private(access_token: Annotated[dict, Depends(valid_access_token)]):
-    return {"Hello": f"{access_token['preferred_username']}"}
+@app.get("/base-image-tags")
+def get_base_image_tags(
+        access_token: Annotated[dict, Depends(valid_access_token)]
+        ):
+    return base_image_tags.get()
