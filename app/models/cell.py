@@ -1,11 +1,15 @@
 import json
+from dataclasses import field
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, field_validator
 import json
 import logging
+
 import re
 from typing import Literal
 from typing import Optional
+
+from pydantic.v1.schema import field_schema
 from slugify import slugify
 
 logger = logging.getLogger(__name__)
@@ -15,7 +19,7 @@ class Cell(BaseModel):
     title: str | None = None
     task_name: str | None = None
     original_source: str | None = None
-    base_image: dict| None = None
+    base_image: dict
     inputs: Optional[list]| None = None
     outputs: Optional[list]| None = None
     params: Optional[list]| None = None
@@ -27,51 +31,13 @@ class Cell(BaseModel):
     node_id: str| None = None
     container_source: str| None = None
     global_conf: Optional[dict]| None = None
-    kernel: Literal ['python', 'r', 'ipython', 'c']
+    kernel: Literal ['python', 'IRKernel', 'ipython', 'c']
     notebook_json: dict| None = None
     image_version: str| None = None
     types: Optional[dict]| None = None
 
     def __init__(self, **data):
         super().__init__(**data)
-
-    # def __init__(
-    #         self,
-    #         title,
-    #         task_name,
-    #         original_source,
-    #         inputs,
-    #         outputs,
-    #         params,
-    #         secrets,
-    #         confs,
-    #         dependencies,
-    #         container_source,
-    #         chart_obj=None,
-    #         node_id='',
-    #         kernel='',
-    #         notebook_dict=None,
-    #         image_version=None,
-    #         base_image = None
-    # ) -> None:
-    #
-    #     self.title = slugify(title.strip())
-    #     self.task_name = slugify(task_name)
-    #     self.original_source = original_source
-    #     self.types = dict()
-    #     self.add_inputs(inputs)
-    #     self.add_outputs(outputs)
-    #     self.add_params(params)
-    #     self.add_param_values(params)
-    #     self.add_secrets(secrets)
-    #     self.confs = confs
-    #     self.all_inputs = list(inputs) + list(params)
-    #     self.dependencies = list(sorted(dependencies, key=lambda x: x['name']))
-    #     self.chart_obj = chart_obj
-    #     self.node_id = node_id
-    #     self.container_source = container_source
-    #     self.kernel = kernel
-    #     self.notebook_dict = notebook_dict
 
     def _extract_types(self, vars_dict):
         """ Extract types to self.types and return list of var names
@@ -181,6 +147,3 @@ class Cell(BaseModel):
             conf = {c: assignment}
             resolves.append(conf)
         return resolves
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

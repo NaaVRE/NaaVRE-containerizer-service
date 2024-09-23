@@ -7,6 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 
 from app.models.cell import Cell
+from app.models.containerizer_payload import ContainerizerPayload
 from app.services.base_image_tags import BaseImageTags
 from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.containerizer import Containerizer
@@ -43,13 +44,13 @@ def get_base_image_tags(access_token: Annotated[dict, Depends(valid_access_token
 
 
 def init_containerizer(cell):
-    if cell.kernel == 'python':
+    if cell.kernel.lower() == 'python' or cell.kernel == 'ipython':
         return PyContainerizer(cell)
-    elif cell.kernel == 'r':
+    elif cell.kernel.lower() == 'r' or cell.kernel.lower() == 'irkernel':
         return RContainerizer(cell)
-    elif cell.kernel == 'julia':
+    elif cell.kernel.lower() == 'julia':
         return JuliaContainerizer(cell)
-    elif cell.kernel == 'c':
+    elif cell.kernel.lower() == 'c':
         return CContainerizer(cell)
     else:
         raise ValueError('Unsupported kernel')
@@ -57,17 +58,18 @@ def init_containerizer(cell):
 
 
 @app.post("/containerize")
-def containerize(cell: Cell):
-    conteinerizer = init_containerizer(cell)
-    if cell.title.startswith('visualize-'):
-        template_cell = conteinerizer.build_visualization_template_cell()
-    else:
-        template_cell = conteinerizer.build_template_cell()
+def containerize(containerize_payload: ContainerizerPayload):
+    conteinerizer = init_containerizer(containerize_payload.cell)
+    template_cell = conteinerizer.build_template_cell()
+    if conteinerizer.visualization_cell:
+        notebook = conteinerizer.extract_notebook()
 
-    print(template_cell)
+    environment_template = conteinerizer.build_environment_template()
+    docker_template = conteinerizer.build_docker_template()
+
 
     conteinerizer.containerize()
-    return cell
+    return containerize_payload
 
 
 if __name__ == "__main__":
