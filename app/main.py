@@ -8,6 +8,7 @@ import jwt
 
 from app.models.cell import Cell
 from app.models.containerizer_payload import ContainerizerPayload
+from app.services.repositories.githubservice import GithubService
 from app.services.base_image_tags import BaseImageTags
 from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.containerizer import Containerizer
@@ -60,15 +61,20 @@ def init_containerizer(cell):
 @app.post("/containerize")
 def containerize(containerize_payload: ContainerizerPayload):
     conteinerizer = init_containerizer(containerize_payload.cell)
-    template_cell = conteinerizer.build_template_cell()
+    template_cell = conteinerizer.build_cell()
     if conteinerizer.visualization_cell:
         notebook = conteinerizer.extract_notebook()
+    environment_template = conteinerizer.build_environment()
+    docker_template = conteinerizer.build_docker()
 
-    environment_template = conteinerizer.build_environment_template()
-    docker_template = conteinerizer.build_docker_template()
-
-
-    conteinerizer.containerize()
+    repository_url = os.getenv('CELL_GITHUB')
+    if repository_url is None:
+        raise ValueError('CELL_GITHUB environment variable is not set')
+    token = os.getenv('CELL_GITHUB_TOKEN')
+    if token is None:
+        raise ValueError('CELL_GITHUB environment variable is not set')
+    gh = GithubService(repository_url=repository_url, token=token)
+    gh.commit(local_content=template_cell, path=containerize_payload.cell.task_name, file_name='task.py')
     return containerize_payload
 
 

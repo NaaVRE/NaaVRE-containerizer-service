@@ -15,7 +15,7 @@ class PyContainerizer(Containerizer, ABC):
     def __init__(self, cell: Cell):
         super().__init__(cell)
 
-    def build_template_cell(self):
+    def build_cell(self):
         if self.visualization_cell:
             template = 'vis_cell_template.jinja2'
         else:

@@ -7,3 +7,5 @@ Jinja2==3.1.4
 autopep8==2.3.1
 python-slugify==8.0.4
 distro==1.9.0
+gitpython==3.1.43
+PyGitHub==2.4.0

@@ -10,7 +10,7 @@ from app.models.cell import Cell
 
 
 def load_module_name_mapping():
-    module_mapping_url = os.getenv('MODULE_MAPPING_URL')
+    module_mapping_url = os.getenv('MODULE_MAPPING_URL','https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json')
     module_mapping = {}
     if module_mapping_url:
         resp = requests.get(module_mapping_url)
@@ -26,7 +26,7 @@ def load_module_name_mapping():
     loaded_module_name_mapping = json.load(module_name_mapping_file)
     loaded_module_name_mapping.update(module_mapping)
     module_name_mapping_file.close()
-    return
+    return loaded_module_name_mapping
 
 
 class Containerizer():
@@ -54,38 +54,30 @@ class Containerizer():
             raise ValueError('base_image is not set')
         pass
 
-    def containerize(self):
-        template_cell = self.build_template_cell()
-        return self.cell
+
 
     @abstractmethod
-    def build_template_cell(self):
+    def build_cell(self):
         pass
 
     @abstractmethod
     def extract_notebook(self):
         pass
 
-    def build_environment_template(self):
+    def build_environment(self):
         template_conda = self.template_env.get_template('conda_env_template.jinja2')
         mapped_dependencies = self.map_dependencies(dependencies=self.cell.dependencies,
                                                     module_name_mapping=load_module_name_mapping())
         return template_conda.render(base_image=self.cell.base_image, conda_deps=list(
-            mapped_dependencies['conda_deps']), pip_deps=list(mapped_dependencies['pip_deps']))
-
-    @abstractmethod
-    def build_docker_template(self):
-        pass
+            mapped_dependencies['conda_dependencies']), pip_deps=list(mapped_dependencies['pip_dependencies']))
 
     @abstractmethod
     def is_standard_module(self, module_name):
         pass
 
-    def build_docker_template(self):
+    def build_docker(self):
         template_dockerfile = self.template_env.get_template('dockerfile_template_conda.jinja2')
         return template_dockerfile.render(task_name=self.cell.task_name, base_image=self.cell.base_image)
-
-
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         set_conda_deps = set([])
