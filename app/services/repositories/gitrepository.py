@@ -7,5 +7,5 @@ class GitRepository:
         pass
 
     @abstractmethod
-    def _dispatch_containerization_workflow(self):
+    def dispatch_containerization_workflow(self):
         pass

@@ -40,6 +40,7 @@ class Containerizer():
         self.visualization_cell = False
         if self.cell.title.lower().startswith('visualize-'):
             self.visualization_cell = True
+        self.file_extension = ''
 
 
     def check_has_type(self):

@@ -14,6 +14,7 @@ class PyContainerizer(Containerizer, ABC):
 
     def __init__(self, cell: Cell):
         super().__init__(cell)
+        self.file_extension = '.py'
 
     def build_cell(self):
         if self.visualization_cell:

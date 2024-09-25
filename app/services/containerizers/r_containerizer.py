@@ -9,6 +9,7 @@ class RContainerizer(Containerizer, ABC):
 
     def __init__(self, cell: Cell):
         super().__init__(cell)
+        self.file_extension = '.R'
 
     def build_cell(self):
         raise NotImplementedError
