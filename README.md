@@ -19,13 +19,13 @@ fastapi dev app/main.py
 ## Build Docker image
 
 ```shell
-docker build . -t NaaVRE-containerizer-service
+docker build . -f docker/Dockerfile -t naavre-containerizer-service:dev
 ```
 
 To run it:
 
 ```shell
-docker run -p 127.0.0.1:8000:8000 NaaVRE-containerizer-service:dev
+docker run -p 127.0.0.1:8000:8000 naavre-containerizer-service:dev
 ```
 
 and open http://127.0.0.1:8000/docs
