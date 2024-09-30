@@ -15,21 +15,27 @@ from app.services.containerizers.py_containerizer import PyContainerizer
 from app.services.containerizers.r_containerizer import RContainerizer
 from app.services.repositories.githubservice import GithubService, get_content_hash
 from app.utils.openid import OpenIDValidator
+from pydantic_settings import BaseSettings
 
 
-root_path = os.getenv('ROOT_PATH', '')
-if not root_path.startswith("/"):
-    root_path = "/" + root_path
-if root_path.endswith("/"):
-    root_path = root_path[:-1]
 
-app = FastAPI(openapi_url=root_path+"/openapi.json", docs_url=root_path+"/docs")
-prefix_router = APIRouter(prefix=root_path)
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
 base_image_tags = BaseImageTags()
 
+
+
+class Settings(BaseSettings):
+    root_path: str = "my-root-path"
+    if not root_path.startswith("/"):
+        root_path = "/" + root_path
+    if root_path.endswith("/"):
+        root_path = root_path[:-1]
+
+settings = Settings()
+app = FastAPI(openapi_url=settings.root_path+"/openapi.json", docs_url=settings.root_path+"/docs")
+prefix_router = APIRouter(prefix=settings.root_path)
 
 if os.getenv("DEBUG", "false").lower() == "true":
     logging.basicConfig(level=10)
@@ -112,6 +118,13 @@ def containerize(containerize_payload: ContainerizerPayload):
             "image_version": image_version,
             "workflow_url": containerization_workflow_resp["workflow_url"]}
 
+
+@app.get("/info")
+async def info():
+    return {
+        "root_path": settings.root_path,
+        "openapi_url": settings.root_path+"/openapi.json"
+    }
 
 app.include_router(prefix_router)
 if __name__ == "__main__":
