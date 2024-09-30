@@ -35,7 +35,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 app = FastAPI(openapi_url=settings.root_path+"/openapi.json", docs_url=settings.root_path+"/docs")
-# prefix_router = APIRouter(prefix=settings.root_path)
+prefix_router = APIRouter(prefix=settings.root_path)
 
 if os.getenv("DEBUG", "false").lower() == "true":
     logging.basicConfig(level=10)
@@ -52,7 +52,7 @@ def valid_access_token(credentials: Annotated[
 
 
 
-@app.get("/base-image-tags")
+@prefix_router.get("/base-image-tags")
 def get_base_image_tags(access_token: Annotated[dict, Depends(valid_access_token)]):
     return base_image_tags.get()
 
@@ -81,7 +81,7 @@ def _get_github_service():
 
 
 
-@app.post("/containerize")
+@prefix_router.post("/containerize")
 def containerize(containerize_payload: ContainerizerPayload):
     conteinerizer = _get_containerizer(containerize_payload.cell)
     gh = _get_github_service()
@@ -126,6 +126,6 @@ async def info():
         "openapi_url": settings.root_path+"/openapi.json"
     }
 
-# app.include_router(prefix_router)
+app.include_router(prefix_router)
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
