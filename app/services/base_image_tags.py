@@ -23,7 +23,7 @@ class BaseImageTags:
                 requests.ConnectionError,
                 requests.HTTPError,
                 requests.JSONDecodeError,
-                ) as e:
+        ) as e:
             msg = f'Error loading base image tags from {url}\n{e}'
             logger.debug(msg)
 

@@ -1,25 +1,25 @@
+import datetime
+import hashlib
 import json
 import logging
 import os
 import uuid
 from abc import ABC
-
-import hashlib
-import datetime
 from time import sleep
 
 import requests
-
-from app.services.container_registries.container_registry import ContainerRegistry
-from app.services.repositories.gitrepository import GitRepository
 from github import Github
 from github.GithubException import UnknownObjectException
+
+from app.services.container_registries.container_registry import \
+    ContainerRegistry
+from app.services.repositories.gitrepository import GitRepository
 
 logger = logging.getLogger('uvicorn.error')
 
 GITHUB_PREFIX = 'https://github.com/'
 GITHUB_API_PREFIX = 'https://api.github.com/'
-GITHUB_API_REPOS = GITHUB_API_PREFIX+'repos'
+GITHUB_API_REPOS = GITHUB_API_PREFIX + 'repos'
 GITHUB_WORKFLOW_FILENAME = 'build-push-docker.yml'
 
 
@@ -31,29 +31,25 @@ def get_content_hash(contents):
     return s.hexdigest()
 
 
-
-
-
-
-
-
 class GithubService(GitRepository, ABC):
 
     def __init__(self, repository_url=None, token=None):
         self.github = Github(token)
         self.token = token
         self.owner = repository_url.split(GITHUB_PREFIX)[1].split('/')[0]
-        self.repository_name = repository_url.split(GITHUB_PREFIX)[1].split('/')[1]
+        self.repository_name = \
+        repository_url.split(GITHUB_PREFIX)[1].split('/')[1]
         if '.git' in self.repository_name:
             self.repository_name = self.repository_name.split('.git')[0]
-        self.gh_repository = self.github.get_repo(self.owner + '/' + self.repository_name)
+        self.gh_repository = self.github.get_repo(
+            self.owner + '/' + self.repository_name)
         self.dispatches_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/workflows/' + GITHUB_WORKFLOW_FILENAME + '/dispatches'
         self.registry = ContainerRegistry()
 
-
     def commit(self, local_content=None, path=None, file_name=None):
         try:
-            remote_hash = self.gh_repository.get_contents(path=path + '/' + file_name).sha
+            remote_hash = self.gh_repository.get_contents(
+                path=path + '/' + file_name).sha
         except UnknownObjectException:
             remote_hash = None
         local_hash = get_content_hash(local_content)
@@ -75,12 +71,13 @@ class GithubService(GitRepository, ABC):
             content_updated = True
         image_info = None
         if not content_updated:
-            image_info =  self.registry.query_registry_for_image(path)
+            image_info = self.registry.query_registry_for_image(path)
         if not image_info:
             content_updated = True
         return content_updated
 
-    def dispatch_containerization_workflow(self, task_name=None, image_version=None):
+    def dispatch_containerization_workflow(self, task_name=None,
+                                           image_version=None):
         wf_id = str(uuid.uuid4())
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         resp = requests.post(
@@ -102,9 +99,10 @@ class GithubService(GitRepository, ABC):
         )
         if resp.status_code != 201 and resp.status_code != 200 and resp.status_code != 204:
             raise Exception('Error dispatching workflow: ' + resp.text)
-        job  = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc, job_id=None)
+        job = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc,
+                           job_id=None)
 
-        return {'workflow_id':wf_id,'workflow_url':job['html_url']}
+        return {'workflow_id': wf_id, 'workflow_url': job['html_url']}
 
     def get_job(self,
                 wf_id=None,
@@ -121,19 +119,22 @@ class GithubService(GitRepository, ABC):
         and find the one matching {wf_id}
         """
         if job_id:
-            jobs_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/jobs/' + str(job_id)
+            jobs_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/jobs/' + str(
+                job_id)
             self.wait_for_github_api_resources()
             job = self.get_github_workflow_jobs(jobs_url)
             return job
         self.wait_for_github_api_resources()
         sleep_time = 3
         sleep(sleep_time)
-        job = self.find_job_by_name(job_name = wf_id,wf_creation_utc=wf_creation_utc)
+        job = self.find_job_by_name(job_name=wf_id,
+                                    wf_creation_utc=wf_creation_utc)
         count = 0
         while not job and count <= 4:
             sleep(sleep_time)
-            logger.debug('Calling find_job_by_name. Count: '+str(count))
-            job = self.find_job_by_name(job_name=wf_id,wf_creation_utc=wf_creation_utc)
+            logger.debug('Calling find_job_by_name. Count: ' + str(count))
+            job = self.find_job_by_name(job_name=wf_id,
+                                        wf_creation_utc=wf_creation_utc)
             count += 1
             sleep_time += 2
         return job
@@ -150,11 +151,13 @@ class GithubService(GitRepository, ABC):
             sleep(remaining_time + 1)
             rate_limit = self.github.get_rate_limit()
 
-    def get_github_workflow_runs(self,t_utc=None):
+    def get_github_workflow_runs(self, t_utc=None):
         workflow_runs_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/runs'
         if t_utc:
-            t_start = (t_utc - datetime.timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
-            t_stop = (t_utc + datetime.timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            t_start = (t_utc - datetime.timedelta(minutes=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ")
+            t_stop = (t_utc + datetime.timedelta(minutes=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ")
             workflow_runs_url += f"?created={t_start}..{t_stop}"
         headers = {'Accept': 'application/vnd.github.v3+json'}
         if self.token:
@@ -166,7 +169,7 @@ class GithubService(GitRepository, ABC):
         workflow_runs_json = json.loads(workflow_runs.text)
         return workflow_runs_json
 
-    def get_github_workflow_jobs(self,jobs_url=None):
+    def get_github_workflow_jobs(self, jobs_url=None):
         headers = {'Accept': 'application/vnd.github.v3+json'}
         if self.token:
             headers['Authorization'] = 'Bearer ' + self.token
@@ -175,12 +178,13 @@ class GithubService(GitRepository, ABC):
         if jobs.status_code == 200:
             return json.loads(jobs.text)
         else:
-            raise Exception('Error getting jobs for workflow run: ' + jobs.text)
+            raise Exception(
+                'Error getting jobs for workflow run: ' + jobs.text)
 
-    def find_job_by_name(self, job_name=None,wf_creation_utc=None):
+    def find_job_by_name(self, job_name=None, wf_creation_utc=None):
         runs = self.get_github_workflow_runs(
             t_utc=wf_creation_utc)
-        logger.debug('Got runs: '+str(len(runs)))
+        logger.debug('Got runs: ' + str(len(runs)))
         for run in runs['workflow_runs']:
             jobs_url = run['jobs_url']
             self.wait_for_github_api_resources()

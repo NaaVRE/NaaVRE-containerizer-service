@@ -1,19 +1,16 @@
 import json
 import os
-from pathlib import Path
 from time import sleep
 
 from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 if os.path.exists('resources'):
     base_path = 'resources'
 elif os.path.exists('app/tests/resources/'):
     base_path = 'app/tests/resources/'
 client = TestClient(app)
-
 
 
 def test_containerize():
@@ -39,7 +36,8 @@ def test_containerize():
         assert containerization_status_response.status_code == 200
         count = 0
         sleep_time = 10
-        while containerization_status_response.json()['status'] != 'completed' and count <= 3:
+        while containerization_status_response.json()[
+            'status'] != 'completed' and count <= 3:
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/containerization-status/' + workflow_id,
@@ -49,10 +47,5 @@ def test_containerize():
             count += 1
             sleep_time += 5
         assert containerization_status_response.json()['status'] == 'completed'
-        assert containerization_status_response.json()['conclusion'] == 'success'
-
-
-
-
-
-
+        assert containerization_status_response.json()[
+                   'conclusion'] == 'success'

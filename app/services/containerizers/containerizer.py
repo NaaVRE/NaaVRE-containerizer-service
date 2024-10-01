@@ -10,7 +10,8 @@ from app.models.cell import Cell
 
 
 def load_module_name_mapping():
-    module_mapping_url = os.getenv('MODULE_MAPPING_URL','https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json')
+    module_mapping_url = os.getenv('MODULE_MAPPING_URL',
+                                   'https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json')
     module_mapping = {}
     if module_mapping_url:
         resp = requests.get(module_mapping_url)
@@ -31,17 +32,17 @@ def load_module_name_mapping():
 
 class Containerizer():
 
-    def __init__(self,cell: Cell):
+    def __init__(self, cell: Cell):
         self.cell = cell
         self.check_has_type()
         self.check_has_base_image()
         loader = PackageLoader('app', 'templates')
-        self.template_env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+        self.template_env = Environment(loader=loader, trim_blocks=True,
+                                        lstrip_blocks=True)
         self.visualization_cell = False
         if self.cell.title.lower().startswith('visualize-'):
             self.visualization_cell = True
         self.file_extension = ''
-
 
     def check_has_type(self):
         all_vars = self.cell.params + self.cell.inputs + self.cell.outputs
@@ -55,8 +56,6 @@ class Containerizer():
             raise ValueError('base_image is not set')
         pass
 
-
-
     @abstractmethod
     def build_cell(self):
         pass
@@ -66,19 +65,27 @@ class Containerizer():
         pass
 
     def build_environment(self):
-        template_conda = self.template_env.get_template('conda_env_template.jinja2')
-        mapped_dependencies = self.map_dependencies(dependencies=self.cell.dependencies,
-                                                    module_name_mapping=load_module_name_mapping())
-        return template_conda.render(base_image=self.cell.base_image, conda_deps=list(
-            mapped_dependencies['conda_dependencies']), pip_deps=list(mapped_dependencies['pip_dependencies']))
+        template_conda = self.template_env.get_template(
+            'conda_env_template.jinja2')
+        mapped_dependencies = self.map_dependencies(
+            dependencies=self.cell.dependencies,
+            module_name_mapping=load_module_name_mapping())
+        return template_conda.render(base_image=self.cell.base_image,
+                                     conda_deps=list(
+                                         mapped_dependencies[
+                                             'conda_dependencies']),
+                                     pip_deps=list(mapped_dependencies[
+                                                       'pip_dependencies']))
 
     @abstractmethod
     def is_standard_module(self, module_name):
         pass
 
     def build_docker(self):
-        template_dockerfile = self.template_env.get_template('dockerfile_template_conda.jinja2')
-        return template_dockerfile.render(task_name=self.cell.task_name, base_image=self.cell.base_image)
+        template_dockerfile = self.template_env.get_template(
+            'dockerfile_template_conda.jinja2')
+        return template_dockerfile.render(task_name=self.cell.task_name,
+                                          base_image=self.cell.base_image)
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         set_conda_deps = set([])
@@ -110,5 +117,5 @@ class Containerizer():
                         set_conda_deps.add(module_name)
                     if pip_package:
                         set_pip_deps.add(module_name)
-        return {'conda_dependencies': set_conda_deps, 'pip_dependencies': set_pip_deps}
-
+        return {'conda_dependencies': set_conda_deps,
+                'pip_dependencies': set_pip_deps}

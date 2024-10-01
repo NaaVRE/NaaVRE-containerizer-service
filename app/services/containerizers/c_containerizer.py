@@ -1,4 +1,5 @@
 from abc import ABC
+
 from app.models.cell import Cell
 from app.services.containerizers.containerizer import Containerizer
 

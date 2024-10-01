@@ -1,7 +1,7 @@
+import logging
+import os
 import ssl
 from typing import Union
-import os
-import logging
 
 import jwt
 import requests
@@ -49,7 +49,7 @@ class OpenIDValidator:
                 algorithms=[token_header['alg']],
                 audience="account",
                 options={"verify_exp": True},
-                )
+            )
         except jwt.exceptions.InvalidTokenError as e:
             logger.debug(msg="Authentication failed", exc_info=e)
             raise

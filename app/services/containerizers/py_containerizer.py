@@ -1,13 +1,13 @@
-from abc import ABC
 import importlib
 import json
 import sys
 from abc import ABC
-import distro
+
 import autopep8
+import distro
 
 from app.models.cell import Cell
-from app.services.containerizers.containerizer import Containerizer, load_module_name_mapping
+from app.services.containerizers.containerizer import Containerizer
 
 
 class PyContainerizer(Containerizer, ABC):
@@ -22,18 +22,21 @@ class PyContainerizer(Containerizer, ABC):
         else:
             template = 'py_cell_template.jinja2'
         template_cell = self.template_env.get_template(template)
-        compiled_code = template_cell.render(cell=self.cell, deps=self.cell.generate_dependencies(), types=self.cell.types,
+        compiled_code = template_cell.render(cell=self.cell,
+                                             deps=self.cell.generate_dependencies(),
+                                             types=self.cell.types,
                                              confs=self.cell.generate_configuration_dict())
         compiled_code = autopep8.fix_code(compiled_code)
         self.cell.container_source = compiled_code
-        return template_cell.render(cell=self.cell, deps=self.cell.generate_dependencies(), types=self.cell.types,
-                             confs=self.cell.generate_configuration_dict())
+        return template_cell.render(cell=self.cell,
+                                    deps=self.cell.generate_dependencies(),
+                                    types=self.cell.types,
+                                    confs=self.cell.generate_configuration_dict())
 
     def extract_notebook(self):
         return json.dumps(self.cell.notebook_dict, indent=4)
 
-
-    def is_standard_module(self,module_name=None):
+    def is_standard_module(self, module_name=None):
         if module_name in sys.builtin_module_names:
             return True
         installation_path = None

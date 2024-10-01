@@ -1,5 +1,4 @@
 from abc import ABC
-from os import readv
 
 from app.models.cell import Cell
 from app.services.containerizers.containerizer import Containerizer

@@ -1,40 +1,34 @@
-import json
-from dataclasses import field
-
-from pydantic import BaseModel, validator, field_validator
-import json
 import logging
-
 import re
-from typing import Literal
-from typing import Optional
+from typing import Literal, Optional
 
-from pydantic.v1.schema import field_schema
+from pydantic import BaseModel
 from slugify import slugify
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
 
 class Cell(BaseModel):
     title: str | None = None
     task_name: str | None = None
     original_source: str | None = None
     base_image: dict
-    inputs: Optional[list]| None = None
-    outputs: Optional[list]| None = None
-    params: Optional[list]| None = None
-    param_values: Optional[dict]| None = None
-    secrets: Optional[list]| None = None
-    confs: Optional[dict]| None = None
-    dependencies: Optional[list]| None = None
-    chart_obj: dict| None = None
-    node_id: str| None = None
-    container_source: str| None = None
-    global_conf: Optional[dict]| None = None
-    kernel: Literal ['python', 'IRKernel', 'ipython', 'c']
-    notebook_json: dict| None = None
-    image_version: str| None = None
-    types: Optional[dict]| None = None
+    inputs: Optional[list] | None = None
+    outputs: Optional[list] | None = None
+    params: Optional[list] | None = None
+    param_values: Optional[dict] | None = None
+    secrets: Optional[list] | None = None
+    confs: Optional[dict] | None = None
+    dependencies: Optional[list] | None = None
+    chart_obj: dict | None = None
+    node_id: str | None = None
+    container_source: str | None = None
+    global_conf: Optional[dict] | None = None
+    kernel: Literal['python', 'IRKernel', 'ipython', 'c']
+    notebook_json: dict | None = None
+    image_version: str | None = None
+    types: Optional[dict] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -75,7 +69,8 @@ class Cell(BaseModel):
 
     def set_image_version(self, image_version):
         if not image_version:
-            raise ValueError("Image version cannot be empty. Cell title: %s" % self.title)
+            raise ValueError(
+                "Image version cannot be empty. Cell title: %s" % self.title)
         self.image_version = image_version
 
     def add_param_values(self, params):
@@ -83,7 +78,8 @@ class Cell(BaseModel):
         if isinstance(params, dict):
             for param_props in params.values():
                 if 'value' in param_props:
-                    self.param_values[param_props['name']] = param_props['value']
+                    self.param_values[param_props['name']] = param_props[
+                        'value']
 
     def concatenate_all_inputs(self):
         self.all_inputs = list(self.inputs) + list(self.params)
