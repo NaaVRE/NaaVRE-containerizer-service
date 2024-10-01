@@ -121,7 +121,10 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],cont
 @app.get("/containerization-status/{workflow_id}")
 def containerization_status(access_token: Annotated[dict, Depends(valid_access_token)],workflow_id: str):
     gh = _get_github_service()
-    return gh.find_job(wf_id=workflow_id)
+    job = gh.get_job(wf_id=workflow_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="containerization job not found")
+    return job
 
 
 if __name__ == "__main__":

@@ -102,15 +102,15 @@ class GithubService(GitRepository, ABC):
         )
         if resp.status_code != 201 and resp.status_code != 200 and resp.status_code != 204:
             raise Exception('Error dispatching workflow: ' + resp.text)
-        job  = self.find_job(wf_id=wf_id,wf_creation_utc=wf_creation_utc,job_id=None)
+        job  = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc, job_id=None)
 
         return {'workflow_id':wf_id,'workflow_url':job['html_url']}
 
-    def find_job(self,
-            wf_id=None,
-            wf_creation_utc=None,
-            job_id=None,
-    ):
+    def get_job(self,
+                wf_id=None,
+                wf_creation_utc=None,
+                job_id=None,
+                ):
         f""" Find Github workflow job
 
         If job_id is set, retrieve it through
