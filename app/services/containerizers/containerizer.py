@@ -34,6 +34,9 @@ class Containerizer():
 
     def __init__(self, cell: Cell):
         self.cell = cell
+        self.cell.clean_code()
+        self.cell.clean_title()
+        self.cell.clean_task_name()
         self.check_has_type()
         self.check_has_base_image()
         loader = PackageLoader('app', 'templates')

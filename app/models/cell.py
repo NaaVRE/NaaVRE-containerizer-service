@@ -8,7 +8,6 @@ from slugify import slugify
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-
 class Cell(BaseModel):
     title: str | None = None
     task_name: str | None = None
@@ -32,6 +31,15 @@ class Cell(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
+        self.title = slugify(self.title.strip())
+        self.task_name = slugify(self.task_name)
+        self.add_inputs(self.inputs)
+        self.add_outputs(self.outputs)
+        self.add_params(self.params)
+        self.add_param_values(self.params)
+        self.add_secrets(self.secrets)
+        # self.all_inputs = list(self.inputs) + list(self.params)
+        self.dependencies = list(sorted(self.dependencies, key=lambda x: x['name']))
 
     def _extract_types(self, vars_dict):
         """ Extract types to self.types and return list of var names
@@ -81,14 +89,13 @@ class Cell(BaseModel):
                     self.param_values[param_props['name']] = param_props[
                         'value']
 
-    def concatenate_all_inputs(self):
-        self.all_inputs = list(self.inputs) + list(self.params)
+    # def concatenate_all_inputs(self):
+    #     self.all_inputs = list(self.inputs) + list(self.params)
 
     def clean_code(self):
         indices_to_remove = []
         lines = self.original_source.splitlines()
         self.original_source = ""
-
         for line_i in range(0, len(lines)):
             line = lines[line_i]
             # Do not remove line that startswith param_ if not in the self.params
@@ -112,14 +119,14 @@ class Cell(BaseModel):
 
     def clean_title(self):
         self.title = slugify(self.title)
-
-    def integrate_configuration(self):
-        lines = self.original_source.splitlines()
-        self.original_source = ""
-        for idx, conf in enumerate(self.generate_configuration()):
-            lines.insert(idx, conf)
-        self.original_source = "\n".join(lines)
-
+    #
+    # def integrate_configuration(self):
+    #     lines = self.original_source.splitlines()
+    #     self.original_source = ""
+    #     for idx, conf in enumerate(self.generate_configuration()):
+    #         lines.insert(idx, conf)
+    #     self.original_source = "\n".join(lines)
+    #
     def generate_dependencies(self):
         resolves = []
         for d in self.dependencies:
