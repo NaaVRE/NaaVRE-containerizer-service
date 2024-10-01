@@ -15,7 +15,6 @@ from app.services.repositories.gitrepository import GitRepository
 from github import Github
 from github.GithubException import UnknownObjectException
 
-
 logger = logging.getLogger('uvicorn.error')
 
 GITHUB_PREFIX = 'https://github.com/'
@@ -104,6 +103,7 @@ class GithubService(GitRepository, ABC):
         if resp.status_code != 201 and resp.status_code != 200 and resp.status_code != 204:
             raise Exception('Error dispatching workflow: ' + resp.text)
         job  = self.find_job(wf_id=wf_id,wf_creation_utc=wf_creation_utc,job_id=None)
+
         return {'workflow_id':wf_id,'workflow_url':job['html_url']}
 
     def find_job(self,
@@ -129,7 +129,7 @@ class GithubService(GitRepository, ABC):
         sleep(5)
         job = self.find_job_by_name(job_name = wf_id,wf_creation_utc=wf_creation_utc)
         count = 0
-        while not job and count <= 5:
+        while not job and count <= 4:
             sleep(5)
             logger.debug('Calling find_job_by_name. Count: '+str(count))
             job = self.find_job_by_name(job_name=wf_id,wf_creation_utc=wf_creation_utc)

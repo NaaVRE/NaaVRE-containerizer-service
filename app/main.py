@@ -52,9 +52,6 @@ def valid_access_token(credentials: Annotated[
         raise HTTPException(status_code=401, detail="Not authenticated")
 
 
-
-
-# @prefix_router.get("/base-image-tags")
 @app.get("/base-image-tags")
 def get_base_image_tags(access_token: Annotated[dict, Depends(valid_access_token)]):
     return base_image_tags.get()
@@ -83,10 +80,8 @@ def _get_github_service():
     return GithubService(repository_url=repository_url, token=token)
 
 
-
-# @prefix_router.post("/containerize")
 @app.post("/containerize")
-def containerize(containerize_payload: ContainerizerPayload):
+def containerize(access_token: Annotated[dict, Depends(valid_access_token)],containerize_payload: ContainerizerPayload):
     conteinerizer = _get_containerizer(containerize_payload.cell)
     gh = _get_github_service()
     cell_contents = conteinerizer.build_cell()
@@ -123,13 +118,11 @@ def containerize(containerize_payload: ContainerizerPayload):
             "workflow_url": containerization_workflow_resp["workflow_url"]}
 
 
-@app.get("/info")
-async def info():
-    return {
-        "root_path": settings.root_path,
-        "openapi_url": settings.root_path+"/openapi.json"
-    }
+@app.get("/containerization-status/{workflow_id}")
+def containerization_status(access_token: Annotated[dict, Depends(valid_access_token)],workflow_id: str):
+    gh = _get_github_service()
+    return gh.find_job(wf_id=workflow_id)
 
-# app.include_router(prefix_router)
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
