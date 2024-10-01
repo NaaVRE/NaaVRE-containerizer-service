@@ -38,14 +38,16 @@ def test_containerize():
         )
         assert containerization_status_response.status_code == 200
         count = 0
+        sleep_time = 10
         while containerization_status_response.json()['status'] != 'completed' and count <= 3:
-            sleep(20)
+            sleep(sleep_time)
             containerization_status_response = client.get(
                 '/containerization-status/' + workflow_id,
                 headers={'Authorization:': 'Bearer ABC'},
             )
             assert containerization_status_response.status_code == 200
             count += 1
+            sleep_time += 5
         assert containerization_status_response.json()['status'] == 'completed'
         assert containerization_status_response.json()['conclusion'] == 'success'
 

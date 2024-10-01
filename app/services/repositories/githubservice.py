@@ -126,14 +126,16 @@ class GithubService(GitRepository, ABC):
             job = self.get_github_workflow_jobs(jobs_url)
             return job
         self.wait_for_github_api_resources()
-        sleep(5)
+        sleep_time = 3
+        sleep(sleep_time)
         job = self.find_job_by_name(job_name = wf_id,wf_creation_utc=wf_creation_utc)
         count = 0
         while not job and count <= 4:
-            sleep(5)
+            sleep(sleep_time)
             logger.debug('Calling find_job_by_name. Count: '+str(count))
             job = self.find_job_by_name(job_name=wf_id,wf_creation_utc=wf_creation_utc)
             count += 1
+            sleep_time += 2
         return job
 
     def wait_for_github_api_resources(self):
