@@ -16,12 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-    - name: Set up Python 3.11 and install dependencies from requirements.txt
+      - name: Set up Python 3.11 and install dependencies from requirements.txt
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
 
-    - name: Install dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
