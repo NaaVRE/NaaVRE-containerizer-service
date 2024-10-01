@@ -30,7 +30,7 @@ def test_containerize():
 
         workflow_id = containerize_response.json()['workflow_id']
         containerization_status_response = client.get(
-            '/containerization-status/a',
+            '/containerization-status/' + workflow_id,
             headers={'Authorization': 'Bearer ABC'},
         )
         assert containerization_status_response.status_code == 200
@@ -41,7 +41,7 @@ def test_containerize():
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/containerization-status/' + workflow_id,
-                headers={'Authorization:': 'Bearer ABC'},
+                headers={'Authorization': 'Bearer ABC'},
             )
             assert containerization_status_response.status_code == 200
             count += 1
