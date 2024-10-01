@@ -83,6 +83,7 @@ jobs:
       module_mapping_url: ${{ vars.MODULE_MAPPING_URL }}
       root_path: ${{ vars.ROOT_PATH }}
       cell_github: ${{ vars.CELL_GITHUB }}
+      test: ${{ matrix.test }}
     secrets:
       cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
 
