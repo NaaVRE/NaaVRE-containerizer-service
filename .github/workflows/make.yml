@@ -75,19 +75,16 @@ jobs:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
       runs-on: ${{ needs.configure-workflow.outputs.runner }}
-      jupyterhub_user: ${{ vars.JUPYTERHUB_USER }}
-      vlab_slug: ${{ vars.VLAB_SLUG }}
-      cell_github: ${{ vars.CELL_GITHUB }}
-      api_endpoint: ${{ vars.API_ENDPOINT }}
-      module_mapping_url: ${{ vars.MODULE_MAPPING_URL }}
-      search_api_endpoint: ${{ vars.SEARCH_API_ENDPOINT }}
-      registry_url: ${{ vars.REGISTRY_URL }}
+      base_image_tags_url: ${{ vars.BASE_IMAGE_TAGS_URL }}
       debug: ${{ vars.DEBUG }}
-      test: ${{ matrix.test }}
+      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
+      verify_ssl: ${{ vars.VERIFY_SSL }}
+      disable_auth: ${{ vars.DISABLE_AUTH }}
+      module_mapping_url: ${{ vars.MODULE_MAPPING_URL }}
+      root_path: ${{ vars.ROOT_PATH }}
+      cell_github: ${{ secrets.CELL_GITHUB }}
     secrets:
       cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
-      naavre_api_token: ${{ secrets.NAAVRE_API_TOKEN }}
-      search_api_token: ${{ secrets.SEARCH_API_TOKEN }}
 
   make-release:
     uses: ./.github/workflows/make-release.yml
