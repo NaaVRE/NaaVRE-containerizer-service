@@ -38,12 +38,14 @@ class GithubService(GitRepository, ABC):
         self.token = token
         self.owner = repository_url.split(GITHUB_PREFIX)[1].split('/')[0]
         self.repository_name = \
-        repository_url.split(GITHUB_PREFIX)[1].split('/')[1]
+            repository_url.split(GITHUB_PREFIX)[1].split('/')[1]
         if '.git' in self.repository_name:
             self.repository_name = self.repository_name.split('.git')[0]
         self.gh_repository = self.github.get_repo(
             self.owner + '/' + self.repository_name)
-        self.dispatches_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/workflows/' + GITHUB_WORKFLOW_FILENAME + '/dispatches'
+        self.dispatches_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
+                               self.repository_name + '/actions/workflows/' +
+                               GITHUB_WORKFLOW_FILENAME + '/dispatches')
         self.registry = ContainerRegistry()
 
     def commit(self, local_content=None, path=None, file_name=None):
@@ -146,7 +148,7 @@ class GithubService(GitRepository, ABC):
             # Calculate remaining time for reset
             remaining_time = reset.timestamp() - datetime.datetime.now().timestamp()
             logger.debug(f'Remaining time for reset: {remaining_time} s')
-            logger.debug(f'API rate exceeded, waiting')
+            logger.debug('API rate exceeded, waiting')
             logger.debug(f'Sleeping for: {remaining_time + 1}')
             sleep(remaining_time + 1)
             rate_limit = self.github.get_rate_limit()

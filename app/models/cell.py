@@ -98,7 +98,8 @@ class Cell(BaseModel):
                 param_name = re.findall(pattern, line)[0]
                 if param_name in self.params:
                     indices_to_remove.append(line_i)
-            if re.match('^\s*(#|import|from)', line):
+            regex = r'^\s*(#|import|from)'
+            if re.match(regex, line):
                 indices_to_remove.append(line_i)
 
         for ir in sorted(indices_to_remove, reverse=True):
