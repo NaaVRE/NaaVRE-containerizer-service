@@ -19,6 +19,7 @@ def test_containerize():
     for cell_file in cells_files:
         cell_path = os.path.join(cells_json_path, cell_file)
         with open(cell_path) as f:
+            print('Testing containerize for cell: ' + cell_file)
             containerizer_payload = json.load(f)
         f.close()
         containerize_response = client.post(

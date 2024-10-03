@@ -13,7 +13,7 @@ from github.GithubException import UnknownObjectException
 
 from app.services.container_registries.container_registry import \
     ContainerRegistry
-from app.services.repositories.gitrepository import GitRepository
+from app.services.repositories.git_repository import GitRepository
 
 logger = logging.getLogger('uvicorn.error')
 

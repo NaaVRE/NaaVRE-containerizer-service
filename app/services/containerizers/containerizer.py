@@ -3,6 +3,7 @@ import os
 from abc import abstractmethod
 from pathlib import Path
 
+import autopep8
 import requests
 from jinja2 import Environment, PackageLoader
 
@@ -46,6 +47,8 @@ class Containerizer():
         if self.cell.title.lower().startswith('visualize-'):
             self.visualization_cell = True
         self.file_extension = ''
+        self.template_script = ''
+        self.template_conda_env = 'conda_env_template.jinja2'
 
     def check_has_type(self):
         all_vars = self.cell.params + self.cell.inputs + self.cell.outputs
@@ -60,8 +63,19 @@ class Containerizer():
         pass
 
     @abstractmethod
-    def build_cell(self):
-        pass
+    def build_script(self):
+        template_script = self.template_env.get_template(self.template_script)
+        deps = self.cell.generate_dependencies()
+        types = self.cell.types
+        conf = self.cell.generate_configuration_dict()
+        self.cell.container_source = autopep8.fix_code(template_script.render(cell=self.cell,
+                                               deps=deps,
+                                               types=types,
+                                               confs=conf))
+        return template_script.render(cell=self.cell,
+                                      deps=self.cell.generate_dependencies(),
+                                      types=self.cell.types,
+                                      confs=self.cell.generate_configuration_dict())
 
     @abstractmethod
     def extract_notebook(self):

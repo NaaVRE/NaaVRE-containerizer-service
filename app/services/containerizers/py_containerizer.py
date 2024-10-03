@@ -15,23 +15,11 @@ class PyContainerizer(Containerizer, ABC):
     def __init__(self, cell: Cell):
         super().__init__(cell)
         self.file_extension = '.py'
-
-    def build_cell(self):
         if self.visualization_cell:
-            template = 'vis_cell_template.jinja2'
+            self.template_script = 'vis_cell_template.jinja2'
         else:
-            template = 'py_cell_template.jinja2'
-        template_cell = self.template_env.get_template(template)
-        compiled_code = template_cell.render(cell=self.cell,
-                                             deps=self.cell.generate_dependencies(),
-                                             types=self.cell.types,
-                                             confs=self.cell.generate_configuration_dict())
-        compiled_code = autopep8.fix_code(compiled_code)
-        self.cell.container_source = compiled_code
-        return template_cell.render(cell=self.cell,
-                                    deps=self.cell.generate_dependencies(),
-                                    types=self.cell.types,
-                                    confs=self.cell.generate_configuration_dict())
+            self.template_script = 'R_cell_template.jinja2'
+
 
     def extract_notebook(self):
         return json.dumps(self.cell.notebook_dict, indent=4)

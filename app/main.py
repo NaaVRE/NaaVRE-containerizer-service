@@ -14,8 +14,8 @@ from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.julia_containerizer import JuliaContainerizer
 from app.services.containerizers.py_containerizer import PyContainerizer
 from app.services.containerizers.r_containerizer import RContainerizer
-from app.services.repositories.githubservice import (GithubService,
-                                                     get_content_hash)
+from app.services.repositories.github_service import (GithubService,
+                                                      get_content_hash)
 from app.utils.openid import OpenIDValidator
 
 security = HTTPBearer()
@@ -82,7 +82,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                  containerize_payload: ContainerizerPayload):
     conteinerizer = _get_containerizer(containerize_payload.cell)
     gh = _get_github_service()
-    cell_contents = conteinerizer.build_cell()
+    cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
                              path=containerize_payload.cell.task_name,
                              file_name="task" + conteinerizer.file_extension)

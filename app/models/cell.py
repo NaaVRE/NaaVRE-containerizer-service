@@ -24,7 +24,7 @@ class Cell(BaseModel):
     node_id: str | None = None
     container_source: str | None = None
     global_conf: Optional[dict] | None = None
-    kernel: Literal['python', 'IRKernel', 'ipython', 'c']
+    kernel: Literal['python', 'IRkernel', 'ipython', 'c']
     notebook_json: dict | None = None
     image_version: str | None = None
     types: Optional[dict] | None = None
@@ -37,6 +37,7 @@ class Cell(BaseModel):
         self.add_outputs(self.outputs)
         self.add_params(self.params)
         self.add_param_values(self.params)
+        self.secrets = self.secrets or []
         self.add_secrets(self.secrets)
         # self.all_inputs = list(self.inputs) + list(self.params)
         self.dependencies = list(sorted(self.dependencies, key=lambda x: x['name']))
