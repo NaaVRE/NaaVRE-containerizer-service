@@ -27,7 +27,7 @@ jobs:
       - id: choose-runner
         uses: QCDIS/choose-action-runner@v2
         with:
-          preferred-runner: naavre
+          preferred-runner: ${{ vars.PREFERRED_ACTIONS_RUNNER }}
           fallback-runner: ubuntu-latest
           github-token: ${{ secrets.RUNNER_ACCESS_TOKEN }}
 
