@@ -22,6 +22,7 @@ jobs:
           pip install --upgrade build
           pip install pytest
           pytest --collect-only -q | grep 'tests/' | jq -R . | jq -s . > test_list.json
+          cat test_list.json
 
       - name: Upload pytest output as artifact
         uses: actions/upload-artifact@v3
