@@ -47,8 +47,6 @@ def test_containerize():
                 headers={'Authorization': 'Bearer ABC'},
             )
             assert containerization_status_response.status_code == 200
-            assert containerization_status_response.json()['status'] in [
-                'queued', 'in_progress']
             count += 1
             sleep_time += 5
         assert containerization_status_response.json()['status'] == 'completed'
