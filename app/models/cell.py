@@ -147,8 +147,13 @@ class Cell(BaseModel):
 
     def generate_configuration_dict(self):
         resolves = []
+        assignment_symbol = '='
         for c in self.confs:
-            assignment = self.confs[c].split('=')[1].replace('=', '').strip()
+            if '=' in self.confs[c]:
+                assignment_symbol = '='
+            elif '<-' in self.confs[c]:
+                assignment_symbol = '<-'
+            assignment = self.confs[c].split(assignment_symbol)[1].replace(assignment_symbol, '').strip()
             conf = {c: assignment}
             resolves.append(conf)
         return resolves
