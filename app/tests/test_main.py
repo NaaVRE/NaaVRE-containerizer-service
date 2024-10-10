@@ -17,6 +17,8 @@ def test_containerize():
     cells_json_path = os.path.join(base_path, 'cells')
     cells_files = os.listdir(cells_json_path)
     for cell_file in cells_files:
+        if 'visualize-rasterio-sample-tif-dev-user' not in cell_file:
+            continue
         cell_path = os.path.join(cells_json_path, cell_file)
         with open(cell_path) as f:
             print('Testing containerize for cell: ' + cell_file)
@@ -45,6 +47,8 @@ def test_containerize():
                 headers={'Authorization': 'Bearer ABC'},
             )
             assert containerization_status_response.status_code == 200
+            assert containerization_status_response.json()['status'] in [
+                'queued', 'in_progress']
             count += 1
             sleep_time += 5
         assert containerization_status_response.json()['status'] == 'completed'

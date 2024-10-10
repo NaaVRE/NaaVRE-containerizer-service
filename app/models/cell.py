@@ -25,7 +25,7 @@ class Cell(BaseModel):
     container_source: str | None = None
     global_conf: Optional[dict] | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c']
-    notebook_json: dict | None = None
+    notebook_dict: dict | None = None
     image_version: str | None = None
     types: Optional[dict] | None = None
 
