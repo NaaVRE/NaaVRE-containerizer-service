@@ -40,6 +40,9 @@ jobs:
 
   call-collect-tests:
     uses: ./.github/workflows/collect-tests.yml
+    with:
+      base_image_tags_url: ${{ vars.BASE_IMAGE_TAGS_URL }}
+      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
 
   split-tests:
     needs: [call-collect-tests]
