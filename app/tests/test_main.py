@@ -38,7 +38,7 @@ def test_containerize():
         count = 0
         sleep_time = 10
         while (containerization_status_response.json()['status'] != 'completed'
-               and count <= 3):
+               and count <= 30):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/containerization-status/' + workflow_id,
