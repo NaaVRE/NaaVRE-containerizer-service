@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 from abc import abstractmethod
 from pathlib import Path
 
@@ -10,25 +11,14 @@ from jinja2 import Environment, PackageLoader
 from app.models.cell import Cell
 
 
-def load_module_name_mapping():
+def get_module_name_mapping():
     module_mapping_url = os.getenv('MODULE_MAPPING_URL',
                                    'https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json')
-    module_mapping = {}
-    if module_mapping_url:
-        resp = requests.get(module_mapping_url)
-        module_mapping = json.loads(resp.text)
-    module_name_mapping_path = os.path.join(
-        str(Path.home()), 'NaaVRE', 'module_name_mapping.json')
-    if not os.path.exists(module_name_mapping_path):
-        with open(module_name_mapping_path, 'w') as module_name_mapping_file:
-            json.dump(module_mapping, module_name_mapping_file, indent=4)
-        module_name_mapping_file.close()
+    try:
+        return requests.get(module_mapping_url).json()
+    except Exception as e:
+        raise ValueError('Failed to load module mapping from ' + module_mapping_url) from e
 
-    module_name_mapping_file = open(module_name_mapping_path)
-    loaded_module_name_mapping = json.load(module_name_mapping_file)
-    loaded_module_name_mapping.update(module_mapping)
-    module_name_mapping_file.close()
-    return loaded_module_name_mapping
 
 
 class Containerizer():
@@ -87,7 +77,7 @@ class Containerizer():
             self.template_conda_env)
         mapped_dependencies = self.map_dependencies(
             dependencies=self.cell.dependencies,
-            module_name_mapping=load_module_name_mapping())
+            module_name_mapping=get_module_name_mapping())
         return template_conda.render(base_image=self.cell.base_image,
                                      conda_deps=list(
                                          mapped_dependencies[
