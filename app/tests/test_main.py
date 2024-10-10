@@ -17,8 +17,6 @@ def test_containerize():
     cells_json_path = os.path.join(base_path, 'cells')
     cells_files = os.listdir(cells_json_path)
     for cell_file in cells_files:
-        if 'read-file-lines-r-dev-user-name-at-domain-com.json' not in cell_file:
-            continue
         cell_path = os.path.join(cells_json_path, cell_file)
         with open(cell_path) as f:
             print('Testing containerize for cell: ' + cell_file)
