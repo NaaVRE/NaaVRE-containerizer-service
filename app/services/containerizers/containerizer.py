@@ -49,6 +49,7 @@ class Containerizer():
         self.file_extension = ''
         self.template_script = ''
         self.template_conda_env = 'conda_env_template.jinja2'
+        self.dockerfile_template = 'dockerfile_template_conda.jinja2'
 
     def check_has_type(self):
         all_vars = self.cell.params + self.cell.inputs + self.cell.outputs
@@ -83,7 +84,7 @@ class Containerizer():
 
     def build_environment(self):
         template_conda = self.template_env.get_template(
-            'conda_env_template.jinja2')
+            self.template_conda_env)
         mapped_dependencies = self.map_dependencies(
             dependencies=self.cell.dependencies,
             module_name_mapping=load_module_name_mapping())
@@ -100,7 +101,7 @@ class Containerizer():
 
     def build_docker(self):
         template_dockerfile = self.template_env.get_template(
-            'dockerfile_template_conda.jinja2')
+            self.dockerfile_template)
         return template_dockerfile.render(task_name=self.cell.task_name,
                                           base_image=self.cell.base_image)
 
