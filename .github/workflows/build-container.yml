@@ -19,7 +19,6 @@ on:
       docker_password:
         required: true
 env:
-
   TAG:  ${{ inputs.tag }}
   DOCKERHUB_IMAGE_ID: "qcdis/"
 
