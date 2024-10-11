@@ -69,8 +69,9 @@ jobs:
     - name: Build docker
       uses: docker/build-push-action@v6
       with:
-        context: docker
+        context: .
         push: ${{ inputs.push }}
         tags: qcdis/${{ inputs.tag }}:${{ steps.check_and_truncate.outputs.version }},qcdis/${{ inputs.tag }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=min
+        file: docker/Dockerfile
