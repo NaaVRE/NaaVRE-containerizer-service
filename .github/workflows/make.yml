@@ -95,7 +95,7 @@ jobs:
     uses: ./.github/workflows/build-container.yml
     with:
       push: ${{ github.event_name == 'release' }}
-      docker_file: Dockerfile
+
       tag: naavre-containerizer-service
     secrets:
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}

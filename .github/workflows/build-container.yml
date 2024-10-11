@@ -6,9 +6,7 @@ on:
       runs-on:
         default: ubuntu-latest
         type: string
-      docker_file:
-        required: true
-        type: string
+
       tag:
         required: true
         type: string
@@ -21,7 +19,7 @@ on:
       docker_password:
         required: true
 env:
-  docker_file:  ${{ inputs.docker_file }}
+
   TAG:  ${{ inputs.tag }}
   DOCKERHUB_IMAGE_ID: "qcdis/"
 
@@ -71,7 +69,7 @@ jobs:
     - name: Build docker
       uses: docker/build-push-action@v6
       with:
-        context: docker/${{ inputs.docker_file }}
+        context: docker
         push: ${{ inputs.push }}
         tags: qcdis/${{ inputs.tag }}:${{ steps.check_and_truncate.outputs.version }},qcdis/${{ inputs.tag }}:latest
         cache-from: type=gha
