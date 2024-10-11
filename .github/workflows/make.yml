@@ -95,8 +95,14 @@ jobs:
     uses: ./.github/workflows/build-container.yml
     with:
       push: ${{ github.event_name == 'release' }}
-
       tag: naavre-containerizer-service
     secrets:
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  call-helm-chart-release:
+    needs: [call-build-container]
+    uses: ./.github/workflows/helm-chart-release.yml
+    with:
+      push: ${{ github.event_name == 'release' }}
+
