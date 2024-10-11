@@ -6,9 +6,6 @@ on:
       runs-on:
         default: ubuntu-latest
         type: string
-      tag:
-        required: true
-        type: string
       push:
         required: true
         type: boolean
