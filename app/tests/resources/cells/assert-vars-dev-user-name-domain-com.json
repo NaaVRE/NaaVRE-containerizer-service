@@ -11,8 +11,8 @@
         "hovered": {},
         "links": {},
         "nodes": {
-            "f6ede9d": {
-                "id": "f6ede9d",
+            "f6edge9d": {
+                "id": "f6edge9d",
                 "ports": {
                     "done": {
                         "id": "done",
@@ -30,7 +30,7 @@
                     "inputs": [
                         "done"
                     ],
-                    "og_node_id": "f6ede9d",
+                    "og_node_id": "f6edge9d",
                     "outputs": [],
                     "params": [
                         "param_string",
@@ -74,7 +74,7 @@
         "done"
     ],
     "kernel": "ipython",
-    "node_id": "f6ede9d",
+    "node_id": "f6edge9d",
     "notebook_dict": {
         "cells": [
             {

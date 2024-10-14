@@ -43,9 +43,9 @@ class Containerizer():
 
     def check_has_type(self):
         all_vars = self.cell.params + self.cell.inputs + self.cell.outputs
-        for parm_name in all_vars:
-            if parm_name not in self.cell.types:
-                raise ValueError(parm_name + ' has not type')
+        for param_name in all_vars:
+            if param_name not in self.cell.types:
+                raise ValueError(param_name + ' has not type')
         pass
 
     def check_has_base_image(self):
