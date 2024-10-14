@@ -19,8 +19,6 @@ def get_module_name_mapping():
     except Exception as e:
         raise ValueError('Failed to load module mapping from ' + module_mapping_url) from e
 
-
-
 class Containerizer():
 
     def __init__(self, cell: Cell):
