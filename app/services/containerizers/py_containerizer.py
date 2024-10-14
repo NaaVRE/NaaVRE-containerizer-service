@@ -3,7 +3,6 @@ import json
 import sys
 from abc import ABC
 
-import autopep8
 import distro
 
 from app.models.cell import Cell
@@ -20,7 +19,6 @@ class PyContainerizer(Containerizer, ABC):
         else:
             self.template_script = 'R_cell_template.jinja2'
 
-
     def extract_notebook(self):
         return json.dumps(self.cell.notebook_dict, indent=4)
 
@@ -33,4 +31,6 @@ class PyContainerizer(Containerizer, ABC):
         except ImportError:
             return False
         linux_os = distro.id()
-        return 'dist-packages' not in installation_path if linux_os == 'Ubuntu' else 'site-packages' not in installation_path
+        return 'dist-packages' not in installation_path \
+            if linux_os == 'Ubuntu' else ('site-packages' not in
+                                          installation_path)

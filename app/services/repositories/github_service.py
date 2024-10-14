@@ -99,7 +99,8 @@ class GithubService(GitRepository, ABC):
             headers={'Accept': 'application/vnd.github.v3+json',
                      'Authorization': 'token ' + self.token}
         )
-        if resp.status_code != 201 and resp.status_code != 200 and resp.status_code != 204:
+        if (resp.status_code != 201 and resp.status_code != 200 and
+                resp.status_code != 204):
             raise Exception('Error dispatching workflow: ' + resp.text)
         job = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc,
                            job_id=None)
@@ -121,8 +122,8 @@ class GithubService(GitRepository, ABC):
         and find the one matching {wf_id}
         """
         if job_id:
-            jobs_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/jobs/' + str(
-                job_id)
+            jobs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
+                        self.repository_name + '/actions/jobs/' + str(job_id))
             self.wait_for_github_api_resources()
             job = self.get_github_workflow_jobs(jobs_url)
             return job
@@ -146,7 +147,8 @@ class GithubService(GitRepository, ABC):
         while rate_limit.core.remaining <= 0:
             reset = rate_limit.core.reset
             # Calculate remaining time for reset
-            remaining_time = reset.timestamp() - datetime.datetime.now().timestamp()
+            remaining_time = (reset.timestamp() - datetime.datetime.now().
+                              timestamp())
             logger.debug(f'Remaining time for reset: {remaining_time} s')
             logger.debug('API rate exceeded, waiting')
             logger.debug(f'Sleeping for: {remaining_time + 1}')
@@ -154,7 +156,8 @@ class GithubService(GitRepository, ABC):
             rate_limit = self.github.get_rate_limit()
 
     def get_github_workflow_runs(self, t_utc=None):
-        workflow_runs_url = GITHUB_API_REPOS + '/' + self.owner + '/' + self.repository_name + '/actions/runs'
+        workflow_runs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
+                             self.repository_name + '/actions/runs')
         if t_utc:
             t_start = (t_utc - datetime.timedelta(minutes=1)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")

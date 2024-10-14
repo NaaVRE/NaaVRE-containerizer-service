@@ -1,7 +1,5 @@
 from abc import ABC
 
-import autopep8
-
 from app.models.cell import Cell
 from app.services.containerizers.containerizer import Containerizer
 

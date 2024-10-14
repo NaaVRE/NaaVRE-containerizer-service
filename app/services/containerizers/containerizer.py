@@ -1,8 +1,5 @@
-import json
 import os
-import tempfile
 from abc import abstractmethod
-from pathlib import Path
 
 import autopep8
 import requests
@@ -13,11 +10,14 @@ from app.models.cell import Cell
 
 def get_module_name_mapping():
     module_mapping_url = os.getenv('MODULE_MAPPING_URL',
-                                   'https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json')
+                                   'https://raw.githubusercontent.com/QCDIS'
+                                   '/NaaVRE-conf/main/module_mapping.json')
     try:
         return requests.get(module_mapping_url).json()
     except Exception as e:
-        raise ValueError('Failed to load module mapping from ' + module_mapping_url) from e
+        raise ValueError('Failed to load module mapping from ' +
+                         module_mapping_url) from e
+
 
 class Containerizer():
 
@@ -57,14 +57,16 @@ class Containerizer():
         deps = self.cell.generate_dependencies()
         types = self.cell.types
         conf = self.cell.generate_configuration_dict()
-        self.cell.container_source = autopep8.fix_code(template_script.render(cell=self.cell,
-                                               deps=deps,
-                                               types=types,
-                                               confs=conf))
+        self.cell.container_source = autopep8.fix_code(
+            template_script.render(cell=self.cell,
+                                   deps=deps,
+                                   types=types,
+                                   confs=conf))
         return template_script.render(cell=self.cell,
                                       deps=self.cell.generate_dependencies(),
                                       types=self.cell.types,
-                                      confs=self.cell.generate_configuration_dict())
+                                      confs=self.cell.
+                                      generate_configuration_dict())
 
     @abstractmethod
     def extract_notebook(self):
@@ -100,7 +102,8 @@ class Containerizer():
             module_name = dep.get('module', dep.get('name'))
             if not module_name:
                 continue
-            module_name = module_name.split('.')[0] if '.' in module_name else module_name
+            module_name = module_name.split('.')[
+                0] if '.' in module_name else module_name
             if module_name in module_name_mapping['conda']:
                 conda_deps.add(module_name_mapping['conda'][module_name])
             elif module_name in module_name_mapping['pip']:

@@ -19,21 +19,22 @@ class ContainerRegistry:
     def query_registry_for_image(self, image_name):
         if 'docker' in self.registry_url:
             # Docker Hub
-            url = f'https://hub.docker.com/v2/repositories/{self.owner}/{image_name}'
+            url = (f'https://hub.docker.com/v2/repositories/{self.owner}/'
+                   f'{image_name}')
             headers = {}
         else:
             # OCI registries
             domain = self.registry_url.split('/')[0]
             path = '/'.join(self.registry_url.split('/')[1:])
             url = f'https://{domain}/v2/{path}/{image_name}/tags/list'
-            # OCI registries require authentication, even for public registries.
+            # OCI registries require authentication, even for public registries
             # The token should be set in the $OCI_TOKEN environment variable.
-            # For ghcr.io, connections still succeed when $OCI_TOKEN is unset (this
-            # results in header "Authorization: Bearer None", which grants access
-            # to public registries, although it is not officially documented). If
-            # this fails, or when accessing private registries, OCI_TOKEN should be
-            # a base64-encoded GitHub classic access token with the read:packages
-            # scope.
+            # For ghcr.io, connections still succeed when $OCI_TOKEN is unset
+            # (this results in header "Authorization: Bearer None", which
+            # grants access to public registries, although it is not officially
+            # documented). If this fails, or when accessing private registries,
+            # OCI_TOKEN should be a base64-encoded GitHub classic access token
+            # with the read:packages scope.
             headers = {
                 "Authorization": f"Bearer {os.getenv('OCI_TOKEN')}",
             }

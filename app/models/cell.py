@@ -8,6 +8,7 @@ from slugify import slugify
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 class Cell(BaseModel):
     title: str | None = None
     task_name: str | None = None
@@ -40,7 +41,8 @@ class Cell(BaseModel):
         self.secrets = self.secrets or []
         self.add_secrets(self.secrets)
         # self.all_inputs = list(self.inputs) + list(self.params)
-        self.dependencies = list(sorted(self.dependencies, key=lambda x: x['name']))
+        self.dependencies = list(
+            sorted(self.dependencies, key=lambda x: x['name']))
 
     def _extract_types(self, vars_dict):
         """ Extract types to self.types and return list of var names
@@ -99,7 +101,8 @@ class Cell(BaseModel):
         self.original_source = ""
         for line_i in range(0, len(lines)):
             line = lines[line_i]
-            # Do not remove line that startswith param_ if not in the self.params
+            # Do not remove line that startswith param_ if not in the
+            # self.params
             if line.startswith('param_'):
                 # clean param name
                 pattern = r"\b(param_\w+)\b"
@@ -120,6 +123,7 @@ class Cell(BaseModel):
 
     def clean_title(self):
         self.title = slugify(self.title)
+
     #
     # def integrate_configuration(self):
     #     lines = self.original_source.splitlines()
@@ -153,7 +157,8 @@ class Cell(BaseModel):
                 assignment_symbol = '='
             elif '<-' in self.confs[c]:
                 assignment_symbol = '<-'
-            assignment = self.confs[c].split(assignment_symbol)[1].replace(assignment_symbol, '').strip()
+            assignment = self.confs[c].split(assignment_symbol)[1].replace(
+                assignment_symbol, '').strip()
             conf = {c: assignment}
             resolves.append(conf)
         return resolves
