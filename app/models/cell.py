@@ -13,7 +13,7 @@ class Cell(BaseModel):
     title: str | None = None
     task_name: str | None = None
     original_source: str | None = None
-    base_image: dict
+    base_image: dict | None = None
     inputs: Optional[list] | None = None
     outputs: Optional[list] | None = None
     params: Optional[list] | None = None
@@ -29,6 +29,7 @@ class Cell(BaseModel):
     notebook_dict: dict | None = None
     image_version: str | None = None
     types: Optional[dict] | None = None
+    all_inputs: Optional[list] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)

@@ -9,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic_settings import BaseSettings
 
 from app.models.containerizer_payload import ContainerizerPayload
+from app.models.extractor_payload import ExtractorPayload
 from app.services.base_image_tags import BaseImageTags
 from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.julia_containerizer import JuliaContainerizer
@@ -75,6 +76,13 @@ def _get_github_service():
     if token is None:
         raise ValueError("CELL_GITHUB environment variable is not set")
     return GithubService(repository_url=repository_url, token=token)
+
+
+@app.post("/extract_cell")
+def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
+                 extractor_payload: ExtractorPayload):
+    print(extractor_payload)
+    return {'Hi'}
 
 
 @app.post("/containerize")
