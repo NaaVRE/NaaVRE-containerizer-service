@@ -104,5 +104,7 @@ jobs:
     needs: [call-build-container]
     uses: ./.github/workflows/helm-chart-release.yml
     with:
+      oci_repo: ghcr.io/qcdis/charts
+      version: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       push: ${{ github.event_name == 'release' }}
 
