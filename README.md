@@ -10,6 +10,13 @@ virtualenv venv
 pip install -r requirements.txt
 ```
 
+For the rpy2 dependency, you need to install 'python3.11-dev':
+
+```shell
+sudo apt-get install python3.11-dev 
+```
+
+
 Run the dev server
 
 ```shell
