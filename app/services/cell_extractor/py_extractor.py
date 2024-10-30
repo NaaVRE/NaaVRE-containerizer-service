@@ -7,7 +7,7 @@ from pyflakes import reporter as pyflakes_reporter, api as pyflakes_api
 from pytype import config as pytype_config
 from pytype.tools.annotate_ast import annotate_ast
 
-from app.models.extractor_payload import ExtractorPayload
+from app.models.notebook_data import NotebookData
 from app.services.cell_extractor.extractor import Extractor
 from app.services.cell_extractor.py_conf_assignment_transformer import \
     PyConfAssignmentTransformer
@@ -21,8 +21,7 @@ class PyExtractor(Extractor):
     global_secrets: dict
     undefined: dict
 
-    def __init__(self, extractor_payload: ExtractorPayload):
-        notebook_data = self.extractor_payload.data
+    def __init__(self, notebook_data: NotebookData):
         notebook = notebook_data.notebook
 
         # If cell_type is code and not starting with '!'
@@ -42,7 +41,7 @@ class PyExtractor(Extractor):
         for source in self.sources:
             self.undefined.update(self.__extract_cell_undefined(source))
 
-        super().__init__(extractor_payload)
+        super().__init__(notebook_data)
 
     def __extract_imports(self, sources):
         imports = {}
@@ -122,12 +121,12 @@ class PyExtractor(Extractor):
         return extracted_vars
 
     def infer_cell_outputs(self):
-        cell_names = self.__extract_cell_names(self.cell_source)
+        cell_names = self.__extract_cell_names(self.source)
         return {
             name: properties
             for name, properties in cell_names.items()
             if all([
-                name not in self.__extract_cell_undefined(self.cell_source),
+                name not in self.__extract_cell_undefined(self.source),
                 name not in self.imports,
                 name in self.undefined,
                 name not in self.configurations,
@@ -137,7 +136,7 @@ class PyExtractor(Extractor):
         }
 
     def infer_cell_inputs(self):
-        cell_undefined = self.__extract_cell_undefined(self.cell_source)
+        cell_undefined = self.__extract_cell_undefined(self.source)
         return {
             und: properties
             for und, properties in cell_undefined.items()
@@ -151,7 +150,7 @@ class PyExtractor(Extractor):
 
     def infer_cell_dependencies(self, confs):
         dependencies = []
-        names = self.__extract_cell_names(self.cell_source)
+        names = self.__extract_cell_names(self.source)
 
         for ck in confs:
             names.update(self.__extract_cell_names(confs[ck]))
@@ -282,7 +281,7 @@ class PyExtractor(Extractor):
 
     def extract_cell_conf_ref(self):
         confs = {}
-        cell_unds = self.__extract_cell_undefined(self.cell_source)
+        cell_unds = self.__extract_cell_undefined(self.source)
         conf_unds = [und for und in cell_unds if und in self.configurations]
         for u in conf_unds:
             if u not in confs:

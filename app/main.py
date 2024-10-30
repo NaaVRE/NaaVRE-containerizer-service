@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings
 
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
+from app.models.notebook_data import NotebookData
 from app.services.base_image_tags import BaseImageTags
 from app.services.cell_extractor.extractor import DummyExtractor
 from app.services.cell_extractor.py_extractor import PyExtractor
@@ -83,27 +84,27 @@ def _get_github_service():
     return GithubService(repository_url=repository_url, token=token)
 
 
-def _get_extractor(extractor_payload):
+def _get_extractor(notebook_data: NotebookData):
     extractor = None
-    notebook_data = extractor_payload.data
     notebook = notebook_data.notebook
     cell_index = notebook_data.cell_index
     kernel = notebook_data.kernel
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
-        extractor = DummyExtractor(extractor_payload)
+        extractor = DummyExtractor(notebook_data)
     elif 'python' in kernel.lower():
-        extractor = PyHeaderExtractor(extractor_payload)
+        extractor = PyHeaderExtractor(notebook_data)
     elif 'r' in kernel.lower():
-        extractor = RHeaderExtractor(extractor_payload)
+        extractor = RHeaderExtractor(notebook_data)
 
     if not extractor.is_complete():
         if kernel.lower() == 'irkernel':
-            code_extractor = RExtractor(extractor_payload)
+            code_extractor = RExtractor(notebook_data)
         elif kernel == 'ipython' or kernel == 'python':
-            code_extractor = PyExtractor(extractor_payload)
+            code_extractor = PyExtractor(notebook_data)
         else:
-            raise ValueError("Unsupported kernel")
+            raise HTTPException(status_code=400,
+                                detail="Unsupported kernel: " + kernel)
         extractor.add_missing_values(code_extractor)
     return extractor
 
@@ -111,7 +112,8 @@ def _get_extractor(extractor_payload):
 @app.post("/extract_cell")
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
-    extractor = _get_extractor(extractor_payload)
+    extractor = _get_extractor(extractor_payload.data)
+    extractor.set_user_name(access_token['preferred_username'])
     cell = extractor.extract_cell()
     return cell
 

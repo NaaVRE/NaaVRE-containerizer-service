@@ -5,7 +5,7 @@ import autopep8
 import requests
 from jinja2 import Environment, PackageLoader
 
-from app.models.cell import Cell
+from app.models.workflow_cell import Cell
 
 
 def get_module_name_mapping():

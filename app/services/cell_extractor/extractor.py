@@ -1,55 +1,71 @@
 import abc
 import copy
+import json
 
-from app.models.extractor_payload import ExtractorPayload
+from slugify import slugify
+
+from app.models.notebook_data import NotebookData
 
 
 class Extractor(abc.ABC):
-    # ins: dict
-    # outs: dict
-    # params: dict
-    # secrets: dict
-    # confs: list
-    # dependencies: list
+    ins: dict
+    outs: dict
+    params: dict
+    secrets: dict
+    confs: list
+    dependencies: list
 
-    # def __init__(self, notebook, cell_source):
-    #     self.notebook = notebook
-    #     self.cell_source = cell_source
-    #
-    #     self.ins = self.infer_cell_inputs()
-    #     self.outs = self.infer_cell_outputs()
-    #     self.params = self.extract_cell_params(cell_source)
-    #     self.secrets = self.extract_cell_secrets(cell_source)
-    #     self.confs = self.extract_cell_conf_ref()
-    #     self.dependencies = self.infer_cell_dependencies(self.confs)
+    def __init__(self, notebook_data: NotebookData):
+        self.user_name = None
+        self.notebook_data = notebook_data
+        self.notebook = notebook_data.notebook
+        cells = self.notebook.cells
+        self.cell_index = self.notebook_data.cell_index
+        self.source = cells[self.cell_index].source
+        self.kernel = self.notebook_data.kernel
 
-    def __init__(self, extractor_payload: ExtractorPayload):
-        self.extractor_payload = extractor_payload
+        self.ins = self.infer_cell_inputs()
+        self.outs = self.infer_cell_outputs()
+        self.params = self.extract_cell_params(self.source)
+        self.secrets = self.extract_cell_secrets(self.source)
+        self.confs = self.extract_cell_conf_ref()
+        self.dependencies = self.infer_cell_dependencies(self.confs)
+
+        self.params = self.extract_cell_params(self.source)
+        self.secrets = self.extract_cell_secrets(self.source)
+        self.confs = self.extract_cell_conf_ref()
+        self.dependencies = self.infer_cell_dependencies(self.confs)
+
+    def set_user_name(self, user_name: str):
+        self.user_name = user_name
 
     def extract_cell(self):
-        notebook_data = self.extractor_payload.data
-        notebook = notebook_data.notebook
-        cells = notebook.cells
-        cell_index = notebook_data.cell_index
-        kernel = notebook_data.kernel
-        source = cells[cell_index].source
-
-        print(kernel)
-        print(source)
-
-        # extracted_nb = self._extract_cell_by_index(notebook, cell_index)
-        # if kernel.lower() == "irkernel":
+        # extracted_nb = self._extract_cell_by_index(self.notebook,
+        #                                                     self.cell_index)
+        # if self.kernel.lower() == "irkernel":
         #     extracted_nb = self._set_notebook_kernel(extracted_nb, 'R')
-        # else:
+        # elif self.kernel.lower() == "ipython" or self.kernel.lower()
+        #                                                          == "python":
         #     extracted_nb = self._set_notebook_kernel(extracted_nb, 'python3')
-        #
-        # # initialize variables
-        # title = source.partition('\n')[0].strip()
-        # title = slugify(title) if title and title[0] == "#" else "Untitled"
-        #
-        # if 'JUPYTERHUB_USER' in os.environ:
-        #     title += '-' + slugify(os.environ['JUPYTERHUB_USER'])
+        # else:
+        #     raise ValueError("Unsupported kernel")
 
+        # initialize variables
+        title = self.source.partition('\n')[0].strip()
+        title = slugify(title) if title and title[0] == "#" else "Untitled"
+        title += '-' + slugify(self.user_name)
+
+        # If any of these change, we create a new cell in the catalog.
+        # This matches the cell properties saved in workflows.
+        cell_identity_dict = {
+            'title': title,
+            'params': self.params,
+            'secrets': self.secrets,
+            'inputs': self.ins,
+            'outputs': self.outs,
+        }
+        cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
+        print(cell_identity_str)
         return {}
 
     @abc.abstractmethod
@@ -82,13 +98,15 @@ class Extractor(abc.ABC):
             new_nb.cells = [notebook.cells[cell_index]]
             return new_nb
 
+    # Not sure why we need this method
     def _set_notebook_kernel(self, notebook, kernel):
-        new_nb = copy.deepcopy(notebook)
-        # Replace kernel name in the notebook metadata
-        new_nb.metadata.kernelspec.name = kernel
-        new_nb.metadata.kernelspec.display_name = kernel
-        new_nb.metadata.kernelspec.language = kernel
-        return new_nb
+        # new_nb = copy.deepcopy(notebook)
+        # # Replace kernel name in the notebook metadata
+        # new_nb.metadata.kernelspec.name = kernel
+        # new_nb.metadata.kernelspec.display_name = kernel
+        # new_nb.metadata.kernelspec.language = kernel
+        # return new_nb
+        return notebook
 
 
 class DummyExtractor(Extractor):

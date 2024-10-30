@@ -2,14 +2,14 @@ import logging
 
 from pydantic import BaseModel
 
-from app.models.j_cell import JCell
+from app.models.notebook_cell import NotebookCell
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
 class Notebook(BaseModel):
-    cells: list[JCell]
+    cells: list[NotebookCell]
     metadata: dict
     nbformat: int
     nbformat_minor: int

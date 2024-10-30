@@ -7,7 +7,7 @@ from typing import Literal, Union
 import jsonschema
 import yaml
 
-from app.models.extractor_payload import ExtractorPayload
+from app.models.notebook_data import NotebookData
 from app.services.cell_extractor.extractor import Extractor
 
 
@@ -52,7 +52,7 @@ class HeaderExtractor(Extractor):
     confs: Union[list, None]
     dependencies: Union[list, None]
 
-    def __init__(self, extractor_payload: ExtractorPayload):
+    def __init__(self, notebook_data: NotebookData):
         self.re_yaml_doc_in_comment = re.compile(
             (r"^(?:.*\n)*"
              r"\s*#\s*---\s*\n"
@@ -60,7 +60,6 @@ class HeaderExtractor(Extractor):
              r"\s*#\s*\.\.\.\s*\n"
              ),
             re.MULTILINE)
-        notebook_data = self.extractor_payload.data
         notebook = notebook_data.notebook
         cell_index = notebook_data.cell_index
         cell_source = notebook.cells[cell_index].source
@@ -70,7 +69,7 @@ class HeaderExtractor(Extractor):
         self._external_extract_cell_params = None
         self._external_extract_cell_secrets = None
 
-        super().__init__(extractor_payload)
+        super().__init__(notebook_data)
 
     @staticmethod
     def _load_schema():

@@ -5,7 +5,7 @@ from abc import ABC
 
 import distro
 
-from app.models.cell import Cell
+from app.models.workflow_cell import Cell
 from app.services.containerizers.containerizer import Containerizer
 
 

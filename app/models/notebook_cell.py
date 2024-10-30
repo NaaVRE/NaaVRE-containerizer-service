@@ -1,5 +1,5 @@
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -7,13 +7,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class JCell(BaseModel):
+class NotebookCell(BaseModel):
     cell_type: Literal['code', 'markdown', 'raw']
     execution_count: int | None = None
     id: str
     metadata: dict | None = None
-    outputs: Optional[list] | None = None
-    source: str | None = None
-
-    def __init__(self, **data):
-        super().__init__(**data)
+    outputs: list | None = None
+    source: str

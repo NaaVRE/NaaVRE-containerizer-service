@@ -20,30 +20,37 @@ class Cell(BaseModel):
     param_values: Optional[dict] | None = None
     secrets: Optional[list] | None = None
     confs: Optional[dict] | None = None
-    dependencies: Optional[list] | None = None
+    dependencies: Optional[list[dict]] | None = None
     chart_obj: dict | None = None
     node_id: str | None = None
     container_source: str | None = None
     global_conf: Optional[dict] | None = None
-    kernel: Literal['python', 'IRkernel', 'ipython', 'c']
+    kernel: Literal['python', 'IRkernel', 'ipython', 'c'] | None = None
     notebook_dict: dict | None = None
     image_version: str | None = None
     types: Optional[dict] | None = None
-    all_inputs: Optional[list] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.title = slugify(self.title.strip())
-        self.task_name = slugify(self.task_name)
-        self.add_inputs(self.inputs)
-        self.add_outputs(self.outputs)
-        self.add_params(self.params)
-        self.add_param_values(self.params)
-        self.secrets = self.secrets or []
-        self.add_secrets(self.secrets)
-        # self.all_inputs = list(self.inputs) + list(self.params)
-        self.dependencies = list(
-            sorted(self.dependencies, key=lambda x: x['name']))
+        if self.title:
+            self.title = slugify(self.title.strip())
+        if self.task_name:
+            self.task_name = slugify(self.task_name)
+        if self.inputs:
+            self.add_inputs(self.inputs)
+        if self.outputs:
+            self.add_outputs(self.outputs)
+        if self.params:
+            self.add_params(self.params)
+            self.add_param_values(self.params)
+        if self.secrets:
+            self.secrets = self.secrets or []
+            self.add_secrets(self.secrets)
+            # self.all_inputs = list(self.inputs) + list(self.params)
+            # Check if list is not empty and has at least non-empty dict
+        if self.dependencies and any(self.dependencies):
+            self.dependencies = list(
+                sorted(self.dependencies, key=lambda x: x['name']))
 
     def _extract_types(self, vars_dict):
         """ Extract types to self.types and return list of var names
