@@ -2,18 +2,16 @@
 
 ## Running locally
 
-Install dependencies:
+Create conda environment:
 
 ```shell
-virtualenv venv
-. venv/bin/activate
-pip install -r requirements.txt
+conda env create -f environment.yaml
 ```
 
-For the rpy2 dependency, you need to install 'python3.11-dev':
+Activate the environment:
 
 ```shell
-sudo apt-get install python3.11-dev 
+conda activate naavre-containerizer-service
 ```
 
 

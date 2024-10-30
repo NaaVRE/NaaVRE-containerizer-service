@@ -36,7 +36,7 @@ class OpenIDValidator:
 
     def validate(self, access_token):
         if os.getenv('DISABLE_AUTH', 'false').lower() == 'true':
-            return {'sub': 'tests'}
+            return self.validate_fake_token(access_token)
         url = self.openid_conf['jwks_uri']
         jwks_client = jwt.PyJWKClient(url, ssl_context=self.ssl_context)
 
@@ -46,6 +46,26 @@ class OpenIDValidator:
             data = jwt.decode(
                 access_token,
                 signing_key.key,
+                algorithms=[token_header['alg']],
+                audience="account",
+                options={"verify_exp": True},
+            )
+        except jwt.exceptions.InvalidTokenError as e:
+            logger.debug(msg="Authentication failed", exc_info=e)
+            raise
+        return data
+
+    def validate_fake_token(self, access_token):
+        """ Validate fake token for testing purpose
+
+        This expects a jwt token using the HMAC+SHA (HS) algorithm and the
+        secret 'fake-secret'
+        """
+        token_header = jwt.get_unverified_header(access_token)
+        try:
+            data = jwt.decode(
+                access_token,
+                'fake-secret',
                 algorithms=[token_header['alg']],
                 audience="account",
                 options={"verify_exp": True},

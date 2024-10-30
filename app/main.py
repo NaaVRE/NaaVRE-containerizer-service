@@ -11,6 +11,11 @@ from pydantic_settings import BaseSettings
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
 from app.services.base_image_tags import BaseImageTags
+from app.services.cell_extractor.extractor import DummyExtractor
+from app.services.cell_extractor.py_extractor import PyExtractor
+from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
+from app.services.cell_extractor.r_extractor import RExtractor
+from app.services.cell_extractor.r_header_extractor import RHeaderExtractor
 from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.julia_containerizer import JuliaContainerizer
 from app.services.containerizers.py_containerizer import PyContainerizer
@@ -78,11 +83,37 @@ def _get_github_service():
     return GithubService(repository_url=repository_url, token=token)
 
 
+def _get_extractor(extractor_payload):
+    extractor = None
+    notebook_data = extractor_payload.data
+    notebook = notebook_data.notebook
+    cell_index = notebook_data.cell_index
+    kernel = notebook_data.kernel
+    if notebook.cells[cell_index].cell_type != 'code':
+        # dummy extractor for non-code cells (e.g. markdown)
+        extractor = DummyExtractor(extractor_payload)
+    elif 'python' in kernel.lower():
+        extractor = PyHeaderExtractor(extractor_payload)
+    elif 'r' in kernel.lower():
+        extractor = RHeaderExtractor(extractor_payload)
+
+    if not extractor.is_complete():
+        if kernel.lower() == 'irkernel':
+            code_extractor = RExtractor(extractor_payload)
+        elif kernel == 'ipython' or kernel == 'python':
+            code_extractor = PyExtractor(extractor_payload)
+        else:
+            raise ValueError("Unsupported kernel")
+        extractor.add_missing_values(code_extractor)
+    return extractor
+
+
 @app.post("/extract_cell")
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
-    print(extractor_payload)
-    return {'Hi'}
+    extractor = _get_extractor(extractor_payload)
+    cell = extractor.extract_cell()
+    return cell
 
 
 @app.post("/containerize")

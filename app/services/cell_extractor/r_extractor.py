@@ -5,6 +5,7 @@ import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
 from rpy2.robjects.packages import importr
 
+from app.models.extractor_payload import ExtractorPayload
 from app.services.cell_extractor.extractor import Extractor
 from app.services.cell_extractor.parseR.Visitors import ExtractNames, \
     ExtractDefined, ExtractUndefined, ExtractConfigs, ExtractPrefixedVar
@@ -110,9 +111,13 @@ class RExtractor(Extractor):
     global_secrets: dict
     undefined: dict
 
-    def __init__(self, notebook, cell_source):
-        self.sources = [nbcell.source for nbcell in notebook.cells if
-                        nbcell.cell_type == 'code' and len(nbcell.source) > 0]
+    def __init__(self, extractor_payload: ExtractorPayload):
+        notebook_data = self.extractor_payload.data
+        notebook = notebook_data.notebook
+
+        self.sources = [nb_cell.source for nb_cell in notebook.cells if
+                        nb_cell.cell_type == 'code' and len(
+                            nb_cell.source) > 0]
         self.notebook_names = self.__extract_cell_names(
             '\n'.join(self.sources)
         )
@@ -126,7 +131,7 @@ class RExtractor(Extractor):
         for source in self.sources:
             self.undefined.update(self.__extract_cell_undefined(source))
 
-        super().__init__(notebook, cell_source)
+        super().__init__(extractor_payload)
 
     def __extract_imports(self, sources):
         imports = {}

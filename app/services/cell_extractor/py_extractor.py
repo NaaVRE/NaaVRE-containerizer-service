@@ -7,31 +7,10 @@ from pyflakes import reporter as pyflakes_reporter, api as pyflakes_api
 from pytype import config as pytype_config
 from pytype.tools.annotate_ast import annotate_ast
 
+from app.models.extractor_payload import ExtractorPayload
 from app.services.cell_extractor.extractor import Extractor
-
-
-class PyConfAssignmentTransformer(ast.NodeTransformer):
-
-    def __init__(self, configurations):
-        # get the 'value' side of configuration assignments
-        self.conf_values = {
-            k: ast.parse(v).body[0].value
-            for k, v in configurations.items()
-        }
-
-    def visit_Assign(self, node):
-        # visit the 'value' side of assignments (*<node.targets> = node.value)
-        node.value = self.generic_visit(node.value)
-        return node
-
-    def visit_Name(self, node):
-        # replace variable names starting with 'conf_' by their value
-        if not node.id.startswith('conf_'):
-            return node
-        if node.id not in self.conf_values:
-            raise ValueError(f'{node.id} is not defined')
-        # Recursively call self.visit() to replace names in dropped-in values
-        return self.visit(self.conf_values[node.id])
+from app.services.cell_extractor.py_conf_assignment_transformer import \
+    PyConfAssignmentTransformer
 
 
 class PyExtractor(Extractor):
@@ -42,11 +21,14 @@ class PyExtractor(Extractor):
     global_secrets: dict
     undefined: dict
 
-    def __init__(self, notebook, cell_source):
+    def __init__(self, extractor_payload: ExtractorPayload):
+        notebook_data = self.extractor_payload.data
+        notebook = notebook_data.notebook
+
         # If cell_type is code and not starting with '!'
-        self.sources = [nbcell.source for nbcell in notebook.cells if
-                        nbcell.cell_type == 'code' and len(
-                            nbcell.source) > 0 and nbcell.source[0] != '!']
+        self.sources = [nb_cell.source for nb_cell in notebook.cells if
+                        nb_cell.cell_type == 'code' and len(
+                            nb_cell.source) > 0 and nb_cell.source[0] != '!']
         self.notebook_names = self.__extract_cell_names(
             '\n'.join(self.sources),
             infer_types=True,
@@ -60,7 +42,7 @@ class PyExtractor(Extractor):
         for source in self.sources:
             self.undefined.update(self.__extract_cell_undefined(source))
 
-        super().__init__(notebook, cell_source)
+        super().__init__(extractor_payload)
 
     def __extract_imports(self, sources):
         imports = {}
