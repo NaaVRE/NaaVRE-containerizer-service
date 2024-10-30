@@ -61,7 +61,7 @@ jobs:
       - name: Set up Python 3.11 and install dependencies from requirements.txt
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: '3.11-dev'
 
       - name: Install dependencies
         run: |
