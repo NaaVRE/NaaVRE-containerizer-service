@@ -91,19 +91,19 @@ class Extractor(abc.ABC):
         return cell
 
     @abc.abstractmethod
-    def infer_cell_inputs(self):
+    def get_cell_inputs(self):
         pass
 
     @abc.abstractmethod
-    def infer_cell_outputs(self):
+    def get_cell_outputs(self):
         pass
 
     @abc.abstractmethod
-    def extract_cell_params(self):
+    def get_cell_params(self):
         pass
 
     @abc.abstractmethod
-    def extract_cell_secrets(self):
+    def get_cell_secrets(self):
         pass
 
     @abc.abstractmethod
@@ -111,14 +111,10 @@ class Extractor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def infer_cell_dependencies(self):
+    def get_cell_dependencies(self):
         pass
 
-    # @abc.abstractmethod
-    # def __extract_variables(self, cell_source: str, infer_types=False):
-    #     pass
-
-    def _extract_cell_by_index(self, notebook, cell_index):
+    def _get_cell_by_index(self, notebook, cell_index):
         new_nb = copy.deepcopy(notebook)
         if cell_index < len(notebook.cells):
             new_nb.cells = [notebook.cells[cell_index]]
@@ -136,20 +132,20 @@ class Extractor(abc.ABC):
 
 
 class DummyExtractor(Extractor):
-    def infer_cell_inputs(self):
+    def get_cell_inputs(self):
         return {}
 
-    def infer_cell_outputs(self):
+    def get_cell_outputs(self):
         return {}
 
-    def extract_cell_params(self):
+    def get_cell_params(self):
         return {}
 
-    def extract_cell_secrets(self):
+    def get_cell_secrets(self):
         return {}
 
     def extract_cell_conf_ref(self):
         return []
 
-    def infer_cell_dependencies(self):
+    def get_cell_dependencies(self):
         return []

@@ -1,5 +1,4 @@
 import ast
-import logging
 import re
 from functools import lru_cache
 
@@ -37,14 +36,15 @@ class PyExtractor(Extractor):
         self.configurations = self.__extract_prefixed_var('conf')
         self.global_params = self.__extract_prefixed_var('param')
         self.global_secrets = self.__extract_prefixed_var('secret')
-        for source in self.sources:
-            self.undefined.append(self.__extract_cell_undefined(source))
-        self.inputs = self.infer_cell_inputs()
-        self.outputs = self.infer_cell_outputs()
-        self.params = self.extract_cell_params()
-        self.secrets = self.extract_cell_secrets()
+        # self.undefined = []
+        # for source in self.sources:
+        #     self.undefined.append(self.__extract_cell_undefined(source))
+        self.inputs = self.get_cell_inputs()
+        self.outputs = self.get_cell_outputs()
+        self.params = self.get_cell_params()
+        self.secrets = self.get_cell_secrets()
         self.confs = self.extract_cell_conf_ref()
-        self.dependencies = self.infer_cell_dependencies()
+        self.dependencies = self.get_cell_dependencies()
 
     def __extract_prefixed_var(self, prefix):
         extracted_vars = []
@@ -54,92 +54,53 @@ class PyExtractor(Extractor):
                     self.visitor.variable_info[variable_name])
         return extracted_vars
 
-    def infer_cell_outputs(self):
-        cell_names = self.__parse_code(self.source)
+    def is_var_name_in(self, var_name, dict_set):
+        for frozen_dict in dict_set:
+            dictionary = dict(frozen_dict)
+            if var_name in dictionary:
+                return True
+        return False
+
+    def get_cell_outputs(self):
         outputs = []
-        for var_name, properties in cell_names.items():
-            if (var_name not in self.imports and
-                    var_name not in self.undefined and
-                    var_name not in self.configurations and
-                    var_name not in self.global_params and
-                    var_name not in self.global_secrets):
-                outputs.append(properties)
+        cell_undefined = self.__extract_cell_undefined(self.source)
+        for var_name, properties in self.visitor.variable_info.items():
+            if var_name not in cell_undefined and \
+                    not self.is_var_name_in(var_name, self.imports) and \
+                    not self.is_var_name_in(var_name,
+                                            self.configurations) and \
+                    not self.is_var_name_in(var_name, self.global_params) and \
+                    not self.is_var_name_in(var_name, self.global_secrets):
+                outputs.append({'name': var_name,
+                                'value': properties['value'],
+                                'type': properties['type']})
         return outputs
 
-    def infer_cell_inputs(self):
+    def get_cell_inputs(self):
         cell_undefined = self.__extract_cell_undefined(self.source)
         inputs = []
         for var_name, properties in cell_undefined.items():
-            if (var_name not in self.imports and
-                    var_name not in self.configurations and
-                    var_name not in self.global_params and
-                    var_name not in self.global_secrets):
-                inputs.append(properties)
+            if (not self.is_var_name_in(var_name, self.imports) and
+                    not self.is_var_name_in(var_name, self.configurations) and
+                    not self.is_var_name_in(var_name, self.global_params) and
+                    not self.is_var_name_in(var_name, self.global_secrets)):
+                inputs.append({'name': var_name,
+                               'value': properties['value'],
+                               'type': properties['type']})
         return inputs
 
-    def infer_cell_dependencies(self):
+    def get_cell_dependencies(self):
         dependencies = []
-        names = self.__parse_code(self.source)
-
-        for ck in self.confs:
-            names.update(self.__parse_code(self.confs[ck]))
-
-        for name in names:
-            if name in self.imports:
-                dependencies.append(self.imports.get(name))
-
         return dependencies
 
     def infer_cell_conf_dependencies(self, confs):
-        dependencies = []
-        for ck in confs:
-            for name in self.__parse_code(confs[ck]):
-                if name in self.imports:
-                    dependencies.append(self.imports.get(name))
-
-        return dependencies
+        pass
 
     @staticmethod
     @lru_cache
     def __get_annotated_ast(cell_source):
         return annotate_ast.annotate_source(
             cell_source, ast, pytype_config.Options.create())
-
-    def __convert_type_annotation(self, type_annotation):
-        """ Convert type annotation to the ones supported for cell interfaces
-
-        :param type_annotation: type annotation obtained by e.g. pytype
-        :return: converted type: 'int', 'float', 'str', 'list', or None
-        """
-        if type_annotation is None:
-            return None
-
-        patterns = {
-            'int': [
-                re.compile(r'^int$'),
-            ],
-            'float': [
-                re.compile(r'^float$'),
-            ],
-            'str': [
-                re.compile(r'^str$'),
-            ],
-            'list': [
-                re.compile(r'^List\['),
-            ],
-            None: [
-                re.compile(r'^Any$'),
-                re.compile(r'^Dict'),
-                re.compile(r'^Callable'),
-            ]
-        }
-        for type_name, regs in patterns.items():
-            for reg in regs:
-                if reg.match(type_annotation):
-                    return type_name
-
-        logging.getLogger(__name__).debug(f'Unmatched type: {type_annotation}')
-        return None
 
     def __parse_code(self, source_code, infer_types=False):
         if infer_types:
@@ -162,17 +123,14 @@ class PyExtractor(Extractor):
                               "\n{}".format('\t' + '\t'.join(rep._stderr())))
         p = r"'(.+?)'"
         out = rep._stdout()
-        undef_vars = dict()
+        undef_vars = {}
         for line in filter(lambda a: a != '\n' and 'undefined name' in a, out):
             var_search = re.search(p, line)
             var_name = var_search.group(1)
-            undef_vars[var_name] = {
-                'name': var_name,
-                'type': self.visitor.variable_info[var_name]['type']
-            }
+            undef_vars[var_name] = (self.get_variable_info(var_name))
         return undef_vars
 
-    def extract_cell_params(self):
+    def get_cell_params(self):
         params = []
         cell_unds = self.__extract_cell_undefined(self.source)
         param_unds = [und for und in cell_unds if und in self.global_params]
@@ -181,7 +139,7 @@ class PyExtractor(Extractor):
                 params[u] = self.global_params[u]
         return params
 
-    def extract_cell_secrets(self):
+    def get_cell_secrets(self):
         secrets = []
         cell_unds = self.__extract_cell_undefined(self.source)
         secret_unds = [und for und in cell_unds if und in self.global_secrets]
@@ -207,6 +165,11 @@ class PyExtractor(Extractor):
         }
         configurations.update(resolved_configurations)
         return configurations
+
+    def get_variable_info(self, var_name):
+        for var in self.visitor.variable_info:
+            if var == var_name:
+                return self.visitor.variable_info[var]
 
 
 class StreamList:

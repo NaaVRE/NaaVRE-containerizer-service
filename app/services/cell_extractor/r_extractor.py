@@ -221,7 +221,7 @@ class RExtractor(Extractor):
 
         return extracted_vars
 
-    def infer_cell_outputs(self):
+    def get_cell_outputs(self):
         cell_names = self.__extract_variables(self.source)
         cell_undef = self.__extract_cell_undefined(self.source)
         return {
@@ -237,7 +237,7 @@ class RExtractor(Extractor):
             ])
         }
 
-    def infer_cell_inputs(self):
+    def get_cell_inputs(self):
         cell_undefined = self.__extract_cell_undefined(self.source)
         return {
             und: properties
@@ -250,7 +250,7 @@ class RExtractor(Extractor):
             )
         }
 
-    def infer_cell_dependencies(self, confs):
+    def get_cell_dependencies(self, confs):
         # we probably like to only use dependencies that are necessary to
         # execute the cell
         # however this is challenging in R as functions are non-scoped
@@ -293,7 +293,7 @@ class RExtractor(Extractor):
 
         return undef_vars
 
-    def extract_cell_params(self, cell_source):
+    def get_cell_params(self, cell_source):
         params = {}
         cell_unds = self.__extract_cell_undefined(cell_source)
         param_unds = [und for und in cell_unds if und in self.global_params]
@@ -302,7 +302,7 @@ class RExtractor(Extractor):
                 params[u] = self.global_params[u]
         return params
 
-    def extract_cell_secrets(self, cell_source):
+    def get_cell_secrets(self, cell_source):
         secrets = {}
         cell_unds = self.__extract_cell_undefined(cell_source)
         secret_unds = [und for und in cell_unds if und in self.global_secrets]
