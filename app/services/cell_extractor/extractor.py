@@ -1,10 +1,13 @@
 import abc
 import copy
+import hashlib
 import json
 
 from slugify import slugify
 
 from app.models.notebook_data import NotebookData
+from app.models.workflow_cell import Cell
+from app.services.converter.converter import ConverterReactFlowChart
 
 
 class Extractor(abc.ABC):
@@ -65,8 +68,43 @@ class Extractor(abc.ABC):
             'outputs': self.outs,
         }
         cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
-        print(cell_identity_str)
-        return {}
+        node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
+        # Create cell from dict
+        cell = Cell(title=title,
+                    task_name=slugify(title.lower()),
+                    original_source=self.source,
+                    inputs=self.ins,
+                    outputs=self.outs,
+                    params=self.params,
+                    secrets=self.secrets,
+                    confs=self.confs,
+                    dependencies=self.dependencies,
+                    container_source="",
+                    kernel=self.kernel,
+                    node_id=node_id
+                    )
+        node = ConverterReactFlowChart.get_node(
+            node_id,
+            title,
+            set(self.ins),
+            set(self.outs),
+            self.params,
+            self.secrets,
+        )
+        chart = {
+            'offset': {
+                'x': 0,
+                'y': 0,
+            },
+            'scale': 1,
+            'nodes': {node_id: node},
+            'links': {},
+            'selected': {},
+            'hovered': {},
+        }
+
+        cell.chart_obj = chart
+        return cell
 
     @abc.abstractmethod
     def infer_cell_inputs(self):
