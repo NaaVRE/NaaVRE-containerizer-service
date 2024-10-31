@@ -13,6 +13,11 @@ class NotebookData(BaseModel):
     kernel: str
     notebook: Notebook
     save: bool
+    user_name: str | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    def set_user_name(self, user_name: str):
+        self.user_name = user_name
+        return self

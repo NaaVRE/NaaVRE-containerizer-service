@@ -117,7 +117,7 @@ class RExtractor(Extractor):
         self.sources = [nb_cell.source for nb_cell in notebook.cells if
                         nb_cell.cell_type == 'code' and len(
                             nb_cell.source) > 0]
-        self.notebook_names = self.__extract_cell_names(
+        self.notebook_names = self.__extract_variables(
             '\n'.join(self.sources)
         )
 
@@ -222,7 +222,7 @@ class RExtractor(Extractor):
         return extracted_vars
 
     def infer_cell_outputs(self):
-        cell_names = self.__extract_cell_names(self.source)
+        cell_names = self.__extract_variables(self.source)
         cell_undef = self.__extract_cell_undefined(self.source)
         return {
             name: properties
@@ -262,13 +262,13 @@ class RExtractor(Extractor):
     def infer_cell_conf_dependencies(self, confs):
         dependencies = []
         for ck in confs:
-            for name in self.__extract_cell_names(confs[ck]):
+            for name in self.__extract_variables(confs[ck]):
                 if name in self.imports:
                     dependencies.append(self.imports.get(name))
 
         return dependencies
 
-    def __extract_cell_names(self, cell_source):
+    def __extract_variables(self, cell_source, infer_types=True):
         tree = parse_text(cell_source)
         visitor = ExtractNames()
         vars_r = visitor.visit(tree)

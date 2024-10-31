@@ -45,14 +45,15 @@ class HeaderExtractor(Extractor):
     The document is validated with the schema `cell_header.schema.json`
 
     """
-    ins: Union[dict, None]
-    outs: Union[dict, None]
+    inputs: Union[dict, None]
+    outputs: Union[dict, None]
     params: Union[dict, None]
     secrets: Union[dict, None]
-    confs: Union[list, None]
+    confs: Union[dict, None]
     dependencies: Union[list, None]
 
     def __init__(self, notebook_data: NotebookData):
+        super().__init__(notebook_data)
         self.re_yaml_doc_in_comment = re.compile(
             (r"^(?:.*\n)*"
              r"\s*#\s*---\s*\n"
@@ -60,16 +61,16 @@ class HeaderExtractor(Extractor):
              r"\s*#\s*\.\.\.\s*\n"
              ),
             re.MULTILINE)
-        notebook = notebook_data.notebook
-        cell_index = notebook_data.cell_index
-        cell_source = notebook.cells[cell_index].source
-
         self.schema = self._load_schema()
-        self.cell_header = self._extract_header(cell_source)
+        self.cell_header = self._extract_header(self.source)
         self._external_extract_cell_params = None
         self._external_extract_cell_secrets = None
-
-        super().__init__(notebook_data)
+        self.inputs = self.infer_cell_inputs()
+        self.outputs = self.infer_cell_outputs()
+        self.params = self.extract_cell_params(self.source)
+        self.secrets = self.extract_cell_secrets(self.source)
+        self.confs = self.extract_cell_conf_ref()
+        self.dependencies = self.infer_cell_dependencies()
 
     @staticmethod
     def _load_schema():
@@ -85,8 +86,8 @@ class HeaderExtractor(Extractor):
 
     def is_complete(self):
         return (
-                (self.ins is not None)
-                and (self.outs is not None)
+                (self.inputs is not None)
+                and (self.outputs is not None)
                 and (self.params is not None)
                 and (self.secrets is not None)
                 and (self.confs is not None)
@@ -118,10 +119,10 @@ class HeaderExtractor(Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
-        if self.ins is None:
-            self.ins = extractor.ins
-        if self.outs is None:
-            self.outs = extractor.outs
+        if self.inputs is None:
+            self.inputs = extractor.inputs
+        if self.outputs is None:
+            self.outputs = extractor.outputs
         if self.params is None:
             self.params = extractor.params
             # We store a reference to extractor.extract_cell_params because
@@ -137,6 +138,9 @@ class HeaderExtractor(Extractor):
             self.confs = extractor.confs
         if self.dependencies is None:
             self.dependencies = extractor.dependencies
+
+    def __extract_variables(self, cell_source: str, infer_types=False):
+        pass
 
     @staticmethod
     def _parse_interface_vars_items(
@@ -258,7 +262,7 @@ class HeaderExtractor(Extractor):
             return None
         return {k: v['assignation'] for it in items for k, v in it.items()}
 
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self):
         if self.cell_header is None:
             return None
         items = self.cell_header['NaaVRE']['cell'].get('dependencies')

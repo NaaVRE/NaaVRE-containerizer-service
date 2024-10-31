@@ -6,7 +6,13 @@ from colorhash import ColorHash
 class ConverterReactFlowChart:
 
     @staticmethod
-    def get_node(node_id, title, ins, outs, params, secrets):
+    def get_node(node_id: str,
+                 title: str,
+                 inputs: list,
+                 outputs: list,
+                 params: list,
+                 secrets: list
+                 ):
         node = {}
         position = {}
         ports = {}
@@ -17,37 +23,41 @@ class ConverterReactFlowChart:
         node['position'] = position
         properties = {'title': title,
                       'vars': [],
-                      'params': list(params),
-                      'secrets': list(secrets),
-                      'inputs': list(ins),
-                      'outputs': list(outs),
+                      'params': params,
+                      'secrets': secrets,
+                      'inputs': inputs,
+                      'outputs': outputs,
                       'og_node_id': node_id}
         node['properties'] = properties
 
-        for i in ins:
-            ports[i] = {}
-            ports[i]['properties'] = {}
-            ports[i]['id'] = i
-            ports[i]['type'] = 'left'
-            ports[i]['properties']['color'] = ColorHash(i).hex
+        for cell_input in inputs:
+            input_name = cell_input['name']
+            ports[input_name] = {}
+            ports[input_name]['properties'] = {}
+            ports[input_name]['id'] = input_name
+            ports[input_name]['type'] = 'left'
+            ports[input_name]['properties']['color'] = (
+                ColorHash(cell_input).hex)
             properties['vars'].append({
-                'name': i,
+                'name': input_name,
                 'direction': 'input',
                 'type': 'datatype',
-                'color': ports[i]['properties']['color']
+                'color': ports[input_name]['properties']['color']
             })
 
-        for o in outs:
-            ports[o] = {}
-            ports[o]['properties'] = {}
-            ports[o]['id'] = o
-            ports[o]['type'] = 'right'
-            ports[o]['properties']['color'] = ColorHash(o).hex
+        for cell_outputs in outputs:
+            output_name = cell_outputs['name']
+            ports[output_name] = {}
+            ports[output_name]['properties'] = {}
+            ports[output_name]['id'] = output_name
+            ports[output_name]['type'] = 'right'
+            ports[output_name]['properties']['color'] = (
+                ColorHash(output_name).hex)
             properties['vars'].append({
-                'name': o,
+                'name': output_name,
                 'direction': 'output',
                 'type': 'datatype',
-                'color': ports[o]['properties']['color']
+                'color': ports[output_name]['properties']['color']
             })
 
         node['ports'] = ports
@@ -57,11 +67,11 @@ class ConverterReactFlowChart:
 class ConverterReactFlow:
 
     @staticmethod
-    def get_input_nodes(ins):
+    def get_input_nodes(inputs):
         nodes = []
         idx = 0
 
-        for i in ins:
+        for i in inputs:
             i_node = {'data': {}, 'position': {}, 'id': i, 'type': 'input'}
             i_node['data']['label'] = i
             i_node['position']['x'] = 10 + idx * 200
@@ -72,11 +82,11 @@ class ConverterReactFlow:
         return nodes
 
     @staticmethod
-    def get_output_nodes(outs):
+    def get_output_nodes(outputs):
         nodes = []
         idx = 0
 
-        for o in outs:
+        for o in outputs:
             o_node = {'data': {}, 'position': {}, 'id': o, 'type': 'output'}
             o_node['data']['label'] = o
             o_node['position']['x'] = 10 + idx * 200
@@ -96,17 +106,25 @@ class ConverterReactFlow:
         return d_node
 
     @staticmethod
-    def get_edges(d_node_id, ins, outs):
+    def get_edges(d_node_id, inputs, outputs):
         edges = []
 
-        for i in ins:
-            i_edge = {'id': "%s-%s" % (i, d_node_id), 'source': i,
-                      'target': d_node_id, 'animated': True}
+        for cell_input in inputs:
+            input_name = cell_input['name']
+            i_edge = {'id': "%s-%s" % (input_name, d_node_id),
+                      'source': input_name,
+                      'target': d_node_id,
+                      'animated': True
+                      }
             edges.append(i_edge)
 
-        for o in outs:
-            o_edge = {'id': "%s-%s" % (d_node_id, o), 'source': d_node_id,
-                      'target': o, 'animated': True}
+        for cell_output in outputs:
+            output_name = cell_output['name']
+            o_edge = {'id': "%s-%s" % (d_node_id, output_name),
+                      'source': d_node_id,
+                      'target': output_name,
+                      'animated': True
+                      }
             edges.append(o_edge)
 
         return edges
@@ -115,7 +133,7 @@ class ConverterReactFlow:
 class ConverterFlume:
 
     @staticmethod
-    def get_ports(ins, outs):
+    def get_ports(inputs, outputs):
         colors = [
             'yellow',
             'orange',
@@ -130,13 +148,16 @@ class ConverterFlume:
         ports = set()
         ports_types = []
 
-        ports.update(ins)
-        ports.update(outs)
+        ports.update(inputs)
+        ports.update(outputs)
 
         color_i = 0
         for port in ports:
-            p_type = {'type': port, 'name': port, 'label': port,
-                      'color': (colors[color_i],)}
+            p_type = {'type': port,
+                      'name': port,
+                      'label': port,
+                      'color': (colors[color_i],)
+                      }
             color_i = (color_i + 1) % len(colors)
 
             ports_types.append(p_type)
@@ -144,7 +165,7 @@ class ConverterFlume:
         return ports_types
 
     @staticmethod
-    def get_node(source, ports, ins, outs):
+    def get_node(source, ports, inputs, outputs):
         title = source.partition('\n')[0]
         short_uuid = str(uuid.uuid4())[:7]
 
@@ -153,8 +174,8 @@ class ConverterFlume:
                   "Untitled %s" % short_uuid,
                   'description': short_uuid}
 
-        ports_in = [p for p in ports if p['name'] in ins]
-        ports_out = [p for p in ports if p['name'] in outs]
+        ports_in = [p for p in ports if p['name'] in inputs]
+        ports_out = [p for p in ports if p['name'] in outputs]
 
         n_type['inputs'] = ports_in
         n_type['outputs'] = ports_out

@@ -7,153 +7,82 @@ from pyflakes import reporter as pyflakes_reporter, api as pyflakes_api
 from pytype import config as pytype_config
 from pytype.tools.annotate_ast import annotate_ast
 
-from app.models.notebook_data import NotebookData
-from app.services.cell_extractor.extractor import Extractor
-from app.services.cell_extractor.py_conf_assignment_transformer import \
-    PyConfAssignmentTransformer
+from .extractor import Extractor
+from .py_conf_assignment_transformer import PyConfAssignmentTransformer
+from .py_visitors.visitor import Visitor
+from ...models.notebook_data import NotebookData
 
 
 class PyExtractor(Extractor):
     sources: list
-    imports: dict
-    configurations: dict
-    global_params: dict
-    global_secrets: dict
-    undefined: dict
+    imports: list
+    configurations: list
+    global_params: list
+    global_secrets: list
+    undefined: list
 
     def __init__(self, notebook_data: NotebookData):
+        super().__init__(notebook_data)
         notebook = notebook_data.notebook
-
         # If cell_type is code and not starting with '!'
-        self.sources = [nb_cell.source for nb_cell in notebook.cells if
-                        nb_cell.cell_type == 'code' and len(
-                            nb_cell.source) > 0 and nb_cell.source[0] != '!']
-        self.notebook_names = self.__extract_cell_names(
+        self.sources = [nbcell.source for nbcell in notebook.cells
+                        if nbcell.cell_type == 'code' and
+                        len(nbcell.source) > 0 and
+                        nbcell.source[0] != '!']
+        self.visitor = self.__parse_code(
             '\n'.join(self.sources),
             infer_types=True,
         )
-        self.imports = self.__extract_imports(self.sources)
-        self.configurations = self.__extract_configurations(self.sources)
-        self.global_params = self.__extract_prefixed_var(self.sources, 'param')
-        self.global_secrets = self.__extract_prefixed_var(self.sources,
-                                                          'secret')
-        self.undefined = dict()
+        self.imports = self.visitor.imports
+        self.configurations = self.__extract_prefixed_var('conf')
+        self.global_params = self.__extract_prefixed_var('param')
+        self.global_secrets = self.__extract_prefixed_var('secret')
         for source in self.sources:
-            self.undefined.update(self.__extract_cell_undefined(source))
+            self.undefined.append(self.__extract_cell_undefined(source))
+        self.inputs = self.infer_cell_inputs()
+        self.outputs = self.infer_cell_outputs()
+        self.params = self.extract_cell_params()
+        self.secrets = self.extract_cell_secrets()
+        self.confs = self.extract_cell_conf_ref()
+        self.dependencies = self.infer_cell_dependencies()
 
-        super().__init__(notebook_data)
-
-    def __extract_imports(self, sources):
-        imports = {}
-        for s in sources:
-            tree = ast.parse(s)
-            for node in ast.walk(tree):
-                if isinstance(node, (ast.Import, ast.ImportFrom,)):
-                    for n in node.names:
-                        key = n.asname if n.asname else n.name
-                        if key not in imports:
-                            module = ""
-                            if isinstance(node, ast.ImportFrom):
-                                module = node.module
-                            imports[key] = {
-                                'name': n.name,
-                                'asname': n.asname or None,
-                                'module': module
-                            }
-        return imports
-
-    def __extract_configurations(self, sources):
-        configurations = {}
-        for s in sources:
-            lines = s.splitlines()
-            tree = ast.parse(s)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Assign):
-                    target = node.targets[0]
-                    if hasattr(target, 'id'):
-                        name = node.targets[0].id
-                        prefix = name.split('_')[0]
-                        if prefix == 'conf' and name not in configurations:
-                            conf_line = ''
-                            for line in lines[node.lineno - 1:node.end_lineno]:
-                                conf_line += line.strip()
-                            configurations[name] = conf_line
-        return self.__resolve_configurations(configurations)
-
-    def __extract_prefixed_var(self, sources, prefix):
-        extracted_vars = dict()
-        for s in sources:
-            lines = s.splitlines()
-            tree = ast.parse(s)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Assign) and hasattr(node.targets[0],
-                                                            'id'):
-                    name = node.targets[0].id
-                    node_prefix = name.split('_')[0]
-                    if node_prefix == prefix:
-                        var_line = ''
-                        for line in lines[node.lineno - 1:node.end_lineno]:
-                            var_line += line.strip()
-                        var_value = ast.unparse(node.value)
-                        try:
-                            # remove quotes around strings
-                            var_value = str(ast.literal_eval(var_value))
-                            # Cast according to
-                            # self.notebook_names[name]['type']
-                            if self.notebook_names[name]['type'] == 'int':
-                                var_value = int(var_value)
-                            elif self.notebook_names[name]['type'] == 'float':
-                                var_value = float(var_value)
-                            elif self.notebook_names[name]['type'] == 'list':
-                                var_value = list(ast.literal_eval(var_value))
-                            elif self.notebook_names[name]['type'] == 'str':
-                                var_value = str(var_value)
-                        except ValueError:
-                            # when var_value can't safely be parsed,
-                            pass
-                        extracted_vars[name] = {
-                            'name': name,
-                            'type': self.notebook_names[name]['type'],
-                            'value': var_value,
-                        }
-                        if prefix == 'secret':
-                            del extracted_vars[name]['value']
+    def __extract_prefixed_var(self, prefix):
+        extracted_vars = []
+        for variable_name in self.visitor.variable_info:
+            if variable_name.startswith(prefix + '_'):
+                extracted_vars.append(
+                    self.visitor.variable_info[variable_name])
         return extracted_vars
 
     def infer_cell_outputs(self):
-        cell_names = self.__extract_cell_names(self.source)
-        return {
-            name: properties
-            for name, properties in cell_names.items()
-            if all([
-                name not in self.__extract_cell_undefined(self.source),
-                name not in self.imports,
-                name in self.undefined,
-                name not in self.configurations,
-                name not in self.global_params,
-                name not in self.global_secrets
-            ])
-        }
+        cell_names = self.__parse_code(self.source)
+        outputs = []
+        for var_name, properties in cell_names.items():
+            if (var_name not in self.imports and
+                    var_name not in self.undefined and
+                    var_name not in self.configurations and
+                    var_name not in self.global_params and
+                    var_name not in self.global_secrets):
+                outputs.append(properties)
+        return outputs
 
     def infer_cell_inputs(self):
         cell_undefined = self.__extract_cell_undefined(self.source)
-        return {
-            und: properties
-            for und, properties in cell_undefined.items()
-            if all([
-                und not in self.imports,
-                und not in self.configurations,
-                und not in self.global_params,
-                und not in self.global_secrets
-            ])
-        }
+        inputs = []
+        for var_name, properties in cell_undefined.items():
+            if (var_name not in self.imports and
+                    var_name not in self.configurations and
+                    var_name not in self.global_params and
+                    var_name not in self.global_secrets):
+                inputs.append(properties)
+        return inputs
 
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self):
         dependencies = []
-        names = self.__extract_cell_names(self.source)
+        names = self.__parse_code(self.source)
 
-        for ck in confs:
-            names.update(self.__extract_cell_names(confs[ck]))
+        for ck in self.confs:
+            names.update(self.__parse_code(self.confs[ck]))
 
         for name in names:
             if name in self.imports:
@@ -164,7 +93,7 @@ class PyExtractor(Extractor):
     def infer_cell_conf_dependencies(self, confs):
         dependencies = []
         for ck in confs:
-            for name in self.__extract_cell_names(confs[ck]):
+            for name in self.__parse_code(confs[ck]):
                 if name in self.imports:
                     dependencies.append(self.imports.get(name))
 
@@ -212,29 +141,14 @@ class PyExtractor(Extractor):
         logging.getLogger(__name__).debug(f'Unmatched type: {type_annotation}')
         return None
 
-    def __extract_cell_names(self, cell_source, infer_types=False):
-        names = dict()
+    def __parse_code(self, source_code, infer_types=False):
         if infer_types:
-            tree = self.__get_annotated_ast(cell_source)
+            tree = self.__get_annotated_ast(source_code)
         else:
-            tree = ast.parse(cell_source)
-        for module in ast.walk(tree):
-            if isinstance(module, (ast.Name,)):
-                var_name = module.id
-                if infer_types:
-                    try:
-                        var_type = self.__convert_type_annotation(
-                            module.resolved_annotation)
-                    except AttributeError:
-                        print('__extract_cell_names failed', var_name)
-                        var_type = None
-                else:
-                    var_type = self.notebook_names[var_name]['type']
-                names[module.id] = {
-                    'name': var_name,
-                    'type': var_type,
-                }
-        return names
+            tree = ast.parse(source_code)
+        visitor = Visitor()
+        visitor.visit(tree)
+        return visitor
 
     def __extract_cell_undefined(self, cell_source):
         flakes_stdout = StreamList()
@@ -243,36 +157,33 @@ class PyExtractor(Extractor):
             flakes_stdout.reset(),
             flakes_stderr.reset())
         pyflakes_api.check(cell_source, filename="temp", reporter=rep)
-
         if rep._stderr():
             raise SyntaxError("Flakes reported the following error:"
                               "\n{}".format('\t' + '\t'.join(rep._stderr())))
         p = r"'(.+?)'"
-
         out = rep._stdout()
         undef_vars = dict()
-
         for line in filter(lambda a: a != '\n' and 'undefined name' in a, out):
             var_search = re.search(p, line)
             var_name = var_search.group(1)
             undef_vars[var_name] = {
                 'name': var_name,
-                'type': self.notebook_names[var_name]['type'],
+                'type': self.visitor.variable_info[var_name]['type']
             }
         return undef_vars
 
-    def extract_cell_params(self, cell_source):
-        params = {}
-        cell_unds = self.__extract_cell_undefined(cell_source)
+    def extract_cell_params(self):
+        params = []
+        cell_unds = self.__extract_cell_undefined(self.source)
         param_unds = [und for und in cell_unds if und in self.global_params]
         for u in param_unds:
             if u not in params:
                 params[u] = self.global_params[u]
         return params
 
-    def extract_cell_secrets(self, cell_source):
-        secrets = {}
-        cell_unds = self.__extract_cell_undefined(cell_source)
+    def extract_cell_secrets(self):
+        secrets = []
+        cell_unds = self.__extract_cell_undefined(self.source)
         secret_unds = [und for und in cell_unds if und in self.global_secrets]
         for u in secret_unds:
             if u not in secrets:
@@ -286,7 +197,7 @@ class PyExtractor(Extractor):
         for u in conf_unds:
             if u not in confs:
                 confs[u] = self.configurations[u]
-        return confs
+        return []
 
     def __resolve_configurations(self, configurations):
         assignment_transformer = PyConfAssignmentTransformer(configurations)

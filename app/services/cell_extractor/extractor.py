@@ -11,36 +11,20 @@ from app.services.converter.converter import ConverterReactFlowChart
 
 
 class Extractor(abc.ABC):
-    ins: dict
-    outs: dict
-    params: dict
-    secrets: dict
+    inputs: list
+    outputs: list
+    params: list
+    secrets: list
     confs: list
     dependencies: list
 
     def __init__(self, notebook_data: NotebookData):
-        self.user_name = None
         self.notebook_data = notebook_data
         self.notebook = notebook_data.notebook
-        cells = self.notebook.cells
+        notebook_cells = self.notebook.cells
         self.cell_index = self.notebook_data.cell_index
-        self.source = cells[self.cell_index].source
+        self.source = notebook_cells[self.cell_index].source
         self.kernel = self.notebook_data.kernel
-
-        self.ins = self.infer_cell_inputs()
-        self.outs = self.infer_cell_outputs()
-        self.params = self.extract_cell_params(self.source)
-        self.secrets = self.extract_cell_secrets(self.source)
-        self.confs = self.extract_cell_conf_ref()
-        self.dependencies = self.infer_cell_dependencies(self.confs)
-
-        self.params = self.extract_cell_params(self.source)
-        self.secrets = self.extract_cell_secrets(self.source)
-        self.confs = self.extract_cell_conf_ref()
-        self.dependencies = self.infer_cell_dependencies(self.confs)
-
-    def set_user_name(self, user_name: str):
-        self.user_name = user_name
 
     def extract_cell(self):
         # extracted_nb = self._extract_cell_by_index(self.notebook,
@@ -56,7 +40,7 @@ class Extractor(abc.ABC):
         # initialize variables
         title = self.source.partition('\n')[0].strip()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
-        title += '-' + slugify(self.user_name)
+        title += '-' + slugify(self.notebook_data.user_name)
 
         # If any of these change, we create a new cell in the catalog.
         # This matches the cell properties saved in workflows.
@@ -64,8 +48,8 @@ class Extractor(abc.ABC):
             'title': title,
             'params': self.params,
             'secrets': self.secrets,
-            'inputs': self.ins,
-            'outputs': self.outs,
+            'inputs': self.inputs,
+            'outputs': self.outputs,
         }
         cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
         node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
@@ -73,8 +57,8 @@ class Extractor(abc.ABC):
         cell = Cell(title=title,
                     task_name=slugify(title.lower()),
                     original_source=self.source,
-                    inputs=self.ins,
-                    outputs=self.outs,
+                    inputs=self.inputs,
+                    outputs=self.outputs,
                     params=self.params,
                     secrets=self.secrets,
                     confs=self.confs,
@@ -86,8 +70,8 @@ class Extractor(abc.ABC):
         node = ConverterReactFlowChart.get_node(
             node_id,
             title,
-            set(self.ins),
-            set(self.outs),
+            self.inputs,
+            self.outputs,
             self.params,
             self.secrets,
         )
@@ -115,11 +99,11 @@ class Extractor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def extract_cell_params(self, source):
+    def extract_cell_params(self):
         pass
 
     @abc.abstractmethod
-    def extract_cell_secrets(self, source):
+    def extract_cell_secrets(self):
         pass
 
     @abc.abstractmethod
@@ -127,8 +111,12 @@ class Extractor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self):
         pass
+
+    # @abc.abstractmethod
+    # def __extract_variables(self, cell_source: str, infer_types=False):
+    #     pass
 
     def _extract_cell_by_index(self, notebook, cell_index):
         new_nb = copy.deepcopy(notebook)
@@ -154,14 +142,14 @@ class DummyExtractor(Extractor):
     def infer_cell_outputs(self):
         return {}
 
-    def extract_cell_params(self, source):
+    def extract_cell_params(self):
         return {}
 
-    def extract_cell_secrets(self, source):
+    def extract_cell_secrets(self):
         return {}
 
     def extract_cell_conf_ref(self):
         return []
 
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self):
         return []

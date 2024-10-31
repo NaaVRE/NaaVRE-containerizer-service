@@ -96,7 +96,6 @@ def _get_extractor(notebook_data: NotebookData):
         extractor = PyHeaderExtractor(notebook_data)
     elif 'r' in kernel.lower():
         extractor = RHeaderExtractor(notebook_data)
-
     if not extractor.is_complete():
         if kernel.lower() == 'irkernel':
             code_extractor = RExtractor(notebook_data)
@@ -112,8 +111,8 @@ def _get_extractor(notebook_data: NotebookData):
 @app.post("/extract_cell")
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
+    extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload.data)
-    extractor.set_user_name(access_token['preferred_username'])
     cell = extractor.extract_cell()
     return cell
 

@@ -47,7 +47,7 @@ class Containerizer():
         pass
 
     def check_has_base_image(self):
-        if self.cell.base_image is None:
+        if self.cell.base_container_image is None:
             raise ValueError('base_image is not set')
         pass
 
@@ -78,7 +78,7 @@ class Containerizer():
         mapped_dependencies = self.map_dependencies(
             dependencies=self.cell.dependencies,
             module_name_mapping=get_module_name_mapping())
-        return template_conda.render(base_image=self.cell.base_image,
+        return template_conda.render(base_image=self.cell.base_container_image,
                                      conda_deps=list(
                                          mapped_dependencies[
                                              'conda_dependencies']),
@@ -92,8 +92,9 @@ class Containerizer():
     def build_docker(self):
         template_dockerfile = self.template_env.get_template(
             self.dockerfile_template)
-        return template_dockerfile.render(task_name=self.cell.task_name,
-                                          base_image=self.cell.base_image)
+        return template_dockerfile.render(
+                task_name=self.cell.task_name,
+                base_image=self.cell.base_container_image)
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         conda_deps = set()

@@ -1,5 +1,4 @@
 import logging
-import re
 from typing import Literal, Optional
 
 from pydantic import BaseModel
@@ -11,22 +10,18 @@ logger.setLevel(logging.DEBUG)
 
 class Cell(BaseModel):
     title: str | None = None
-    task_name: str | None = None
-    original_source: str | None = None
-    base_image: dict | None = None
-    inputs: Optional[list] | None = None
-    outputs: Optional[list] | None = None
-    params: Optional[list] | None = None
-    param_values: Optional[dict] | None = None
-    secrets: Optional[list] | None = None
-    confs: Optional[dict] | None = None
+    # original_source: str | None = None
+    base_container_image: dict | None = None
+    inputs: Optional[list[dict]] | None = None
+    outputs: Optional[list[dict]] | None = None
+    params: Optional[list[dict]] | None = None
+    secrets: Optional[list[dict]] | None = None
+    confs: Optional[list[dict]] | None = None
     dependencies: Optional[list[dict]] | None = None
     chart_obj: dict | None = None
-    node_id: str | None = None
     container_source: str | None = None
     global_conf: Optional[dict] | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c'] | None = None
-    notebook_dict: dict | None = None
     image_version: str | None = None
     types: Optional[dict] | None = None
 
@@ -34,20 +29,15 @@ class Cell(BaseModel):
         super().__init__(**data)
         if self.title:
             self.title = slugify(self.title.strip())
-        if self.task_name:
-            self.task_name = slugify(self.task_name)
         if self.inputs:
             self.add_inputs(self.inputs)
         if self.outputs:
             self.add_outputs(self.outputs)
         if self.params:
             self.add_params(self.params)
-            self.add_param_values(self.params)
         if self.secrets:
             self.secrets = self.secrets or []
             self.add_secrets(self.secrets)
-            # self.all_inputs = list(self.inputs) + list(self.params)
-            # Check if list is not empty and has at least non-empty dict
         if self.dependencies and any(self.dependencies):
             self.dependencies = list(
                 sorted(self.dependencies, key=lambda x: x['name']))
@@ -92,42 +82,28 @@ class Cell(BaseModel):
                 "Image version cannot be empty. Cell title: %s" % self.title)
         self.image_version = image_version
 
-    def add_param_values(self, params):
-        self.param_values = {}
-        if isinstance(params, dict):
-            for param_props in params.values():
-                if 'value' in param_props:
-                    self.param_values[param_props['name']] = param_props[
-                        'value']
-
-    # def concatenate_all_inputs(self):
-    #     self.all_inputs = list(self.inputs) + list(self.params)
-
-    def clean_code(self):
-        indices_to_remove = []
-        lines = self.original_source.splitlines()
-        self.original_source = ""
-        for line_i in range(0, len(lines)):
-            line = lines[line_i]
-            # Do not remove line that startswith param_ if not in the
-            # self.params
-            if line.startswith('param_'):
-                # clean param name
-                pattern = r"\b(param_\w+)\b"
-                param_name = re.findall(pattern, line)[0]
-                if param_name in self.params:
-                    indices_to_remove.append(line_i)
-            regex = r'^\s*(#|import|from)'
-            if re.match(regex, line):
-                indices_to_remove.append(line_i)
-
-        for ir in sorted(indices_to_remove, reverse=True):
-            lines.pop(ir)
-
-        self.original_source = "\n".join(lines)
-
-    def clean_task_name(self):
-        self.task_name = slugify(self.task_name)
+    # def clean_code(self):
+    #     indices_to_remove = []
+    #     lines = self.original_source.splitlines()
+    #     self.original_source = ""
+    #     for line_i in range(0, len(lines)):
+    #         line = lines[line_i]
+    #         # Do not remove line that startswith param_ if not in the
+    #         # self.params
+    #         if line.startswith('param_'):
+    #             # clean param name
+    #             pattern = r"\b(param_\w+)\b"
+    #             param_name = re.findall(pattern, line)[0]
+    #             if param_name in self.params:
+    #                 indices_to_remove.append(line_i)
+    #         regex = r'^\s*(#|import|from)'
+    #         if re.match(regex, line):
+    #             indices_to_remove.append(line_i)
+    #
+    #     for ir in sorted(indices_to_remove, reverse=True):
+    #         lines.pop(ir)
+    #
+    #     self.original_source = "\n".join(lines)
 
     def clean_title(self):
         self.title = slugify(self.title)
