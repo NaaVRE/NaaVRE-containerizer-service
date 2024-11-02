@@ -1,7 +1,7 @@
 {
   "cell": {
     "all_inputs": [],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
     },

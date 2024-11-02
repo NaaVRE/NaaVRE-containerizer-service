@@ -1,4 +1,4 @@
-from app.services.cell_extractor.headerextractor import HeaderExtractor
+from app.services.cell_extractor.header_extractor import HeaderExtractor
 
 
 class PyHeaderExtractor(HeaderExtractor):

@@ -1,4 +1,4 @@
-from .headerextractor import HeaderExtractor
+from .header_extractor import HeaderExtractor
 
 
 class RHeaderExtractor(HeaderExtractor):

@@ -1,7 +1,7 @@
 {
   "cell": {
     "all_inputs": [],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-lter-life-veluwe:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-lter-life-veluwe:latest"
     },
@@ -122,7 +122,7 @@
       "rolling_mean_temp_str",
       "temperature_data_str"
     ],
-    "param_values": {},
+    "params": {},
     "params": [],
     "task_name": "install-and-load-the-climwinb-packages-dev-user-name-at-domain-com",
     "title": "Install and load the climwinb packages-dev-user-name-at-domain-com",

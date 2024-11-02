@@ -7,8 +7,8 @@ from typing import Literal, Union
 import jsonschema
 import yaml
 
-from app.models.notebook_data import NotebookData
-from app.services.cell_extractor.extractor import Extractor
+from .extractor import Extractor
+from ...models.notebook_data import NotebookData
 
 
 class HeaderExtractor(Extractor):
@@ -45,15 +45,8 @@ class HeaderExtractor(Extractor):
     The document is validated with the schema `cell_header.schema.json`
 
     """
-    inputs: Union[dict, None]
-    outputs: Union[dict, None]
-    params: Union[dict, None]
-    secrets: Union[dict, None]
-    confs: Union[dict, None]
-    dependencies: Union[list, None]
 
     def __init__(self, notebook_data: NotebookData):
-        super().__init__(notebook_data)
         self.re_yaml_doc_in_comment = re.compile(
             (r"^(?:.*\n)*"
              r"\s*#\s*---\s*\n"
@@ -61,16 +54,14 @@ class HeaderExtractor(Extractor):
              r"\s*#\s*\.\.\.\s*\n"
              ),
             re.MULTILINE)
+        cell_source = notebook_data.notebook.cells[
+            notebook_data.cell_index].source
         self.schema = self._load_schema()
-        self.cell_header = self._extract_header(self.source)
+        self.cell_header = self._extract_header(cell_source)
         self._external_extract_cell_params = None
         self._external_extract_cell_secrets = None
-        self.inputs = self.get_cell_inputs()
-        self.outputs = self.get_cell_outputs()
-        self.params = self.get_cell_params(self.source)
-        self.secrets = self.get_cell_secrets(self.source)
-        self.confs = self.extract_cell_conf_ref()
-        self.dependencies = self.get_cell_dependencies()
+
+        super().__init__(notebook_data)
 
     @staticmethod
     def _load_schema():
@@ -86,12 +77,12 @@ class HeaderExtractor(Extractor):
 
     def is_complete(self):
         return (
-                (self.inputs is not None)
-                and (self.outputs is not None)
-                and (self.params is not None)
-                and (self.secrets is not None)
-                and (self.confs is not None)
-                and (self.dependencies is not None)
+                (self.cell_inputs is not None)
+                and (self.cell_outputs is not None)
+                and (self.cell_params is not None)
+                and (self.cell_secrets is not None)
+                and (self.cell_confs is not None)
+                and (self.cell_dependencies is not None)
         )
 
     def _extract_header(self, cell_source):
@@ -119,28 +110,26 @@ class HeaderExtractor(Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
-        if self.inputs is None:
-            self.inputs = extractor.inputs
-        if self.outputs is None:
-            self.outputs = extractor.outputs
-        if self.params is None:
-            self.params = extractor.params
+        if self.cell_inputs is None:
+            self.cell_inputs = extractor.infer_cell_inputs()
+        if self.cell_outputs is None:
+            self.cell_outputs = extractor.infer_cell_outputs()
+        if self.cell_params is None:
+            self.cell_params = extractor.extract_cell_params()
             # We store a reference to extractor.extract_cell_params because
             # self.extract_cell_params is called after self.add_missing_values
             # in component_containerizer.handlers.ExtractorHandler.post()
-            self._external_extract_cell_params = extractor.get_cell_params
-        if self.secrets is None:
-            self.secrets = extractor.secrets
+            self._external_extract_cell_params = extractor.extract_cell_params
+        if self.cell_secrets is None:
+            self.cell_secrets = extractor.cell_secrets
             # Same as self._external_extract_cell_params
             self._external_extract_cell_secrets = (
-                extractor.get_cell_secrets)
-        if self.confs is None:
-            self.confs = extractor.confs
-        if self.dependencies is None:
-            self.dependencies = extractor.dependencies
-
-    def __extract_variables(self, cell_source: str, infer_types=False):
-        pass
+                extractor.extract_cell_secrets())
+        if self.cell_confs is None:
+            self.cell_confs = extractor.extract_cell_conf_ref()
+        if self.cell_dependencies is None:
+            self.cell_dependencies = (
+                extractor.infer_cell_dependencies(self.cell_confs))
 
     @staticmethod
     def _parse_interface_vars_items(
@@ -226,31 +215,31 @@ class HeaderExtractor(Extractor):
                  for it in items]
         return {it['name']: it for it in items}
 
-    def get_cell_inputs(self):
+    def infer_cell_inputs(self):
         return self._infer_cell_interface_vars(
             self.cell_header,
             'inputs',
         )
 
-    def get_cell_outputs(self):
+    def infer_cell_outputs(self):
         return self._infer_cell_interface_vars(
             self.cell_header,
             'outputs',
         )
 
-    def get_cell_params(self, source):
+    def extract_cell_params(self):
         if self._external_extract_cell_params is not None:
-            return self._external_extract_cell_params(source)
+            return self._external_extract_cell_params(self.cell_source)
         return self._infer_cell_interface_vars(
-            self._extract_header(source),
+            self._extract_header(self.cell_source),
             'params',
         )
 
-    def get_cell_secrets(self, source):
+    def extract_cell_secrets(self):
         if self._external_extract_cell_secrets is not None:
-            return self._external_extract_cell_secrets(source)
+            return self._external_extract_cell_secrets(self.cell_source)
         return self._infer_cell_interface_vars(
-            self._extract_header(source),
+            self._extract_header(self.cell_source),
             'secrets',
         )
 
@@ -262,7 +251,7 @@ class HeaderExtractor(Extractor):
             return None
         return {k: v['assignation'] for it in items for k, v in it.items()}
 
-    def get_cell_dependencies(self):
+    def infer_cell_dependencies(self, confs):
         if self.cell_header is None:
             return None
         items = self.cell_header['NaaVRE']['cell'].get('dependencies')

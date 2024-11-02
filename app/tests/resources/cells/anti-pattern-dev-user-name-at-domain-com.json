@@ -4,7 +4,7 @@
       "count",
       "a"
     ],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
     },

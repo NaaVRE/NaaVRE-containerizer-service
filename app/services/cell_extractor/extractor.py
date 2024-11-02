@@ -1,5 +1,4 @@
 import abc
-import copy
 import hashlib
 import json
 
@@ -11,69 +10,46 @@ from app.services.converter.converter import ConverterReactFlowChart
 
 
 class Extractor(abc.ABC):
-    inputs: list
-    outputs: list
-    params: list
-    secrets: list
-    confs: list
-    dependencies: list
+    cell_inputs: list
+    cell_outputs: list
+    cell_params: list
+    cell_secrets: list
+    cell_confs: list
+    cell_dependencies: list
 
     def __init__(self, notebook_data: NotebookData):
-        self.notebook_data = notebook_data
         self.notebook = notebook_data.notebook
-        notebook_cells = self.notebook.cells
-        self.cell_index = self.notebook_data.cell_index
-        self.source = notebook_cells[self.cell_index].source
-        self.kernel = self.notebook_data.kernel
+        self.cell_source = (
+            notebook_data.notebook.cells[notebook_data.cell_index].source)
 
-    def extract_cell(self):
-        # extracted_nb = self._extract_cell_by_index(self.notebook,
-        #                                                     self.cell_index)
-        # if self.kernel.lower() == "irkernel":
-        #     extracted_nb = self._set_notebook_kernel(extracted_nb, 'R')
-        # elif self.kernel.lower() == "ipython" or self.kernel.lower()
-        #                                                          == "python":
-        #     extracted_nb = self._set_notebook_kernel(extracted_nb, 'python3')
-        # else:
-        #     raise ValueError("Unsupported kernel")
+        self.cell_inputs = self.infer_cell_inputs()
+        self.cell_outputs = self.infer_cell_outputs()
+        self.cell_params = self.extract_cell_params()
+        self.cell_secrets = self.extract_cell_secrets()
+        self.cell_confs = self.extract_cell_conf_ref()
+        self.cell_dependencies = self.infer_cell_dependencies(self.cell_confs)
+        self.user_name = notebook_data.user_name
 
-        # initialize variables
-        title = self.source.partition('\n')[0].strip()
+    def extract_cell(self) -> Cell:
+        title = self.cell_source.partition('\n')[0].strip()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
-        title += '-' + slugify(self.notebook_data.user_name)
-
-        # If any of these change, we create a new cell in the catalog.
-        # This matches the cell properties saved in workflows.
+        title += '-' + slugify(self.user_name)
         cell_identity_dict = {
             'title': title,
-            'params': self.params,
-            'secrets': self.secrets,
-            'inputs': self.inputs,
-            'outputs': self.outputs,
+            'params': self.cell_params,
+            'secrets': self.cell_secrets,
+            'inputs': self.cell_inputs,
+            'outputs': self.cell_outputs,
         }
         cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
         node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
-        # Create cell from dict
-        cell = Cell(title=title,
-                    task_name=slugify(title.lower()),
-                    original_source=self.source,
-                    inputs=self.inputs,
-                    outputs=self.outputs,
-                    params=self.params,
-                    secrets=self.secrets,
-                    confs=self.confs,
-                    dependencies=self.dependencies,
-                    container_source="",
-                    kernel=self.kernel,
-                    node_id=node_id
-                    )
         node = ConverterReactFlowChart.get_node(
             node_id,
             title,
-            self.inputs,
-            self.outputs,
-            self.params,
-            self.secrets,
+            self.cell_inputs,
+            self.cell_outputs,
+            self.cell_params,
+            self.cell_secrets,
         )
         chart = {
             'offset': {
@@ -86,24 +62,33 @@ class Extractor(abc.ABC):
             'selected': {},
             'hovered': {},
         }
-
-        cell.chart_obj = chart
-        return cell
+        cell_dict = {
+            'title': title,
+            'params': self.cell_params,
+            'secrets': self.cell_secrets,
+            'inputs': self.cell_inputs,
+            'outputs': self.cell_outputs,
+            'confs': self.cell_confs,
+            'dependencies': self.cell_dependencies,
+            'base_container_image': None,
+            'chart_obj': chart,
+        }
+        return Cell.model_validate(cell_dict)
 
     @abc.abstractmethod
-    def get_cell_inputs(self):
+    def infer_cell_inputs(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def get_cell_outputs(self):
+    def infer_cell_outputs(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def get_cell_params(self):
+    def extract_cell_params(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def get_cell_secrets(self):
+    def extract_cell_secrets(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
@@ -111,41 +96,25 @@ class Extractor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_cell_dependencies(self):
+    def infer_cell_dependencies(self, confs) -> list[dict]:
         pass
-
-    def _get_cell_by_index(self, notebook, cell_index):
-        new_nb = copy.deepcopy(notebook)
-        if cell_index < len(notebook.cells):
-            new_nb.cells = [notebook.cells[cell_index]]
-            return new_nb
-
-    # Not sure why we need this method
-    def _set_notebook_kernel(self, notebook, kernel):
-        # new_nb = copy.deepcopy(notebook)
-        # # Replace kernel name in the notebook metadata
-        # new_nb.metadata.kernelspec.name = kernel
-        # new_nb.metadata.kernelspec.display_name = kernel
-        # new_nb.metadata.kernelspec.language = kernel
-        # return new_nb
-        return notebook
 
 
 class DummyExtractor(Extractor):
-    def get_cell_inputs(self):
+    def infer_cell_inputs(self):
         return {}
 
-    def get_cell_outputs(self):
+    def infer_cell_outputs(self):
         return {}
 
-    def get_cell_params(self):
+    def extract_cell_params(self):
         return {}
 
-    def get_cell_secrets(self):
+    def extract_cell_secrets(self):
         return {}
 
     def extract_cell_conf_ref(self):
         return []
 
-    def get_cell_dependencies(self):
+    def infer_cell_dependencies(self, confs):
         return []

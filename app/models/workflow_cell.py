@@ -10,7 +10,6 @@ logger.setLevel(logging.DEBUG)
 
 class Cell(BaseModel):
     title: str | None = None
-    # original_source: str | None = None
     base_container_image: dict | None = None
     inputs: Optional[list[dict]] | None = None
     outputs: Optional[list[dict]] | None = None
@@ -19,7 +18,7 @@ class Cell(BaseModel):
     confs: Optional[list[dict]] | None = None
     dependencies: Optional[list[dict]] | None = None
     chart_obj: dict | None = None
-    container_source: str | None = None
+    # container_source: str | None = None
     global_conf: Optional[dict] | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c'] | None = None
     image_version: str | None = None

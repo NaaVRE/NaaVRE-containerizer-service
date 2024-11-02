@@ -5,11 +5,14 @@ import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
 from rpy2.robjects.packages import importr
 
-from app.models.notebook_data import NotebookData
-from app.services.cell_extractor.extractor import Extractor
-from app.services.cell_extractor.parseR.Visitors import ExtractNames, \
-    ExtractDefined, ExtractUndefined, ExtractConfigs, ExtractPrefixedVar
-from app.services.cell_extractor.parseR.parsing import parse_text
+from .extractor import Extractor
+from .parseR.parsing import parse_text
+from .parseR.r_visitors.extract_configs import ExtractConfigs
+from .parseR.r_visitors.extract_defined import ExtractDefined
+from .parseR.r_visitors.extract_names import ExtractNames
+from .parseR.r_visitors.extract_prefixed_var import ExtractPrefixedVar
+from .parseR.r_visitors.extract_undefined import ExtractUndefined
+from ...models.notebook_data import NotebookData
 
 # Create an R environment
 r_env = robjects.globalenv
@@ -107,25 +110,24 @@ class RExtractor(Extractor):
     sources: list
     imports: dict
     configurations: dict
-    global_params: dict
-    global_secrets: dict
+    notebook_params: dict
+    notebook_secrets: dict
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData):
         notebook = notebook_data.notebook
-
-        self.sources = [nb_cell.source for nb_cell in notebook.cells if
-                        nb_cell.cell_type == 'code' and len(
-                            nb_cell.source) > 0]
-        self.notebook_names = self.__extract_variables(
+        self.sources = [nbcell.source for nbcell in notebook.cells if
+                        nbcell.cell_type == 'code' and len(nbcell.source) > 0]
+        self.notebook_names = self.__extract_cell_names(
             '\n'.join(self.sources)
         )
 
         self.imports = self.__extract_imports(self.sources)
         self.configurations = self.__extract_configurations(self.sources)
-        self.global_params = self.__extract_prefixed_var(self.sources, 'param')
-        self.global_secrets = self.__extract_prefixed_var(self.sources,
-                                                          'secret')
+        self.notebook_params = self.__extract_prefixed_var(self.sources,
+                                                           'param')
+        self.notebook_secrets = self.__extract_prefixed_var(self.sources,
+                                                            'secret')
         self.undefined = dict()
         for source in self.sources:
             self.undefined.update(self.__extract_cell_undefined(source))
@@ -198,8 +200,7 @@ class RExtractor(Extractor):
         return self.__resolve_configurations(configurations)
 
     # check source https://adv-r.hadley.nz/expressions.html)
-    def __extract_prefixed_var(self, sources,
-                               prefix):
+    def __extract_prefixed_var(self, sources, prefix):
         extracted_vars = {}
         for s in sources:
             tree = parse_text(s)
@@ -207,9 +208,9 @@ class RExtractor(Extractor):
             output = visitor.visit(tree)
 
             for variable in output:
-                if (variable not in extracted_vars or 'value' not in
-                        extracted_vars[variable] or extracted_vars[variable]
-                        ['value'] is None):
+                if (variable not in extracted_vars or
+                        'value' not in extracted_vars[variable] or
+                        extracted_vars[variable]['value'] is None):
                     extracted_vars[variable] = {
                         'name': variable,
                         'type': self.notebook_names[variable]['type']
@@ -221,39 +222,54 @@ class RExtractor(Extractor):
 
         return extracted_vars
 
-    def get_cell_outputs(self):
-        cell_names = self.__extract_variables(self.source)
-        cell_undef = self.__extract_cell_undefined(self.source)
-        return {
-            name: properties
-            for name, properties in cell_names.items()
-            if all([
-                name not in cell_undef,
-                name not in self.imports,
-                name in self.undefined,
-                name not in self.configurations,
-                name not in self.global_params,
-                name not in self.global_secrets
-            ])
-        }
+    def infer_cell_outputs(self) -> list[dict]:
+        cell_names = self.__extract_cell_names(self.cell_source)
+        cell_undef = self.__extract_cell_undefined(self.cell_source)
+        # confs =  {
+        #     name: properties
+        #     for name, properties in cell_names.items()
+        #     if name not in cell_undef
+        #        and name not in self.imports
+        #        and name in self.undefined
+        #        and name not in self.configurations
+        #        and name not in self.notebook_params
+        #        and name not in self.notebook_secrets
+        # }
+        cell_confs = []
+        for name, properties in cell_names.items():
+            if (name not in cell_undef and
+                    name not in self.imports and
+                    name in self.undefined and
+                    name not in self.configurations and
+                    name not in self.notebook_params and
+                    name not in self.notebook_secrets):
+                cell_confs.append({name: properties})
+        return cell_confs
 
-    def get_cell_inputs(self):
-        cell_undefined = self.__extract_cell_undefined(self.source)
-        return {
-            und: properties
-            for und, properties in cell_undefined.items()
-            if (
-                    und not in self.imports and
+    def infer_cell_inputs(self) -> list[dict]:
+        cell_undefined = self.__extract_cell_undefined(self.cell_source)
+        # ins = {
+        #     und: properties
+        #     for und, properties in cell_undefined.items()
+        #     if und not in self.imports
+        #        and und not in self.configurations
+        #        and und not in self.notebook_params
+        #        and und not in self.notebook_secrets
+        # }
+        cell_inputs = []
+        for und, properties in cell_undefined.items():
+            if (und not in self.imports and
                     und not in self.configurations and
-                    und not in self.global_params and
-                    und not in self.global_secrets
-            )
-        }
+                    und not in self.notebook_params and
+                    und not in self.notebook_secrets):
+                cell_inputs.append({und: properties})
 
-    def get_cell_dependencies(self, confs):
+        return cell_inputs
+
+    def infer_cell_dependencies(self, confs):
         # we probably like to only use dependencies that are necessary to
-        # execute the cell
-        # however this is challenging in R as functions are non-scoped
+        # execute the cell however this is challenging in R as functions are
+        # non-scoped
         dependencies = []
         for name in self.imports:
             dependencies.append(self.imports.get(name))
@@ -262,13 +278,13 @@ class RExtractor(Extractor):
     def infer_cell_conf_dependencies(self, confs):
         dependencies = []
         for ck in confs:
-            for name in self.__extract_variables(confs[ck]):
+            for name in self.__extract_cell_names(confs[ck]):
                 if name in self.imports:
                     dependencies.append(self.imports.get(name))
 
         return dependencies
 
-    def __extract_variables(self, cell_source, infer_types=True):
+    def __extract_cell_names(self, cell_source):
         tree = parse_text(cell_source)
         visitor = ExtractNames()
         vars_r = visitor.visit(tree)
@@ -285,35 +301,36 @@ class RExtractor(Extractor):
         undef_vars = {
             name: {
                 'name': name,
-                'type': self.notebook_names[name][
-                    'type'] if name in self.notebook_names else None,
+                'type': self.notebook_names[name]['type']
+                if name in self.notebook_names else None,
             }
             for name in undefs
         }
 
         return undef_vars
 
-    def get_cell_params(self, cell_source):
+    def extract_cell_params(self):
         params = {}
-        cell_unds = self.__extract_cell_undefined(cell_source)
-        param_unds = [und for und in cell_unds if und in self.global_params]
+        cell_unds = self.__extract_cell_undefined(self.cell_source)
+        param_unds = [und for und in cell_unds if und in self.notebook_params]
         for u in param_unds:
             if u not in params:
-                params[u] = self.global_params[u]
+                params[u] = self.notebook_params[u]
         return params
 
-    def get_cell_secrets(self, cell_source):
+    def extract_cell_secrets(self):
         secrets = {}
-        cell_unds = self.__extract_cell_undefined(cell_source)
-        secret_unds = [und for und in cell_unds if und in self.global_secrets]
+        cell_unds = self.__extract_cell_undefined(self.cell_source)
+        secret_unds = [und for und in cell_unds
+                       if und in self.notebook_secrets]
         for u in secret_unds:
             if u not in secrets:
-                secrets[u] = self.global_secrets[u]
+                secrets[u] = self.notebook_secrets[u]
         return secrets
 
     def extract_cell_conf_ref(self):
         confs = {}
-        cell_unds = self.__extract_cell_undefined(self.source)
+        cell_unds = self.__extract_cell_undefined(self.cell_source)
         conf_unds = [und for und in cell_unds if und in self.configurations]
         for u in conf_unds:
             if u not in confs:

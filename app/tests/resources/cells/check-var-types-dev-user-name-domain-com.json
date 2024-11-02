@@ -8,7 +8,7 @@
       "var_list_int",
       "var_list_str"
     ],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
     },
@@ -213,7 +213,7 @@
     "outputs": [
       "done"
     ],
-    "param_values": {
+    "params": {
       "param_float": "1.1",
       "param_int": "1",
       "param_list_int": "[1, 2, 3]",

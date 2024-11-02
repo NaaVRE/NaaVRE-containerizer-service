@@ -1,7 +1,7 @@
 {
   "cell": {
     "all_inputs": [],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
     },
@@ -177,7 +177,7 @@
       "var_list_int",
       "var_list_str"
     ],
-    "param_values": {},
+    "params": {},
     "params": [],
     "task_name": "r-vars-types-dev-user-name-domain-com",
     "title": "R-vars-types-dev-user-name-domain-com",

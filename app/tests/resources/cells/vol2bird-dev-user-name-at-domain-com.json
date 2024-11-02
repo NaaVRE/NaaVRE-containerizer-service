@@ -3,7 +3,7 @@
     "all_inputs": [
       "a"
     ],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-vol2bird:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-vol2bird:latest"
     },

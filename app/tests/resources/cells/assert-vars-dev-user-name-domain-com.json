@@ -3,7 +3,7 @@
     "all_inputs": [
       "done"
     ],
-    "base_image": {
+    "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
     },
@@ -116,7 +116,7 @@
     },
     "original_source": "conf_string = 'param_string value'\nconf_string_with_comment = 'param_string value'  # comment\nconf_int = 1\nconf_float = 1.1\nconf_list_int = [1, 2, 3]\nconf_list_str = [\"list_str\", \"space in elem\", \"3\"]\nprint(done)\n\ncheck_string = 'param_string value'\ncheck_string_with_comment = 'param_string value'  # comment\ncheck_int = 1\ncheck_float = 1.1\ncheck_list_int = [1, 2, 3]\ncheck_list_str = [\"list_str\", \"space in elem\", \"3\"]\n\nassert conf_string == check_string\nassert conf_string_with_comment == check_string_with_comment\nassert conf_int == check_int\nassert conf_float == check_float\nassert conf_list_int == check_list_int\nassert conf_list_str == check_list_str\n\n\nassert param_string == check_string\nassert param_string_with_comment == check_string_with_comment\nassert param_int == check_int\nassert param_float == check_float\nassert param_list_int == check_list_int\nassert param_list_str == check_list_str\n\nprint(\"All variables are the same.\")",
     "outputs": [],
-    "param_values": {
+    "params": {
       "param_float": "1.1",
       "param_int": "1",
       "param_list_int": "[1, 2, 3]",
