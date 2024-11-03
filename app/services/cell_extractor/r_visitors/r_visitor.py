@@ -1,10 +1,7 @@
 # Generated from R.g4 by ANTLR 4.13.1
 from antlr4.tree.Tree import ParseTreeVisitor
 
-if "." in __name__:
-    from .RParser import RParser
-else:
-    from RParser import RParser
+from app.services.cell_extractor.parseR.RParser import RParser
 
 
 # This class defines a complete generic visitor for a parse tree produced by

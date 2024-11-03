@@ -1,7 +1,7 @@
 import json
 
 from app.services.cell_extractor.parseR.RParser import RParser
-from app.services.cell_extractor.parseR.r_visitors.r_visitor import RVisitor
+from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
 
 class ExtractPrefixedVar(RVisitor):
