@@ -28,7 +28,7 @@ class PyExtractor(Extractor):
                                  nbcell.cell_type == 'code' and len(
                                      nbcell.source) > 0 and nbcell.source[
                                      0] != '!']
-        self.notebook_variables = self.__extract_notebook_variables(
+        self.notebook_variables = self.__extract_variables(
             '\n'.join(self.notebook_sources),
             infer_types=True,
         )
@@ -138,9 +138,9 @@ class PyExtractor(Extractor):
         return extracted_vars
 
     def infer_cell_outputs(self) -> list[dict]:
-        cell_names = self.__extract_notebook_variables(self.cell_source)
+        cell_variables = self.__extract_variables(self.cell_source)
         cell_outputs = []
-        for name, properties in cell_names.items():
+        for name, properties in cell_variables.items():
             if (name not in self.__extract_cell_undefined(self.cell_source) and
                     name not in self.notebook_imports and
                     name in self.undefined and
@@ -150,7 +150,7 @@ class PyExtractor(Extractor):
                 cell_outputs.append({'name': name, 'type': properties['type']})
         # outs = {
         #     name: properties
-        #     for name, properties in cell_names.items()
+        #     for name, properties in cell_variables.items()
         #     if name not in self.__extract_cell_undefined(self.cell_source)
         #        and name not in self.notebook_imports
         #        and name in self.undefined
@@ -181,9 +181,9 @@ class PyExtractor(Extractor):
 
     def infer_cell_dependencies(self, confs):
         dependencies = []
-        names = self.__extract_notebook_variables(self.cell_source)
+        names = self.__extract_variables(self.cell_source)
         for ck in confs:
-            names.update(self.__extract_notebook_variables(confs[ck]))
+            names.update(self.__extract_variables(confs[ck]))
         for name in names:
             if name in self.notebook_imports:
                 dependencies.append(self.notebook_imports.get(name))
@@ -193,7 +193,7 @@ class PyExtractor(Extractor):
     def infer_cell_conf_dependencies(self, confs):
         dependencies = []
         for ck in confs:
-            for name in self.__extract_notebook_variables(confs[ck]):
+            for name in self.__extract_variables(confs[ck]):
                 if name in self.notebook_imports:
                     dependencies.append(self.notebook_imports.get(name))
 
@@ -241,7 +241,7 @@ class PyExtractor(Extractor):
         logging.getLogger(__name__).debug(f'Unmatched type: {type_annotation}')
         return None
 
-    def __extract_notebook_variables(self, cell_source, infer_types=False):
+    def __extract_variables(self, cell_source, infer_types=False):
         names = dict()
         if infer_types:
             tree = self.__get_annotated_ast(cell_source)
