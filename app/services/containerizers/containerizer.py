@@ -93,8 +93,8 @@ class Containerizer():
         template_dockerfile = self.template_env.get_template(
             self.dockerfile_template)
         return template_dockerfile.render(
-                task_name=self.cell.task_name,
-                base_image=self.cell.base_container_image)
+            task_name=self.cell.task_name,
+            base_image=self.cell.base_container_image)
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         conda_deps = set()

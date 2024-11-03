@@ -1,7 +1,6 @@
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-
 built_in = ["T", "F", "pi", "is.numeric", "mu", "round"]
 
 
