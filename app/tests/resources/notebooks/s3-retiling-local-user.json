@@ -356,7 +356,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "S3-Retiling-local-user",
+            "title": "S3-Retiling-test-user-2",
             "vars": [
               {
                 "color": "#5382ac",
@@ -444,7 +444,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "S3-Retiling-local-user",
+    "title": "S3-Retiling-test-user-2",
     "base_container_image": {
     }
   }

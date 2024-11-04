@@ -16,8 +16,6 @@ def test_extract_cell():
     cells_json_path = os.path.join(base_path, 'notebooks')
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
-        if 's6-geotiff-export-local-user.json' not in notebook_file:
-            continue
         notebook_path = os.path.join(cells_json_path, notebook_file)
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
