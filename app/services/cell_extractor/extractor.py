@@ -44,7 +44,6 @@ class Extractor(abc.ABC):
         cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
         node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
         node = ConverterReactFlowChart.get_node(
-            node_id,
             title,
             self.cell_inputs,
             self.cell_outputs,
@@ -72,6 +71,7 @@ class Extractor(abc.ABC):
             'dependencies': self.cell_dependencies,
             'base_container_image': None,
             'chart_obj': chart,
+            'kernel': self.notebook.kernel
         }
         return Cell.model_validate(cell_dict)
 

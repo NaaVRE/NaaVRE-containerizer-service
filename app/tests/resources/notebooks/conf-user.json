@@ -174,7 +174,6 @@
     }
   },
   "cell": {
-    "all_inputs": [],
     "chart_obj": {
       "hovered": {},
       "links": {},
@@ -205,8 +204,7 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
-    "container_source": "",
+    "confs": [],
     "dependencies": [
       {
         "asname": null,
@@ -216,47 +214,9 @@
     ],
     "inputs": [],
     "kernel": "ipython",
-    "node_id": "1e8a933",
-    "notebook_dict": {
-      "cells": [
-        {
-          "cell_type": "code",
-          "execution_count": null,
-          "id": "bca08f46-0546-47a6-b0eb-d9fa3a5c9265",
-          "metadata": {},
-          "outputs": [],
-          "source": "# conf \nimport os\n\nconf_data_folder = os.path.join('/tmp','data')\n\nconf_feature_name = 'perc_95_normalized_height'\nconf_validate_precision = '0.001'\nconf_tile_mesh_size = '10.'\nconf_filter_type= 'select_equal'\nconf_attribute = 'raw_classification'\nconf_min_x = '-113107.81'\nconf_max_x = '398892.19'\nconf_min_y = '214783.87'\nconf_max_y = '726783.87'\nconf_n_tiles_side = '512'\nconf_apply_filter_value = '1'\nconf_laz_compression_factor = '7'\nconf_max_filesize = '262144000'  # desired max file size (in bytes)\n\n"
-        }
-      ],
-      "metadata": {
-        "kernelspec": {
-          "display_name": "python3",
-          "language": "python3",
-          "name": "python3"
-        },
-        "language_info": {
-          "codemirror_mode": {
-            "name": "ipython",
-            "version": 3
-          },
-          "file_extension": ".py",
-          "mimetype": "text/x-python",
-          "name": "python",
-          "nbconvert_exporter": "python",
-          "pygments_lexer": "ipython3",
-          "version": "3.11.9"
-        }
-      },
-      "nbformat": 4,
-      "nbformat_minor": 5
-    },
-    "original_source": "# conf \nimport os\n\nconf_data_folder = os.path.join('/tmp','data')\n\nconf_feature_name = 'perc_95_normalized_height'\nconf_validate_precision = '0.001'\nconf_tile_mesh_size = '10.'\nconf_filter_type= 'select_equal'\nconf_attribute = 'raw_classification'\nconf_min_x = '-113107.81'\nconf_max_x = '398892.19'\nconf_min_y = '214783.87'\nconf_max_y = '726783.87'\nconf_n_tiles_side = '512'\nconf_apply_filter_value = '1'\nconf_laz_compression_factor = '7'\nconf_max_filesize = '262144000'  # desired max file size (in bytes)\n",
     "outputs": [],
-    "param_values": {},
     "params": [],
     "secrets": [],
-    "task_name": "conf-user",
-    "title": "conf-user",
-    "types": {}
+    "title": "conf-user"
   }
 }

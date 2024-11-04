@@ -6,8 +6,7 @@ from colorhash import ColorHash
 class ConverterReactFlowChart:
 
     @staticmethod
-    def get_node(node_id: str,
-                 title: str,
+    def get_node(title: str,
                  inputs: list,
                  outputs: list,
                  params: list,
@@ -16,7 +15,6 @@ class ConverterReactFlowChart:
         node = {}
         position = {}
         ports = {}
-        node['id'] = node_id
         node['type'] = 'input-output'
         position['x'] = 35
         position['y'] = 15
@@ -26,8 +24,7 @@ class ConverterReactFlowChart:
                       'params': params,
                       'secrets': secrets,
                       'inputs': inputs,
-                      'outputs': outputs,
-                      'og_node_id': node_id}
+                      'outputs': outputs}
         node['properties'] = properties
 
         for cell_input in inputs:

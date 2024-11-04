@@ -174,10 +174,6 @@
     }
   },
   "cell": {
-    "all_inputs": [
-      "count",
-      "a"
-    ],
     "chart_obj": {
       "hovered": {},
       "links": {},
@@ -254,61 +250,27 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
-    "container_source": "",
+    "confs": [],
     "dependencies": [],
     "inputs": [
-      "count",
-      "a"
+      {
+        "name": "count",
+        "type": "int"
+      },
+      {
+        "name": "a",
+        "type": "int"
+      }
     ],
     "kernel": "ipython",
-    "node_id": "1324c96",
-    "notebook_dict": {
-      "cells": [
-        {
-          "cell_type": "code",
-          "execution_count": null,
-          "id": "c1ee0030-e097-49e9-b67c-69f21a8a6da3",
-          "metadata": {},
-          "outputs": [],
-          "source": "#Anti-pattern  \nsome_list = range(count, a+1)\n\nmsg = '1'\n\n"
-        }
-      ],
-      "metadata": {
-        "kernelspec": {
-          "display_name": "python3",
-          "language": "python3",
-          "name": "python3"
-        },
-        "language_info": {
-          "codemirror_mode": {
-            "name": "ipython",
-            "version": 3
-          },
-          "file_extension": ".py",
-          "mimetype": "text/x-python",
-          "name": "python",
-          "nbconvert_exporter": "python",
-          "pygments_lexer": "ipython3",
-          "version": "3.11.9"
-        }
-      },
-      "nbformat": 4,
-      "nbformat_minor": 5
-    },
-    "original_source": "#Anti-pattern  \nsome_list = range(count, a+1)\n\nmsg = '1'\n",
     "outputs": [
-      "msg"
+      {
+        "name": "msg",
+        "type": "str"
+      }
     ],
-    "param_values": {},
     "params": [],
     "secrets": [],
-    "task_name": "anti-pattern-user",
-    "title": "Anti-pattern-user",
-    "types": {
-      "a": "int",
-      "count": "int",
-      "msg": "str"
-    }
+    "title": "anti-pattern-test-user-2"
   }
 }

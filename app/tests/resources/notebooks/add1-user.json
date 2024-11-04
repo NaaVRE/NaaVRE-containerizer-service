@@ -174,9 +174,6 @@
     }
   },
   "cell": {
-    "all_inputs": [
-      "count"
-    ],
     "chart_obj": {
       "hovered": {},
       "links": {},
@@ -239,59 +236,27 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
-    "container_source": "",
+    "confs": [],
     "dependencies": [],
     "inputs": [
-      "count"
+      {
+        "name": "count",
+        "type": "int"
+      }
     ],
     "kernel": "ipython",
-    "node_id": "c7a7c9b",
-    "notebook_dict": {
-      "cells": [
-        {
-          "cell_type": "code",
-          "execution_count": null,
-          "id": "25bdee30-184c-4fb9-9f60-6cb2bf3830a4",
-          "metadata": {},
-          "outputs": [],
-          "source": "# Add1\n\na = count + 1"
-        }
-      ],
-      "metadata": {
-        "kernelspec": {
-          "display_name": "python3",
-          "language": "python3",
-          "name": "python3"
-        },
-        "language_info": {
-          "codemirror_mode": {
-            "name": "ipython",
-            "version": 3
-          },
-          "file_extension": ".py",
-          "mimetype": "text/x-python",
-          "name": "python",
-          "nbconvert_exporter": "python",
-          "pygments_lexer": "ipython3",
-          "version": "3.11.9"
-        }
-      },
-      "nbformat": 4,
-      "nbformat_minor": 5
-    },
-    "original_source": "# Add1\n\na = count + 1",
     "outputs": [
-      "a"
+      {
+        "name": "a",
+        "type": "int"
+      }
     ],
-    "param_values": {},
     "params": [],
     "secrets": [],
-    "task_name": "add1-user",
     "title": "Add1-user",
-    "types": {
-      "a": "int",
-      "count": "int"
+    "base_container_image": {
+      "build": "",
+      "runtime": "python:3.7"
     }
   }
 }

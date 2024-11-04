@@ -174,7 +174,6 @@
     }
   },
   "cell": {
-    "all_inputs": [],
     "chart_obj": {
       "hovered": {},
       "links": {},
@@ -222,10 +221,12 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {
-      "conf_data_folder": "conf_data_folder = os.path.join('/tmp', 'data')"
-    },
-    "container_source": "",
+    "confs": [
+      {
+        "name": "conf_data_folder",
+        "assignation": "conf_data_folder = os.path.join('/tmp','data')"
+      }
+    ],
     "dependencies": [
       {
         "asname": null,
@@ -250,51 +251,14 @@
     ],
     "inputs": [],
     "kernel": "ipython",
-    "node_id": "c82b344",
-    "notebook_dict": {
-      "cells": [
-        {
-          "cell_type": "code",
-          "execution_count": null,
-          "id": "00dd23e8-531e-4dd8-90aa-43573c240a48",
-          "metadata": {},
-          "outputs": [],
-          "source": "# Create file \n\nL = [\"a\\n\", \"b\\n\", \"c\\n\"]\nfile_path =  os.path.join(conf_data_folder,'hello.txt')\nfp = open(file_path, 'w')\nfp.writelines(L)\nfp.close()\n\nfrom os import listdir\nfrom os.path import isfile, join\nonlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)\n"
-        }
-      ],
-      "metadata": {
-        "kernelspec": {
-          "display_name": "python3",
-          "language": "python3",
-          "name": "python3"
-        },
-        "language_info": {
-          "codemirror_mode": {
-            "name": "ipython",
-            "version": 3
-          },
-          "file_extension": ".py",
-          "mimetype": "text/x-python",
-          "name": "python",
-          "nbconvert_exporter": "python",
-          "pygments_lexer": "ipython3",
-          "version": "3.11.9"
-        }
-      },
-      "nbformat": 4,
-      "nbformat_minor": 5
-    },
-    "original_source": "conf_data_folder = os.path.join('/tmp', 'data')\n# Create file \n\nL = [\"a\\n\", \"b\\n\", \"c\\n\"]\nfile_path =  os.path.join(conf_data_folder,'hello.txt')\nfp = open(file_path, 'w')\nfp.writelines(L)\nfp.close()\n\nfrom os import listdir\nfrom os.path import isfile, join\nonlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)",
     "outputs": [
-      "file_path"
+      {
+        "name": "file_path",
+        "type": "str"
+      }
     ],
-    "param_values": {},
     "params": [],
     "secrets": [],
-    "task_name": "create-file-user",
-    "title": "Create-file-user",
-    "types": {
-      "file_path": "str"
-    }
+    "title": "Create-file-user"
   }
 }
