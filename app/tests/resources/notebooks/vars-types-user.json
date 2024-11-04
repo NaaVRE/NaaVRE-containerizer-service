@@ -211,6 +211,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "vars-types-user"
+    "title": "vars-types-user",
+    "base_container_image": {
+    }
   }
 }

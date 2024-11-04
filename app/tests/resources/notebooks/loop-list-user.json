@@ -201,7 +201,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "loop-list-user",
+            "title": "loop-list-test-user-2",
             "vars": [
               {
                 "color": "#79c5d2",
@@ -233,6 +233,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "loop-list-user"
+    "title": "loop-list-test-user-2",
+    "base_container_image": {
+    }
   }
 }

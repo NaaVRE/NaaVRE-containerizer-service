@@ -456,6 +456,8 @@
       }
     ],
     "secrets": [],
-    "title": "S6-GeoTIFF-Export-local-user"
+    "title": "S6-GeoTIFF-Export-local-user",
+    "base_container_image": {
+    }
   }
 }

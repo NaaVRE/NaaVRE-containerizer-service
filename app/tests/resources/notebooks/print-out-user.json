@@ -233,6 +233,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "Print-out-user"
+    "title": "Print-out-user",
+    "base_container_image": {
+    }
   }
 }

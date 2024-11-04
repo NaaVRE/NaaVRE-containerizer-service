@@ -279,6 +279,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "read-file-lines-user"
+    "title": "read-file-lines-user",
+    "base_container_image": {
+    }
   }
 }

@@ -233,6 +233,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "process-float-user"
+    "title": "process-float-user",
+    "base_container_image": {
+    }
   }
 }

@@ -395,6 +395,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "visualize-rasterio-user"
+    "title": "visualize-rasterio-user",
+    "base_container_image": {
+    }
   }
 }

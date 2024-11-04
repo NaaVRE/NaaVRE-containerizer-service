@@ -233,6 +233,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "float-user"
+    "title": "float-user",
+    "base_container_image": {
+    }
   }
 }

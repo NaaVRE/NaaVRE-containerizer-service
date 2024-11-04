@@ -259,6 +259,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "vol2bird-user"
+    "title": "vol2bird-user",
+    "base_container_image": {
+    }
   }
 }

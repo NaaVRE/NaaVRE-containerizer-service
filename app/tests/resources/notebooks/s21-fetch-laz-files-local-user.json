@@ -420,6 +420,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "S21-Fetch-Laz-Files-local-user"
+    "title": "S21-Fetch-Laz-Files-local-user",
+    "base_container_image": {
+    }
   }
 }

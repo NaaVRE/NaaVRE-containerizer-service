@@ -18,11 +18,7 @@ class Cell(BaseModel):
     confs: Optional[list[dict]] | None = None
     dependencies: Optional[list[dict]] | None = None
     chart_obj: dict | None = None
-    # container_source: str | None = None
-    global_conf: Optional[dict] | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c'] | None = None
-    image_version: str | None = None
-    types: Optional[dict] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)

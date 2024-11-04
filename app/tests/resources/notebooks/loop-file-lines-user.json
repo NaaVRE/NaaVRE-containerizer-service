@@ -253,6 +253,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "loop-file-lines-user"
+    "title": "loop-file-lines-user",
+    "base_container_image": {
+    }
   }
 }

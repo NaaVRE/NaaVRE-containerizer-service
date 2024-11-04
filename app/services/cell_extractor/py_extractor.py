@@ -183,11 +183,11 @@ class PyExtractor(Extractor):
         dependencies = []
         names = self.__extract_variables(self.cell_source)
         for ck in confs:
-            names.update(self.__extract_variables(confs[ck]))
+            conf_vars = self.__extract_variables(ck['assignation'])
+            names.update(conf_vars)
         for name in names:
             if name in self.notebook_imports:
                 dependencies.append(self.notebook_imports.get(name))
-
         return dependencies
 
     def infer_cell_conf_dependencies(self, confs):
@@ -313,15 +313,15 @@ class PyExtractor(Extractor):
 
     def extract_cell_conf_ref(self) -> list[dict]:
         conf = {}
-        cell_conf = []
+        cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
         conf_unds = [und for und in cell_unds if
                      und in self.notebook_configurations]
         for u in conf_unds:
             if u not in conf:
                 conf[u] = self.notebook_configurations[u]
-                cell_conf.append(conf)
-        return cell_conf
+                cell_confs.append({'name': u, 'assignation': conf[u]})
+        return cell_confs
 
     def __resolve_configurations(self, configurations):
         assignment_transformer = PyConfAssignmentTransformer(configurations)

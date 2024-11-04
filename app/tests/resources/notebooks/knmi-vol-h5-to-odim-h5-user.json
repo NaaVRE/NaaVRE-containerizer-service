@@ -259,6 +259,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "KNMI-vol-h5-to-ODIM-h5-user"
+    "title": "KNMI-vol-h5-to-ODIM-h5-user",
+    "base_container_image": {
+    }
   }
 }

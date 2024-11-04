@@ -233,6 +233,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "process-int-user"
+    "title": "process-int-user",
+    "base_container_image": {
+    }
   }
 }

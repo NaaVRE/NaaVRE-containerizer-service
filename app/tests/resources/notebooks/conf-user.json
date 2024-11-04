@@ -217,6 +217,8 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "conf-user"
+    "title": "conf-user",
+    "base_container_image": {
+    }
   }
 }

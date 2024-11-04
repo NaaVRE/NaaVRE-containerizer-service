@@ -259,6 +259,8 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "Create-file-user"
+    "title": "Create-file-user",
+    "base_container_image": {
+    }
   }
 }

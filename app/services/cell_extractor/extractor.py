@@ -18,6 +18,7 @@ class Extractor(abc.ABC):
     cell_dependencies: list
 
     def __init__(self, notebook_data: NotebookData):
+        self.notebook_data = notebook_data
         self.notebook = notebook_data.notebook
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
@@ -69,9 +70,9 @@ class Extractor(abc.ABC):
             'outputs': self.cell_outputs,
             'confs': self.cell_confs,
             'dependencies': self.cell_dependencies,
-            'base_container_image': None,
+            'base_container_image': {},
             'chart_obj': chart,
-            'kernel': self.notebook.kernel
+            'kernel': self.notebook_data.kernel
         }
         return Cell.model_validate(cell_dict)
 

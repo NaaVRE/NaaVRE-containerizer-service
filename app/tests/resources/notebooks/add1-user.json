@@ -255,8 +255,6 @@
     "secrets": [],
     "title": "Add1-user",
     "base_container_image": {
-      "build": "",
-      "runtime": "python:3.7"
     }
   }
 }
