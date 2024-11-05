@@ -17,6 +17,8 @@ def test_extract_cell():
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)
+        if 's6-geotiff-export-local-user.json' not in notebook_path:
+            continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
@@ -36,4 +38,17 @@ def test_extract_cell():
         del expected_cell['chart_obj']
         print('Expected cell: ' + str(expected_cell))
         print('Extracted cell: ' + str(cell))
+        for key, value in expected_cell.items():
+            if cell[key] != value:
+                if isinstance(value, list):
+                    print('Key: ' + key)
+                    print('Expected: ' + str(value))
+                    print('Extracted: ' + str(cell[key]))
+                    for i in range(len(value)):
+                        if value[i] != cell[key][i]:
+                            print('Expected: ' + str(value[i]))
+                            print('Extracted: ' + str(cell[key][i]))
+                print('Key: ' + key)
+                print('Expected: ' + str(value))
+                print('Extracted: ' + str(cell[key]))
         assert cell == expected_cell

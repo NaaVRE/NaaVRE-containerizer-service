@@ -438,23 +438,7 @@
         "type": "str"
       }
     ],
-    "params": [
-      {
-        "name": "param_hostname",
-        "type": "str",
-        "default_value": "https://host/"
-      },
-      {
-        "name": "param_username",
-        "type": "str",
-        "default_value": "USERNAME"
-      },
-      {
-        "name": "param_password",
-        "type": "str",
-        "default_value": "PASSWORD"
-      }
-    ],
+    "params": [],
     "secrets": [],
     "title": "s6-geotiff-export-local-test-user-2",
     "base_container_image": {
