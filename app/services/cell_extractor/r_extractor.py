@@ -247,7 +247,7 @@ class RExtractor(Extractor):
                     und not in self.notebook_configurations and
                     und not in self.notebook_params and
                     und not in self.notebook_secrets):
-                cell_inputs.append({und: properties})
+                cell_inputs.append(properties)
 
         return cell_inputs
 

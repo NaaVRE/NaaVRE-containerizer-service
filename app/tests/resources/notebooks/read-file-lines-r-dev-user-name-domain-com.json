@@ -217,18 +217,21 @@
     "inputs": [
       {
         "name": "file_path",
-        "type": "str"
+        "type": null
       }
     ],
     "kernel": "IRkernel",
     "outputs": [
       {
         "name": "lines",
-        "type": "list"
+        "type": null
       }
     ],
     "params": [],
     "secrets": [],
-    "task_name": "read-file-lines-r-test-user-2"
+    "title": "read-file-lines-r-test-user-2",
+    "base_container_image": {
+
+    }
   }
 }
