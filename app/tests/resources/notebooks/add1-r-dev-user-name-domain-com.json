@@ -205,8 +205,8 @@
     "params": [],
     "secrets": [],
     "title": "Add1-R-test-user-2",
-    "types": {
-      "count": "int"
+    "base_container_image": {
+
     }
   }
 }
