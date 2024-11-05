@@ -181,7 +181,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "loop-file-lines-R-dev-user-name-domain-com",
+            "title": "loop-file-lines-R-test-user-2",
             "vars": [
               {
                 "color": "#ac535c",
@@ -224,6 +224,6 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "loop-file-lines-R-dev-user-name-domain-com"
+    "title": "loop-file-lines-R-test-user-2"
   }
 }

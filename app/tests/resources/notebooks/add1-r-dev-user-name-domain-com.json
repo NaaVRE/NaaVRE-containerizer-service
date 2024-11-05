@@ -172,7 +172,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "Add1-R-dev-user-name-domain-com",
+            "title": "Add1-R-test-user-2",
             "vars": [
               {
                 "color": "#783d3a",
@@ -204,7 +204,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "Add1-R-dev-user-name-domain-com",
+    "title": "Add1-R-test-user-2",
     "types": {
       "count": "int"
     }

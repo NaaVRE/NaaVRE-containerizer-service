@@ -181,7 +181,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "loop-list-R-dev-user-name-domain-com",
+            "title": "loop-list-R-test-user-2",
             "vars": [
               {
                 "color": "#79c5d2",
@@ -213,6 +213,6 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "task_name": "loop-list-r-dev-user-name-domain-com"
+    "task_name": "loop-list-r-test-user-2"
   }
 }

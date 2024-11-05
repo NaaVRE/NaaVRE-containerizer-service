@@ -16,6 +16,7 @@ class Extractor(abc.ABC):
     cell_secrets: list
     cell_confs: list
     cell_dependencies: list
+    notebook_secrets: dict
 
     def __init__(self, notebook_data: NotebookData):
         self.notebook_data = notebook_data

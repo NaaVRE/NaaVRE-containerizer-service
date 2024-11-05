@@ -181,7 +181,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "loop-int-list-R-dev-user-name-domain-com",
+            "title": "loop-int-list-R-test-user-2",
             "vars": [
               {
                 "color": "#5f1f93",
@@ -213,6 +213,6 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "loop-int-list-R-dev-user-name-domain-com"
+    "title": "loop-int-list-R-test-user-2"
   }
 }

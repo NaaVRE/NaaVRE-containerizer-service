@@ -180,7 +180,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "input-lists-R-dev-user-name-domain-com",
+            "title": "input-lists-R-test-user-2",
             "vars": [
               {
                 "color": "#79c5d2",
@@ -222,6 +222,6 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "input-lists-R-dev-user-name-domain-com"
+    "title": "input-lists-R-test-user-2"
   }
 }

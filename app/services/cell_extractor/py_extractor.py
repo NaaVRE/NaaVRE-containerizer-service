@@ -10,6 +10,7 @@ from pytype.tools.annotate_ast import annotate_ast
 from .extractor import Extractor
 from .py_conf_assignment_transformer import PyConfAssignmentTransformer
 from .py_visitors.visitor import Visitor
+from ..repositories.github_service import logger
 from ...models.notebook_data import NotebookData
 
 
@@ -18,7 +19,7 @@ class PyExtractor(Extractor):
     notebook_imports: dict
     notebook_configurations: dict
     notebook_params: dict
-    notebook_secrets: dict
+    # notebook_secrets: dict
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData):
@@ -255,7 +256,8 @@ class PyExtractor(Extractor):
                         var_type = self.__convert_type_annotation(
                             module.resolved_annotation)
                     except AttributeError:
-                        print('__extract_cell_names failed', var_name)
+                        logger.debug(
+                            '__extract_variables failed. var_name: %s',)
                         var_type = None
                 else:
                     var_type = self.notebook_variables[var_name]['type']
