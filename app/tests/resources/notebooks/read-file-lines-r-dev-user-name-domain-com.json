@@ -231,7 +231,6 @@
     "secrets": [],
     "title": "read-file-lines-r-test-user-2",
     "base_container_image": {
-
     }
   }
 }

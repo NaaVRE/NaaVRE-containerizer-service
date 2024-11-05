@@ -199,11 +199,13 @@
     "outputs": [
       {
         "name": "file_path",
-        "type": "str"
+        "type":  null
       }
     ],
     "params": [],
     "secrets": [],
-    "title": "Create-file-R-test-user-2"
+    "title": "Create-file-R-test-user-2",
+    "base_container_image": {
+    }
   }
 }

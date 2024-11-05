@@ -213,6 +213,9 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "loop-int-list-R-test-user-2"
+    "title": "loop-int-list-R-test-user-2",
+    "base_container_image": {
+
+    }
   }
 }
