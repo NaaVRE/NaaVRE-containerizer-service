@@ -224,6 +224,9 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "loop-file-lines-R-test-user-2"
+    "title": "loop-file-lines-R-test-user-2",
+    "base_container_image": {
+
+    }
   }
 }

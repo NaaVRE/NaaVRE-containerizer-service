@@ -18,9 +18,9 @@ def test_extract_cell():
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)
-        if ('read-file-lines-r-dev-user-name-domain-com.json'
-                not in notebook_file):
-            continue
+        # if ('read-file-lines-r-dev-user-name-domain-com.json'
+        #         not in notebook_file):
+        #     continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
