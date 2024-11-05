@@ -327,7 +327,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "visualize-rasterio-user",
+            "title": "visualize-rasterio-test-user-2",
             "vars": [
               {
                 "color": "#2d35d2",
@@ -395,7 +395,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "visualize-rasterio-user",
+    "title": "visualize-rasterio-test-user-2",
     "base_container_image": {
     }
   }

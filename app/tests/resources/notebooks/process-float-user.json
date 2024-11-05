@@ -201,7 +201,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "process-float-user",
+            "title": "process-float-test-user-2",
             "vars": [
               {
                 "color": "#2dc5d2",
@@ -221,7 +221,7 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
+    "confs": [],
     "dependencies": [],
     "inputs": [
       {
@@ -233,7 +233,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "process-float-user",
+    "title": "process-float-test-user-2",
     "base_container_image": {
     }
   }

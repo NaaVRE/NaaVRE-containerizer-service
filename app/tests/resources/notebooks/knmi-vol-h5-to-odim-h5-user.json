@@ -210,7 +210,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "KNMI-vol-h5-to-ODIM-h5-user",
+            "title": "KNMI-vol-h5-to-ODIM-h5-test-user-2",
             "vars": [
               {
                 "color": "#77862d",
@@ -259,7 +259,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "KNMI-vol-h5-to-ODIM-h5-user",
+    "title": "KNMI-vol-h5-to-ODIM-h5-test-user-2",
     "base_container_image": {
     }
   }

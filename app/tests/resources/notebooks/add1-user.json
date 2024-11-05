@@ -210,7 +210,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "Add1-user",
+            "title": "add1-test-user-2",
             "vars": [
               {
                 "color": "#783d3a",
@@ -253,7 +253,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "Add1-user",
+    "title": "add1-test-user-2",
     "base_container_image": {
     }
   }

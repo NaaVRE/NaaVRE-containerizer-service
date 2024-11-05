@@ -191,7 +191,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "vars-types-user",
+            "title": "vars-types-test-user-2",
             "vars": []
           },
           "type": "input-output"
@@ -204,14 +204,14 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
+    "confs": [],
     "dependencies": [],
     "inputs": [],
     "kernel": "ipython",
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "vars-types-user",
+    "title": "vars-types-test-user-2",
     "base_container_image": {
     }
   }

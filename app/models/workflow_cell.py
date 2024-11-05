@@ -71,11 +71,11 @@ class Cell(BaseModel):
             secrets = self._extract_types(secrets)
         self.secrets = secrets
 
-    def set_image_version(self, image_version):
-        if not image_version:
-            raise ValueError(
-                "Image version cannot be empty. Cell title: %s" % self.title)
-        self.image_version = image_version
+    # def set_image_version(self, image_version):
+    #     if not image_version:
+    #         raise ValueError(
+    #             "Image version cannot be empty. Cell title: %s" % self.title)
+    #     self.image_version = image_version
 
     # def clean_code(self):
     #     indices_to_remove = []

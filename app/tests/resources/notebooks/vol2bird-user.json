@@ -210,7 +210,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "vol2bird-user",
+            "title": "vol2bird-test-user-2",
             "vars": [
               {
                 "color": "#77862d",
@@ -236,7 +236,7 @@
       "scale": 1,
       "selected": {}
     },
-    "confs": {},
+    "confs": [],
     "dependencies": [
       {
         "asname": null,
@@ -259,7 +259,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "vol2bird-user",
+    "title": "vol2bird-test-user-2",
     "base_container_image": {
     }
   }

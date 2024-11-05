@@ -201,7 +201,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "Print-out-user",
+            "title": "print-out-test-user-2",
             "vars": [
               {
                 "color": "#622d86",
@@ -233,7 +233,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "Print-out-user",
+    "title": "print-out-test-user-2",
     "base_container_image": {
     }
   }

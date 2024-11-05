@@ -356,7 +356,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "S21-Fetch-Laz-Files-test-user-2",
+            "title": "s21-fetch-laz-files-local-test-user-2",
             "vars": [
               {
                 "color": "#862d56",
@@ -420,7 +420,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "S21-Fetch-Laz-Files-test-user-2",
+    "title": "s21-fetch-laz-files-local-test-user-2",
     "base_container_image": {
     }
   }

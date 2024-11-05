@@ -388,16 +388,16 @@
     },
     "confs": [
       {
-        "name": "conf_feature_name",
-        "assignation": "conf_feature_name = 'perc_95_normalized_height'"
-      },
-      {
         "name": "conf_local_path_geotiff",
         "assignation": "conf_local_path_geotiff = os.path.join(pathlib.Path('/tmp/data').as_posix(), 'geotiff')"
       },
       {
         "name": "conf_local_path_targets",
         "assignation": "conf_local_path_targets = os.path.join(pathlib.Path('/tmp/data').as_posix(), 'targets')"
+      },
+      {
+        "name": "conf_feature_name",
+        "assignation": "conf_feature_name = 'perc_95_normalized_height'"
       },
       {
         "name": "conf_remote_path_geotiffs",

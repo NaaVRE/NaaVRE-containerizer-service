@@ -191,7 +191,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "conf-user",
+            "title": "conf-test-user-2",
             "vars": []
           },
           "type": "input-output"
@@ -217,7 +217,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "conf-user",
+    "title": "conf-test-user-2",
     "base_container_image": {
     }
   }
