@@ -228,7 +228,7 @@ class RExtractor(Extractor):
     def infer_cell_outputs(self) -> list[dict]:
         cell_names = self.__extract_cell_names(self.cell_source)
         cell_undef = self.__extract_cell_undefined(self.cell_source)
-        cell_confs = []
+        cell_outputs = []
         for name, properties in cell_names.items():
             if (name not in cell_undef and
                     name not in self.imports and
@@ -236,8 +236,8 @@ class RExtractor(Extractor):
                     name not in self.notebook_configurations and
                     name not in self.notebook_params and
                     name not in self.notebook_secrets):
-                cell_confs.append(properties)
-        return cell_confs
+                cell_outputs.append(properties)
+        return cell_outputs
 
     def infer_cell_inputs(self) -> list[dict]:
         cell_undefined = self.__extract_cell_undefined(self.cell_source)

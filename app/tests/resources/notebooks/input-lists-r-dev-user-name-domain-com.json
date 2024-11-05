@@ -213,15 +213,17 @@
     "outputs": [
       {
         "name": "list_of_paths",
-        "type": "list"
+        "type": null
       },
       {
         "name": "list_of_ints",
-        "type": "list"
+        "type": null
       }
     ],
     "params": [],
     "secrets": [],
-    "title": "input-lists-R-test-user-2"
+    "title": "input-lists-R-test-user-2",
+    "base_container_image": {
+    }
   }
 }
