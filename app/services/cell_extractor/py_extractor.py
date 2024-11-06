@@ -160,15 +160,6 @@ class PyExtractor(Extractor):
                 dependencies.append(self.notebook_imports.get(name))
         return dependencies
 
-    # def infer_cell_conf_dependencies(self, confs):
-    #     dependencies = []
-    #     for ck in confs:
-    #         for name in self.__extract_variables(confs[ck]):
-    #             if name in self.notebook_imports:
-    #                 dependencies.append(self.notebook_imports.get(name))
-    #
-    #     return dependencies
-
     @staticmethod
     @lru_cache
     def __get_annotated_ast(cell_source):
