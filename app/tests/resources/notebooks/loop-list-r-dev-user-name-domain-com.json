@@ -214,7 +214,7 @@
     "params": [],
     "secrets": [],
     "title": "loop-list-r-test-user-2",
-        "base_container_image": {
+    "base_container_image": {
     }
   }
 }
