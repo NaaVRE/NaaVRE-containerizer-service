@@ -197,6 +197,10 @@
         "type": "str"
       },
       {
+        "name": "var_string",
+        "type": "str"
+      },
+      {
         "name": "var_int",
         "type": "int"
       },
