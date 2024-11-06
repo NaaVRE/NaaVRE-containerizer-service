@@ -198,65 +198,87 @@ class HeaderExtractor(Extractor):
         # 'value' should only be kept for params
         if item_type not in ['params']:
             del var_dict['value']
-
+        elif item_type in ['params']:
+            var_dict['default_value'] = var_dict['value']
+            del var_dict['value']
         return var_dict
 
     def _infer_cell_interface_vars(
             self,
             header: Union[dict, None],
             item_type: Literal['inputs', 'outputs', 'params', 'secrets'],
-    ) -> Union[dict, None]:
+    ) -> list[dict]:
         if header is None:
-            return None
+            return []
+        vars = []
         items = header['NaaVRE']['cell'].get(item_type)
         if items is None:
-            return None
-        items = [self._parse_interface_vars_items(it, item_type)
-                 for it in items]
-        return {it['name']: it for it in items}
+            return []
+        for item in items:
+            var = self._parse_interface_vars_items(item, item_type)
+            vars.append(var)
+        return vars
 
-    def infer_cell_inputs(self):
-        return self._infer_cell_interface_vars(
+    def infer_cell_inputs(self) -> list[dict]:
+        inputs = self._infer_cell_interface_vars(
             self.cell_header,
             'inputs',
         )
+        return inputs
 
-    def infer_cell_outputs(self):
-        return self._infer_cell_interface_vars(
+    def infer_cell_outputs(self) -> list[dict]:
+        outputs = self._infer_cell_interface_vars(
             self.cell_header,
             'outputs',
         )
+        return outputs
 
-    def extract_cell_params(self):
+    def extract_cell_params(self) -> list[dict]:
         if self._external_extract_cell_params is not None:
-            return self._external_extract_cell_params(self.cell_source)
-        return self._infer_cell_interface_vars(
-            self._extract_header(self.cell_source),
-            'params',
-        )
+            params = self._external_extract_cell_params(self.cell_source)
+        else:
+            params = self._infer_cell_interface_vars(
+                self._extract_header(self.cell_source),
+                'params',
+            )
+        return params
 
-    def extract_cell_secrets(self):
+    def extract_cell_secrets(self) -> list[dict]:
         if self._external_extract_cell_secrets is not None:
-            return self._external_extract_cell_secrets(self.cell_source)
-        return self._infer_cell_interface_vars(
-            self._extract_header(self.cell_source),
-            'secrets',
-        )
+            secrets = self._external_extract_cell_secrets(self.cell_source)
+        else:
+            secrets = self._infer_cell_interface_vars(
+                self._extract_header(self.cell_source),
+                'secrets',
+            )
+        return secrets
 
-    def extract_cell_conf_ref(self):
+    def extract_cell_conf_ref(self) -> list[dict]:
         if self.cell_header is None:
-            return None
+            return []
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
-            return None
-        return {k: v['assignation'] for it in items for k, v in it.items()}
+            return []
+        confs = []
+        for item in items:
+            for k, v in item.items():
+                if 'assignation' in v:
+                    assignation = v.get('assignation')
+                    if '[' in assignation and ']' in assignation:
+                        # Replace to R list format
+                        assignation = assignation.replace('[',
+                                                          'list(').replace(']',
+                                                                           ')')
+                        item[k]['assignation'] = assignation
+            confs.append({k: v['assignation'] for k, v in item.items()})
+        return confs
 
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self, confs) -> list[dict]:
         if self.cell_header is None:
-            return None
+            return []
         items = self.cell_header['NaaVRE']['cell'].get('dependencies')
         if items is None:
-            return None
+            return []
         return [
             {
                 'name': it.get('name'),

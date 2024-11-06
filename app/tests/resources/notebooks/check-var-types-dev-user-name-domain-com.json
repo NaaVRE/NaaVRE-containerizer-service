@@ -273,22 +273,6 @@
         "type": "str"
       }
     ],
-    "param_values": {
-      "param_float": 1.1,
-      "param_int": 1,
-      "param_list_int": [
-        1,
-        2,
-        3
-      ],
-      "param_list_str": [
-        "list_str",
-        "space in elem",
-        "3"
-      ],
-      "param_string": "param_string value",
-      "param_string_with_comment": "param_string value"
-    },
     "params": [
       {
         "name": "param_string",

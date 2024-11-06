@@ -1,5 +1,6 @@
 import os
 import tempfile
+from typing import Literal
 
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
@@ -201,28 +202,29 @@ class RExtractor(Extractor):
         return self.__resolve_configurations(configurations)
 
     # check source https://adv-r.hadley.nz/expressions.html)
-    def __extract_prefixed_var(self, sources, prefix):
+    def __extract_prefixed_var(self, sources,
+                               prefix:
+                               Literal['input', 'output', 'param', 'secret']) \
+            -> list[dict]:
         extracted_vars = []
+        key_value_name = 'value'
+        if prefix == 'param':
+            key_value_name = 'default_value'
         for s in sources:
             tree = parse_text(s)
             visitor = ExtractPrefixedVar(prefix)
-            output = visitor.visit(tree)
-            for variable in output:
-                print(variable)
-
-                # if (variable not in extracted_vars or
-                #         'value' not in extracted_vars[variable] or
-                #         extracted_vars[variable]['value'] is None):
-                #
-                #     extracted_vars[variable] = {
-                #         'name': variable,
-                #         'type': self.notebook_names[variable]['type']
-                #         if variable in self.notebook_names else None,
-                #         'value': output[variable]['value']
-                #     }
-                #     if prefix == 'secret':
-                #         del extracted_vars[variable]['value']
-
+            variable_names = visitor.visit(tree)
+            for variable_name in variable_names:
+                if variable_name.startswith(prefix+'_'):
+                    extracted_var = {
+                        'name': variable_name,
+                        'type': self.notebook_names[variable_name]['type']
+                        if variable_name in self.notebook_names else None,
+                        key_value_name: variable_names[variable_name]['value']
+                    }
+                    if prefix == 'secret':
+                        del extracted_var[key_value_name]
+                    extracted_vars.append(extracted_var)
         return extracted_vars
 
     def infer_cell_outputs(self) -> list[dict]:
@@ -248,7 +250,6 @@ class RExtractor(Extractor):
                     und not in self.notebook_params and
                     und not in self.notebook_secrets):
                 cell_inputs.append(properties)
-
         return cell_inputs
 
     def infer_cell_dependencies(self, confs):
@@ -282,7 +283,6 @@ class RExtractor(Extractor):
         defs, scoped = visitor.visit(tree)
         visitor = ExtractUndefined(defs, scoped)
         undefs = visitor.visit(tree)
-
         undef_vars = {
             name: {
                 'name': name,
@@ -291,7 +291,6 @@ class RExtractor(Extractor):
             }
             for name in undefs
         }
-
         return undef_vars
 
     def extract_cell_params(self) -> list[dict]:

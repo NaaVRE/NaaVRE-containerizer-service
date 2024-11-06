@@ -137,7 +137,7 @@
             ],
             "params": [],
             "secrets": [],
-            "title": "R-vars-types-dev-user-name-domain-com",
+            "title": "r-vars-types-test-user-2",
             "vars": [
               {
                 "color": "#87c0c5",
@@ -215,7 +215,7 @@
     ],
     "params": [],
     "secrets": [],
-    "title": "R-vars-types-dev-user-name-domain-com",
+    "title": "r-vars-types-test-user-2",
     "base_container_image": {
     }
   }

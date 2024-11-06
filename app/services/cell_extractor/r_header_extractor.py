@@ -3,12 +3,13 @@ from .header_extractor import HeaderExtractor
 
 class RHeaderExtractor(HeaderExtractor):
 
-    def extract_cell_conf_ref(self):
+    def extract_cell_conf_ref(self) -> list[dict]:
         if self.cell_header is None:
-            return None
+            return []
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
-            return None
+            return []
+        confs = []
         for item in items:
             for k, v in item.items():
                 if 'assignation' in v:
@@ -19,6 +20,6 @@ class RHeaderExtractor(HeaderExtractor):
                                                           'list(').replace(']',
                                                                            ')')
                         item[k]['assignation'] = assignation
-        cell_conf = {k: v['assignation'] for it in items for k, v in
-                     it.items()}
-        return cell_conf
+                conf = {'name': k, 'assignation': item[k]['assignation']}
+                confs.append(conf)
+        return confs

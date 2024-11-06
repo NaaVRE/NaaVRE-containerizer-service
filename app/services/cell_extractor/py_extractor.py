@@ -2,6 +2,7 @@ import ast
 import logging
 import re
 from functools import lru_cache
+from typing import Literal
 
 from pyflakes import reporter as pyflakes_reporter, api as pyflakes_api
 from pytype import config as pytype_config
@@ -95,7 +96,9 @@ class PyExtractor(Extractor):
                             configurations[name] = conf_line
         return self.__resolve_configurations(configurations)
 
-    def __extract_prefixed_var(self, sources, prefix):
+    def __extract_prefixed_var(self, sources,
+                               prefix:
+                               Literal['input', 'output', 'param', 'secret']):
         extracted_vars = dict()
         for s in sources:
             lines = s.splitlines()
@@ -170,14 +173,6 @@ class PyExtractor(Extractor):
                     und not in self.notebook_params and
                     und not in self.notebook_secrets):
                 cell_inputs.append({'name': und, 'type': properties['type']})
-        # ins = {
-        #     und: properties
-        #     for und, properties in cell_undefined.items()
-        #     if und not in self.notebook_imports
-        #        and und not in self.notebook_configurations
-        #        and und not in self.notebook_params
-        #        and und not in self.notebook_secrets
-        # }
         return cell_inputs
 
     def infer_cell_dependencies(self, confs):
@@ -257,7 +252,7 @@ class PyExtractor(Extractor):
                             module.resolved_annotation)
                     except AttributeError:
                         logger.debug(
-                            '__extract_variables failed. var_name: %s',)
+                            '__extract_variables failed. var_name: %s', )
                         var_type = None
                 else:
                     var_type = self.notebook_variables[var_name]['type']
@@ -298,7 +293,8 @@ class PyExtractor(Extractor):
         for u in param_unds:
             if u not in param:
                 param[u] = self.notebook_params[u]
-                cell_params.append(param)
+                cell_params.append({'name': u, 'type': param[u]['type'],
+                                    'default_value': param[u]['value']})
         return cell_params
 
     def extract_cell_secrets(self) -> list[dict]:
