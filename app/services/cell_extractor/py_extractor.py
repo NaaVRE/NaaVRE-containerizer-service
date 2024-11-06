@@ -38,7 +38,6 @@ class PyExtractor(Extractor):
             self.__parse_code('\n'.join(self.notebook_sources),
                               infer_types=True,
                               ))
-
         self.notebook_imports = notebook_visitor.imports
         self.notebook_configurations = self.__extract_configurations(
             self.notebook_sources)
@@ -125,7 +124,7 @@ class PyExtractor(Extractor):
                             del extracted_vars[name]['value']
         return extracted_vars
 
-    def infer_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict]:
         cell_variables = self.__extract_variables(self.cell_source)
         cell_outputs = []
         for name, properties in cell_variables.items():
@@ -138,7 +137,7 @@ class PyExtractor(Extractor):
                 cell_outputs.append({'name': name, 'type': properties['type']})
         return cell_outputs
 
-    def infer_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict]:
         cell_undefined = self.__extract_cell_undefined(self.cell_source)
         cell_inputs = []
         for und, properties in cell_undefined.items():
@@ -149,7 +148,7 @@ class PyExtractor(Extractor):
                 cell_inputs.append({'name': und, 'type': properties['type']})
         return cell_inputs
 
-    def infer_cell_dependencies(self, confs):
+    def get_cell_dependencies(self, confs):
         dependencies = []
         names = self.__extract_variables(self.cell_source)
         for ck in confs:
@@ -259,7 +258,7 @@ class PyExtractor(Extractor):
             }
         return undef_vars
 
-    def extract_cell_params(self) -> list[dict]:
+    def get_cell_params(self) -> list[dict]:
         param = {}
         cell_params = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -271,7 +270,7 @@ class PyExtractor(Extractor):
                                     'default_value': param[u]['value']})
         return cell_params
 
-    def extract_cell_secrets(self) -> list[dict]:
+    def get_cell_secrets(self) -> list[dict]:
         secret = {}
         cell_secrets = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -283,7 +282,7 @@ class PyExtractor(Extractor):
                 cell_secrets.append({'name': u, 'type': secret[u]['type']})
         return cell_secrets
 
-    def extract_cell_conf(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict]:
         conf = {}
         cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)

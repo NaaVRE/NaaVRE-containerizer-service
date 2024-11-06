@@ -92,19 +92,18 @@ def _get_extractor(notebook_data: NotebookData):
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
         extractor = DummyExtractor(notebook_data)
-    elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
-        extractor = PyHeaderExtractor(notebook_data)
     elif 'r' in kernel.lower():
         extractor = RHeaderExtractor(notebook_data)
-    if not extractor.is_complete():
-        if kernel.lower() == 'irkernel':
-            code_extractor = RExtractor(notebook_data)
-        elif kernel == 'ipython' or kernel == 'python':
-            code_extractor = PyExtractor(notebook_data)
-        else:
-            raise HTTPException(status_code=400,
-                                detail="Unsupported kernel: " + kernel)
-        extractor.add_missing_values(code_extractor)
+    elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
+        extractor = PyHeaderExtractor(notebook_data)
+    if kernel.lower() == 'irkernel':
+        code_extractor = RExtractor(notebook_data)
+    elif kernel == 'ipython' or kernel == 'python':
+        code_extractor = PyExtractor(notebook_data)
+    else:
+        raise HTTPException(status_code=400,
+                            detail="Unsupported kernel: " + kernel)
+    extractor.mearge_values(code_extractor)
     return extractor
 
 
@@ -113,7 +112,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload.data)
-    cell = extractor.extract_cell()
+    cell = extractor.get_cell()
     return cell
 
 

@@ -108,7 +108,6 @@ base = importr('base')
 
 
 class RExtractor(Extractor):
-    sources: list
     imports: dict
     notebook_configurations: dict
     notebook_params: list[dict]
@@ -117,30 +116,28 @@ class RExtractor(Extractor):
 
     def __init__(self, notebook_data: NotebookData):
         notebook = notebook_data.notebook
-        self.sources = [nbcell.source for nbcell in notebook.cells if
-                        nbcell.cell_type == 'code' and len(nbcell.source) > 0]
+        sources = [nbcell.source for nbcell in notebook.cells if
+                   nbcell.cell_type == 'code' and len(nbcell.source) > 0]
         self.notebook_names = self.__extract_cell_names(
-            '\n'.join(self.sources)
+            '\n'.join(sources)
         )
 
-        self.imports = self.__extract_imports(self.sources)
+        self.imports = self.__extract_imports(sources)
         self.notebook_configurations = (
-            self.__extract_configurations(self.sources))
-        self.notebook_params = self.__extract_prefixed_var(self.sources,
+            self.__extract_configurations(sources))
+        self.notebook_params = self.__extract_prefixed_var(sources,
                                                            'param')
-        self.notebook_secrets = self.__extract_prefixed_var(self.sources,
+        self.notebook_secrets = self.__extract_prefixed_var(sources,
                                                             'secret')
         self.undefined = dict()
-        for source in self.sources:
+        for source in sources:
             self.undefined.update(self.__extract_cell_undefined(source))
 
         super().__init__(notebook_data)
 
-    def __extract_imports(self, sources):
+    def __extract_imports(self, sources: list[str]) -> dict:
         imports = {}
         for s in sources:
-            packages = []
-
             ''' Approach 1: Simple regex.
                 this matches the following cases: require(pkg), library(pkg),
                 library("pkg"), library(package=pkg), library(package="pkg")
@@ -227,7 +224,7 @@ class RExtractor(Extractor):
                     extracted_vars.append(extracted_var)
         return extracted_vars
 
-    def infer_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict]:
         cell_names = self.__extract_cell_names(self.cell_source)
         cell_undef = self.__extract_cell_undefined(self.cell_source)
         cell_outputs = []
@@ -241,7 +238,7 @@ class RExtractor(Extractor):
                 cell_outputs.append(properties)
         return cell_outputs
 
-    def infer_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict]:
         cell_undefined = self.__extract_cell_undefined(self.cell_source)
         cell_inputs = []
         for und, properties in cell_undefined.items():
@@ -252,7 +249,7 @@ class RExtractor(Extractor):
                 cell_inputs.append(properties)
         return cell_inputs
 
-    def infer_cell_dependencies(self, confs) -> list[dict]:
+    def get_cell_dependencies(self, confs) -> list[dict]:
         # we probably like to only use dependencies that are necessary to
         # execute the cell however this is challenging in R as functions are
         # non-scoped
@@ -293,7 +290,7 @@ class RExtractor(Extractor):
         }
         return undef_vars
 
-    def extract_cell_params(self) -> list[dict]:
+    def get_cell_params(self) -> list[dict]:
         param = {}
         cell_params = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -304,7 +301,7 @@ class RExtractor(Extractor):
                 cell_params.append(param)
         return cell_params
 
-    def extract_cell_secrets(self) -> list[dict]:
+    def get_cell_secrets(self) -> list[dict]:
         secret = {}
         cell_secret = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -316,7 +313,7 @@ class RExtractor(Extractor):
                 cell_secret.append({'name': u, 'type': secret[u]['type']})
         return cell_secret
 
-    def extract_cell_conf(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict]:
         conf = {}
         cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)

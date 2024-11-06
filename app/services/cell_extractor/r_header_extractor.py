@@ -3,7 +3,10 @@ from .header_extractor import HeaderExtractor
 
 class RHeaderExtractor(HeaderExtractor):
 
-    def extract_cell_conf(self) -> list[dict]:
+    def __init__(self, notebook_data):
+        super().__init__(notebook_data)
+
+    def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
         items = self.cell_header['NaaVRE']['cell'].get('confs')

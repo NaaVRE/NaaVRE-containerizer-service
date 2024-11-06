@@ -10,32 +10,33 @@ from app.services.converter.converter import ConverterReactFlowChart
 
 
 class Extractor(abc.ABC):
+    user_name: str
+    cell_source: str
     cell_inputs: list
     cell_outputs: list
     cell_params: list
     cell_secrets: list
     cell_confs: list
     cell_dependencies: list
-    notebook_secrets: dict
+    kernel: str
 
     def __init__(self, notebook_data: NotebookData):
-        self.notebook_data = notebook_data
-        self.notebook = notebook_data.notebook
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
-
-        self.cell_inputs = self.infer_cell_inputs()
-        self.cell_outputs = self.infer_cell_outputs()
-        self.cell_params = self.extract_cell_params()
-        self.cell_secrets = self.extract_cell_secrets()
-        self.cell_confs = self.extract_cell_conf()
-        self.cell_dependencies = self.infer_cell_dependencies(self.cell_confs)
         self.user_name = notebook_data.user_name
+        self.kernel = notebook_data.kernel
+        self.cell_inputs = self.get_cell_inputs()
+        self.cell_outputs = self.get_cell_outputs()
+        self.cell_params = self.get_cell_params()
+        self.cell_secrets = self.get_cell_secrets()
+        self.cell_confs = self.get_cell_confs()
+        self.cell_dependencies = self.get_cell_dependencies(self.cell_confs)
 
-    def extract_cell(self) -> Cell:
+    def get_cell(self) -> Cell:
         title = self.cell_source.partition('\n')[0].strip()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
+
         cell_identity_dict = {
             'title': title,
             'params': self.cell_params,
@@ -73,50 +74,50 @@ class Extractor(abc.ABC):
             'dependencies': self.cell_dependencies,
             'base_container_image': {},
             'chart_obj': chart,
-            'kernel': self.notebook_data.kernel
+            'kernel': self.kernel
         }
         return Cell.model_validate(cell_dict)
 
     @abc.abstractmethod
-    def infer_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def infer_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def extract_cell_params(self) -> list[dict]:
+    def get_cell_params(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def extract_cell_secrets(self) -> list[dict]:
+    def get_cell_secrets(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def extract_cell_conf(self):
+    def get_cell_confs(self) -> list[dict]:
         pass
 
     @abc.abstractmethod
-    def infer_cell_dependencies(self, confs) -> list[dict]:
+    def get_cell_dependencies(self, confs) -> list[dict]:
         pass
 
 
 class DummyExtractor(Extractor):
-    def infer_cell_inputs(self):
-        return {}
-
-    def infer_cell_outputs(self):
-        return {}
-
-    def extract_cell_params(self):
-        return {}
-
-    def extract_cell_secrets(self):
-        return {}
-
-    def extract_cell_conf(self):
+    def get_cell_inputs(self) -> list[dict]:
         return []
 
-    def infer_cell_dependencies(self, confs):
+    def get_cell_outputs(self) -> list[dict]:
+        return []
+
+    def get_cell_params(self) -> list[dict]:
+        return []
+
+    def get_cell_secrets(self) -> list[dict]:
+        return []
+
+    def get_cell_confs(self) -> list[dict]:
+        return []
+
+    def get_cell_dependencies(self, confs) -> list[dict]:
         return []

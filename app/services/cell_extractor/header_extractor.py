@@ -45,6 +45,9 @@ class HeaderExtractor(Extractor):
     The document is validated with the schema `cell_header.schema.json`
 
     """
+    schema: dict
+    re_yaml_doc_in_comment: re.Pattern
+    cell_header: Union[dict, None]
 
     def __init__(self, notebook_data: NotebookData):
         self.re_yaml_doc_in_comment = re.compile(
@@ -54,26 +57,23 @@ class HeaderExtractor(Extractor):
              r"\s*#\s*\.\.\.\s*\n"
              ),
             re.MULTILINE)
-        cell_source = notebook_data.notebook.cells[
-            notebook_data.cell_index].source
         self.schema = self._load_schema()
-        self.cell_header = self._extract_header(cell_source)
-        self._external_extract_cell_params = None
-        self._external_extract_cell_secrets = None
-
+        self.cell_source = (
+            notebook_data.notebook.cells[notebook_data.cell_index].source)
+        self.cell_header = self._extract_header()
         super().__init__(notebook_data)
+        #
+        # self._external_extract_cell_params = None
+        # self._external_extract_cell_secrets = None
 
     @staticmethod
-    def _load_schema():
+    def _load_schema() -> dict:
         filename = os.path.join(
             os.path.dirname(__file__),
             'cell_header.schema.json')
         with open(filename) as f:
             schema = json.load(f)
         return schema
-
-    def enabled(self):
-        return self.cell_header is not None
 
     def is_complete(self):
         return (
@@ -85,9 +85,9 @@ class HeaderExtractor(Extractor):
                 and self.cell_dependencies
         )
 
-    def _extract_header(self, cell_source):
+    def _extract_header(self) -> Union[dict, None]:
         # get yaml document from cell comments
-        m = self.re_yaml_doc_in_comment.match(cell_source)
+        m = self.re_yaml_doc_in_comment.match(self.cell_source)
         if not (m and m.groups()):
             return None
         yaml_doc = m.group(1)
@@ -106,30 +106,46 @@ class HeaderExtractor(Extractor):
             raise e
         return header
 
-    def add_missing_values(self, extractor: Extractor):
+    def mearge_values(self, extractor: Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
         if not self.cell_inputs:
-            self.cell_inputs = extractor.infer_cell_inputs()
+            self.cell_inputs = extractor.cell_inputs
+        else:
+            for var in extractor.cell_inputs:
+                if var not in self.cell_inputs:
+                    self.cell_inputs.append(var)
         if not self.cell_outputs:
-            self.cell_outputs = extractor.infer_cell_outputs()
+            self.cell_outputs = extractor.cell_outputs
+        else:
+            for var in extractor.cell_outputs:
+                if var not in self.cell_outputs:
+                    self.cell_outputs.append(var)
         if not self.cell_params:
-            self.cell_params = extractor.extract_cell_params()
-            # We store a reference to extractor.extract_cell_params because
-            # self.extract_cell_params is called after self.add_missing_values
-            # in component_containerizer.handlers.ExtractorHandler.post()
-            self._external_extract_cell_params = extractor.extract_cell_params
+            self.cell_params = extractor.cell_params
+        else:
+            for var in extractor.cell_params:
+                if var not in self.cell_params:
+                    self.cell_params.append(var)
         if not self.cell_secrets:
-            self.cell_secrets = extractor.extract_cell_secrets()
-            # # Same as self._external_extract_cell_params
-            self._external_extract_cell_secrets = (
-                extractor.extract_cell_secrets())
+            self.cell_secrets = extractor.cell_secrets
+        else:
+            for var in extractor.cell_secrets:
+                if var not in self.cell_secrets:
+                    self.cell_secrets.append(var)
         if not self.cell_confs:
-            self.cell_confs = extractor.extract_cell_conf()
+            self.cell_confs = extractor.cell_confs
+        else:
+            for var in extractor.cell_confs:
+                if var not in self.cell_confs:
+                    self.cell_confs.append(var)
         if not self.cell_dependencies:
-            self.cell_dependencies = (
-                extractor.infer_cell_dependencies(self.cell_confs))
+            self.cell_dependencies = extractor.cell_dependencies
+        else:
+            for var in extractor.cell_dependencies:
+                if var not in self.cell_dependencies:
+                    self.cell_dependencies.append(var)
 
     @staticmethod
     def _parse_interface_vars_items(
@@ -219,41 +235,35 @@ class HeaderExtractor(Extractor):
             vars.append(var)
         return vars
 
-    def infer_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict]:
         inputs = self._infer_cell_interface_vars(
             self.cell_header,
             'inputs',
         )
         return inputs
 
-    def infer_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict]:
         outputs = self._infer_cell_interface_vars(
             self.cell_header,
             'outputs',
         )
         return outputs
 
-    def extract_cell_params(self) -> list[dict]:
-        if self._external_extract_cell_params is not None:
-            params = self._external_extract_cell_params(self.cell_source)
-        else:
-            params = self._infer_cell_interface_vars(
-                self._extract_header(self.cell_source),
-                'params',
-            )
+    def get_cell_params(self) -> list[dict]:
+        params = self._infer_cell_interface_vars(
+            self._extract_header(),
+            'params',
+        )
         return params
 
-    def extract_cell_secrets(self) -> list[dict]:
-        if self._external_extract_cell_secrets is not None:
-            secrets = self._external_extract_cell_secrets(self.cell_source)
-        else:
-            secrets = self._infer_cell_interface_vars(
-                self._extract_header(self.cell_source),
-                'secrets',
-            )
+    def get_cell_secrets(self) -> list[dict]:
+        secrets = self._infer_cell_interface_vars(
+            self._extract_header(),
+            'secrets',
+        )
         return secrets
 
-    def extract_cell_conf(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
         items = self.cell_header['NaaVRE']['cell'].get('confs')
@@ -273,7 +283,7 @@ class HeaderExtractor(Extractor):
             confs.append({k: v['assignation'] for k, v in item.items()})
         return confs
 
-    def infer_cell_dependencies(self, confs) -> list[dict]:
+    def get_cell_dependencies(self, confs) -> list[dict]:
         if self.cell_header is None:
             return []
         items = self.cell_header['NaaVRE']['cell'].get('dependencies')
