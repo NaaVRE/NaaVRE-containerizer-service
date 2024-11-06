@@ -108,7 +108,7 @@
               "param_list_str"
             ],
             "secrets": [],
-            "title": "Assert-vars-dev-user-name-domain-com",
+            "title": "assert-vars-test-user-2",
             "vars": [
               {
                 "color": "#ac8a53",
@@ -204,7 +204,7 @@
       }
     ],
     "secrets": [],
-    "title": "Assert-vars-dev-user-name-domain-com",
+    "title": "assert-vars-test-user-2",
     "base_container_image": {
     }
   }
