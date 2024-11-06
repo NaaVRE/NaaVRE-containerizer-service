@@ -92,7 +92,7 @@ def _get_extractor(notebook_data: NotebookData):
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
         extractor = DummyExtractor(notebook_data)
-    elif 'python' in kernel.lower():
+    elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
         extractor = PyHeaderExtractor(notebook_data)
     elif 'r' in kernel.lower():
         extractor = RHeaderExtractor(notebook_data)

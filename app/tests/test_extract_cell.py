@@ -18,9 +18,6 @@ def test_extract_cell():
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)
-        # if ('r-vars-types-test-user-2.json'
-        #         not in notebook_file):
-        #     continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
@@ -43,35 +40,36 @@ def test_extract_cell():
 
         returned_cell_confs = returned_cell.confs
         expected_cell_confs = expected_cell.confs
-        for returned_conf in returned_cell_confs:
-            assert returned_conf in expected_cell_confs
+        for expected_cell_conf in expected_cell_confs:
+            assert expected_cell_conf in returned_cell_confs
+
         assert returned_cell.title == expected_cell.title
         assert returned_cell.kernel == expected_cell.kernel
 
         returned_cell_inputs = returned_cell.inputs
         expected_cell_inputs = expected_cell.inputs
-        for returned_input in returned_cell_inputs:
-            assert returned_input in expected_cell_inputs
+        for expected_cell_input in expected_cell_inputs:
+            assert expected_cell_input in returned_cell_inputs
 
         returned_cell_outputs = returned_cell.outputs
         expected_cell_outputs = expected_cell.outputs
-        for returned_output in returned_cell_outputs:
-            assert returned_output in expected_cell_outputs
+        for expected_cell_output in expected_cell_outputs:
+            assert expected_cell_output in returned_cell_outputs
 
         returned_cell_params = returned_cell.params
         expected_cell_params = expected_cell.params
-        for returned_param in returned_cell_params:
-            assert returned_param in expected_cell_params
+        for expected_cell_param in expected_cell_params:
+            assert expected_cell_param in returned_cell_params
 
         returned_cell_secrets = returned_cell.secrets
         expected_cell_secrets = expected_cell.secrets
-        for returned_secret in returned_cell_secrets:
-            assert returned_secret in expected_cell_secrets
+        for expected_cell_secret in expected_cell_secrets:
+            assert expected_cell_secrets in returned_cell_secrets
 
         returned_cell_dependencies = returned_cell.dependencies
         expected_cell_dependencies = expected_cell.dependencies
-        for returned_dependency in returned_cell_dependencies:
-            assert returned_dependency in expected_cell_dependencies
+        for expected_cell_dependency in expected_cell_dependencies:
+            assert expected_cell_dependency in returned_cell_dependencies
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)

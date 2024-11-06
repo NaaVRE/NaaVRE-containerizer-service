@@ -34,12 +34,18 @@ class PyExtractor(Extractor):
             '\n'.join(self.notebook_sources),
             infer_types=True,
         )
-        # notebook_visitor = (
-        #     self.__parse_code('\n'.join(self.notebook_sources),
-        #                       infer_types=True,
-        #                       ))
+        notebook_visitor = (
+            self.__parse_code('\n'.join(self.notebook_sources),
+                              infer_types=True,
+                              ))
 
         self.notebook_imports = self.__extract_imports(self.notebook_sources)
+
+        visitor_imports = notebook_visitor.imports
+        for imp in self.notebook_imports:
+            if imp not in visitor_imports:
+                print(f'Warning: {imp} not found in imports')
+
         self.notebook_configurations = self.__extract_configurations(
             self.notebook_sources)
         self.notebook_params = self.__extract_prefixed_var(
