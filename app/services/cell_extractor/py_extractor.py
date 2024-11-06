@@ -16,7 +16,8 @@ from ...models.notebook_data import NotebookData
 
 
 class PyExtractor(Extractor):
-    notebook_sources: list
+    # notebook_sources: list
+    notebook_variables: dict
     notebook_imports: dict
     notebook_configurations: dict
     notebook_params: dict
@@ -24,29 +25,29 @@ class PyExtractor(Extractor):
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData):
-        # If cell_type is code and not starting with '!'
         notebook = notebook_data.notebook
-        self.notebook_sources = [nbcell.source for nbcell in notebook.cells if
-                                 nbcell.cell_type == 'code' and len(
-                                     nbcell.source) > 0 and nbcell.source[
-                                     0] != '!']
+        notebook_sources = []
+        for nb_cell in notebook.cells:
+            if nb_cell.cell_type == 'code' and len(nb_cell.source) > 0 and \
+                    nb_cell.source[0] != '!':
+                notebook_sources.append(nb_cell.source)
         self.notebook_variables = self.__extract_variables(
-            '\n'.join(self.notebook_sources),
+            '\n'.join(notebook_sources),
             infer_types=True,
         )
         notebook_visitor = (
-            self.__parse_code('\n'.join(self.notebook_sources),
+            self.__parse_code('\n'.join(notebook_sources),
                               infer_types=True,
                               ))
         self.notebook_imports = notebook_visitor.imports
         self.notebook_configurations = self.__extract_configurations(
-            self.notebook_sources)
+            notebook_sources)
         self.notebook_params = self.__extract_prefixed_var(
-            self.notebook_sources, 'param')
+            notebook_sources, 'param')
         self.notebook_secrets = self.__extract_prefixed_var(
-            self.notebook_sources, 'secret')
+            notebook_sources, 'secret')
         self.undefined = dict()
-        for source in self.notebook_sources:
+        for source in notebook_sources:
             self.undefined.update(self.__extract_cell_undefined(source))
         super().__init__(notebook_data)
 
