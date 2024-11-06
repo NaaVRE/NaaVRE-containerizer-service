@@ -110,24 +110,24 @@ class HeaderExtractor(Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
-        if self.cell_inputs is None:
+        if not self.cell_inputs:
             self.cell_inputs = extractor.infer_cell_inputs()
-        if self.cell_outputs is None:
+        if not self.cell_outputs:
             self.cell_outputs = extractor.infer_cell_outputs()
-        if self.cell_params is None:
+        if not self.cell_params:
             self.cell_params = extractor.extract_cell_params()
             # We store a reference to extractor.extract_cell_params because
             # self.extract_cell_params is called after self.add_missing_values
             # in component_containerizer.handlers.ExtractorHandler.post()
             self._external_extract_cell_params = extractor.extract_cell_params
-        if self.cell_secrets is None:
-            self.cell_secrets = extractor.cell_secrets
-            # Same as self._external_extract_cell_params
+        if not self.cell_secrets:
+            self.cell_secrets = extractor.extract_cell_secrets()
+            # # Same as self._external_extract_cell_params
             self._external_extract_cell_secrets = (
                 extractor.extract_cell_secrets())
-        if self.cell_confs is None:
-            self.cell_confs = extractor.extract_cell_conf_ref()
-        if self.cell_dependencies is None:
+        if not self.cell_confs:
+            self.cell_confs = extractor.extract_cell_conf()
+        if not self.cell_dependencies:
             self.cell_dependencies = (
                 extractor.infer_cell_dependencies(self.cell_confs))
 
@@ -253,7 +253,7 @@ class HeaderExtractor(Extractor):
             )
         return secrets
 
-    def extract_cell_conf_ref(self) -> list[dict]:
+    def extract_cell_conf(self) -> list[dict]:
         if self.cell_header is None:
             return []
         items = self.cell_header['NaaVRE']['cell'].get('confs')

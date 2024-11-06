@@ -28,7 +28,7 @@ class Extractor(abc.ABC):
         self.cell_outputs = self.infer_cell_outputs()
         self.cell_params = self.extract_cell_params()
         self.cell_secrets = self.extract_cell_secrets()
-        self.cell_confs = self.extract_cell_conf_ref()
+        self.cell_confs = self.extract_cell_conf()
         self.cell_dependencies = self.infer_cell_dependencies(self.cell_confs)
         self.user_name = notebook_data.user_name
 
@@ -94,7 +94,7 @@ class Extractor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def extract_cell_conf_ref(self):
+    def extract_cell_conf(self):
         pass
 
     @abc.abstractmethod
@@ -115,7 +115,7 @@ class DummyExtractor(Extractor):
     def extract_cell_secrets(self):
         return {}
 
-    def extract_cell_conf_ref(self):
+    def extract_cell_conf(self):
         return []
 
     def infer_cell_dependencies(self, confs):

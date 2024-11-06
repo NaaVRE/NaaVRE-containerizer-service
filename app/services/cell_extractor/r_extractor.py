@@ -111,8 +111,8 @@ class RExtractor(Extractor):
     sources: list
     imports: dict
     notebook_configurations: dict
-    notebook_params: dict
-    notebook_secrets: dict
+    notebook_params: list[dict]
+    notebook_secrets: list[dict]
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData):
@@ -215,7 +215,7 @@ class RExtractor(Extractor):
             visitor = ExtractPrefixedVar(prefix)
             variable_names = visitor.visit(tree)
             for variable_name in variable_names:
-                if variable_name.startswith(prefix+'_'):
+                if variable_name.startswith(prefix + '_'):
                     extracted_var = {
                         'name': variable_name,
                         'type': self.notebook_names[variable_name]['type']
@@ -252,7 +252,7 @@ class RExtractor(Extractor):
                 cell_inputs.append(properties)
         return cell_inputs
 
-    def infer_cell_dependencies(self, confs):
+    def infer_cell_dependencies(self, confs) -> list[dict]:
         # we probably like to only use dependencies that are necessary to
         # execute the cell however this is challenging in R as functions are
         # non-scoped
@@ -261,23 +261,23 @@ class RExtractor(Extractor):
             dependencies.append(self.imports.get(name))
         return dependencies
 
-    def infer_cell_conf_dependencies(self, confs):
-        dependencies = []
-        for ck in confs:
-            for name in self.__extract_cell_names(confs[ck]):
-                if name in self.imports:
-                    dependencies.append(self.imports.get(name))
+    # def infer_cell_conf_dependencies(self, confs)-> list[dict]:
+    #     dependencies = []
+    #     for ck in confs:
+    #         for name in self.__extract_cell_names(confs[ck]):
+    #             if name in self.imports:
+    #                 dependencies.append(self.imports.get(name))
+    #
+    #     return dependencies
 
-        return dependencies
-
-    def __extract_cell_names(self, cell_source):
-        tree = parse_text(cell_source)
+    def __extract_cell_names(self, source) -> dict:
+        tree = parse_text(source)
         visitor = ExtractNames()
         vars_r = visitor.visit(tree)
 
         return vars_r
 
-    def __extract_cell_undefined(self, cell_source):
+    def __extract_cell_undefined(self, cell_source) -> dict:
         tree = parse_text(cell_source)
         visitor = ExtractDefined()
         defs, scoped = visitor.visit(tree)
@@ -313,10 +313,10 @@ class RExtractor(Extractor):
         for u in secret_unds:
             if u not in secret:
                 secret[u] = self.notebook_secrets[u]
-                cell_secret.append(secret)
+                cell_secret.append({'name': u, 'type': secret[u]['type']})
         return cell_secret
 
-    def extract_cell_conf_ref(self) -> list[dict]:
+    def extract_cell_conf(self) -> list[dict]:
         conf = {}
         cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -328,7 +328,7 @@ class RExtractor(Extractor):
                 cell_confs.append({'name': u, 'assignation': conf[u]})
         return cell_confs
 
-    def __resolve_configurations(self, configurations):
+    def __resolve_configurations(self, configurations) -> dict:
         resolved_configurations = {}
         max_depth = 50
         for k, assignment in configurations.items():

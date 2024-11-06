@@ -18,6 +18,8 @@ def test_extract_cell():
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)
+        # if 'anti-pattern-user.json' not in notebook_file:
+        #     continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
@@ -64,7 +66,7 @@ def test_extract_cell():
         returned_cell_secrets = returned_cell.secrets
         expected_cell_secrets = expected_cell.secrets
         for expected_cell_secret in expected_cell_secrets:
-            assert expected_cell_secrets in returned_cell_secrets
+            assert expected_cell_secret in returned_cell_secrets
 
         returned_cell_dependencies = returned_cell.dependencies
         expected_cell_dependencies = expected_cell.dependencies

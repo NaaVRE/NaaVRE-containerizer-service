@@ -20,7 +20,7 @@ class PyExtractor(Extractor):
     notebook_imports: dict
     notebook_configurations: dict
     notebook_params: dict
-    # notebook_secrets: dict
+    notebook_secrets: dict
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData):
@@ -39,20 +39,13 @@ class PyExtractor(Extractor):
                               infer_types=True,
                               ))
 
-        self.notebook_imports = self.__extract_imports(self.notebook_sources)
-
-        visitor_imports = notebook_visitor.imports
-        for imp in self.notebook_imports:
-            if imp not in visitor_imports:
-                print(f'Warning: {imp} not found in imports')
-
+        self.notebook_imports = notebook_visitor.imports
         self.notebook_configurations = self.__extract_configurations(
             self.notebook_sources)
         self.notebook_params = self.__extract_prefixed_var(
             self.notebook_sources, 'param')
         self.notebook_secrets = self.__extract_prefixed_var(
-            self.notebook_sources,
-            'secret')
+            self.notebook_sources, 'secret')
         self.undefined = dict()
         for source in self.notebook_sources:
             self.undefined.update(self.__extract_cell_undefined(source))
@@ -66,23 +59,6 @@ class PyExtractor(Extractor):
         visitor = Visitor()
         visitor.visit(tree)
         return visitor
-
-    def __extract_imports(self, sources):
-        imports = {}
-        for s in sources:
-            tree = ast.parse(s)
-            for node in ast.walk(tree):
-                if isinstance(node, (ast.Import, ast.ImportFrom,)):
-                    for n in node.names:
-                        key = n.asname if n.asname else n.name
-                        if key not in imports:
-                            imports[key] = {
-                                'name': n.name,
-                                'asname': n.asname or None,
-                                'module': node.module if isinstance(
-                                    node, ast.ImportFrom) else ""
-                            }
-        return imports
 
     def __extract_configurations(self, sources):
         configurations = {}
@@ -102,9 +78,11 @@ class PyExtractor(Extractor):
                             configurations[name] = conf_line
         return self.__resolve_configurations(configurations)
 
-    def __extract_prefixed_var(self, sources,
-                               prefix:
-                               Literal['input', 'output', 'param', 'secret']):
+    def __extract_prefixed_var(
+            self,
+            sources,
+            prefix: Literal['input', 'output', 'param', 'secret', 'conf']) \
+            -> dict:
         extracted_vars = dict()
         for s in sources:
             lines = s.splitlines()
@@ -158,16 +136,6 @@ class PyExtractor(Extractor):
                     name not in self.notebook_params and
                     name not in self.notebook_secrets):
                 cell_outputs.append({'name': name, 'type': properties['type']})
-        # outs = {
-        #     name: properties
-        #     for name, properties in cell_variables.items()
-        #     if name not in self.__extract_cell_undefined(self.cell_source)
-        #        and name not in self.notebook_imports
-        #        and name in self.undefined
-        #        and name not in self.notebook_configurations
-        #        and name not in self.notebook_params
-        #        and name not in self.notebook_secrets
-        # }
         return cell_outputs
 
     def infer_cell_inputs(self) -> list[dict]:
@@ -192,14 +160,14 @@ class PyExtractor(Extractor):
                 dependencies.append(self.notebook_imports.get(name))
         return dependencies
 
-    def infer_cell_conf_dependencies(self, confs):
-        dependencies = []
-        for ck in confs:
-            for name in self.__extract_variables(confs[ck]):
-                if name in self.notebook_imports:
-                    dependencies.append(self.notebook_imports.get(name))
-
-        return dependencies
+    # def infer_cell_conf_dependencies(self, confs):
+    #     dependencies = []
+    #     for ck in confs:
+    #         for name in self.__extract_variables(confs[ck]):
+    #             if name in self.notebook_imports:
+    #                 dependencies.append(self.notebook_imports.get(name))
+    #
+    #     return dependencies
 
     @staticmethod
     @lru_cache
@@ -268,13 +236,13 @@ class PyExtractor(Extractor):
                 }
         return names
 
-    def __extract_cell_undefined(self, cell_source):
+    def __extract_cell_undefined(self, source) -> dict:
         flakes_stdout = StreamList()
         flakes_stderr = StreamList()
         rep = pyflakes_reporter.Reporter(
             flakes_stdout.reset(),
             flakes_stderr.reset())
-        pyflakes_api.check(cell_source, filename="temp", reporter=rep)
+        pyflakes_api.check(source, filename="temp", reporter=rep)
         if rep._stderr():
             raise SyntaxError("Flakes reported the following error:"
                               "\n{}".format('\t' + '\t'.join(rep._stderr())))
@@ -305,17 +273,17 @@ class PyExtractor(Extractor):
 
     def extract_cell_secrets(self) -> list[dict]:
         secret = {}
-        cell_secret = []
+        cell_secrets = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
         secret_unds = [und for und in cell_unds if
                        und in self.notebook_secrets]
         for u in secret_unds:
             if u not in secret:
                 secret[u] = self.notebook_secrets[u]
-                cell_secret.append(secret)
-        return cell_secret
+                cell_secrets.append({'name': u, 'type': secret[u]['type']})
+        return cell_secrets
 
-    def extract_cell_conf_ref(self) -> list[dict]:
+    def extract_cell_conf(self) -> list[dict]:
         conf = {}
         cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
