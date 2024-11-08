@@ -261,6 +261,8 @@
     "secrets": [],
     "title": "Create-file-test-user-2",
     "base_container_image": {
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
     }
   }
 }

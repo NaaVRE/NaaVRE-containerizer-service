@@ -9,8 +9,8 @@ logger.setLevel(logging.DEBUG)
 
 
 class Cell(BaseModel):
-    title: str | None = None
-    base_container_image: dict | None = None
+    title: str
+    base_container_image: dict
     inputs: Optional[list[dict]] | None = None
     outputs: Optional[list[dict]] | None = None
     params: Optional[list[dict]] | None = None
@@ -18,7 +18,7 @@ class Cell(BaseModel):
     confs: Optional[list[dict]] | None = None
     dependencies: Optional[list[dict]] | None = None
     chart_obj: dict | None = None
-    kernel: Literal['python', 'IRkernel', 'ipython', 'c'] | None = None
+    kernel: Literal['python', 'IRkernel', 'ipython', 'c']
 
     def __init__(self, **data):
         super().__init__(**data)

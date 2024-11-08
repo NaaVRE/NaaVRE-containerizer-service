@@ -224,6 +224,8 @@
     "secrets": [],
     "title": "input-lists-R-test-user-2",
     "base_container_image": {
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.18"
     }
   }
 }

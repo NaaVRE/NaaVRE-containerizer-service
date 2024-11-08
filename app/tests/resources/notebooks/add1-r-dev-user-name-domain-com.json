@@ -142,7 +142,8 @@
           "id": "9cb7e576-3a49-4109-8772-acddda6016a1"
         }
       ]
-    }
+    },
+    "base_image_name": "r"
   },
   "cell": {
     "chart_obj": {
@@ -206,6 +207,8 @@
     "secrets": [],
     "title": "Add1-R-test-user-2",
     "base_container_image": {
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.18"
     }
   }
 }

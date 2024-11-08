@@ -6,6 +6,7 @@ from slugify import slugify
 
 from app.models.notebook_data import NotebookData
 from app.models.workflow_cell import Cell
+from app.services.base_image_tags import BaseImageTags
 from app.services.converter.converter import ConverterReactFlowChart
 
 
@@ -31,6 +32,7 @@ class Extractor(abc.ABC):
         self.cell_secrets = self.get_cell_secrets()
         self.cell_confs = self.get_cell_confs()
         self.cell_dependencies = self.get_cell_dependencies(self.cell_confs)
+        self.base_image_name = notebook_data.base_image_name
 
     def get_cell(self) -> Cell:
         title = self.cell_source.partition('\n')[0].strip()
@@ -64,6 +66,7 @@ class Extractor(abc.ABC):
             'selected': {},
             'hovered': {},
         }
+        base_image_tags = BaseImageTags()
         cell_dict = {
             'title': title,
             'params': self.cell_params,
@@ -72,7 +75,8 @@ class Extractor(abc.ABC):
             'outputs': self.cell_outputs,
             'confs': self.cell_confs,
             'dependencies': self.cell_dependencies,
-            'base_container_image': {},
+            'base_container_image':
+                base_image_tags.base_image_tags[self.base_image_name],
             'chart_obj': chart,
             'kernel': self.kernel
         }
