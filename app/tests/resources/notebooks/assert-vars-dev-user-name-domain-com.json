@@ -205,6 +205,7 @@
     ],
     "secrets": [],
     "title": "assert-vars-test-user-2",
+    "original_source": "print(done)\n\ncheck_string = 'param_string value'\ncheck_string_with_comment = 'param_string value'  # comment\ncheck_int = 1\ncheck_float = 1.1\ncheck_list_int = [1, 2, 3]\ncheck_list_str = [\"list_str\", \"space in elem\", \"3\"]\n\nassert conf_string == check_string\nassert conf_string_with_comment == check_string_with_comment\nassert conf_int == check_int\nassert conf_float == check_float\nassert conf_list_int == check_list_int\nassert conf_list_str == check_list_str\n\n\nassert param_string == check_string\nassert param_string_with_comment == check_string_with_comment\nassert param_int == check_int\nassert param_float == check_float\nassert param_list_int == check_list_int\nassert param_list_str == check_list_str\n\nprint(\"All variables are the same.\")",
     "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"

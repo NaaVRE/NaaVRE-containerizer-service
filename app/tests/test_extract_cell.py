@@ -24,6 +24,7 @@ def test_extract_cell():
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
         f.close()
+
         extractor_json_payload = notebook_cell.copy()
         del extractor_json_payload['cell']
         expected_cell_dict = notebook_cell['cell']
@@ -75,3 +76,5 @@ def test_extract_cell():
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)
+
+        assert returned_cell.original_source == expected_cell.original_source

@@ -1,12 +1,13 @@
 import abc
 import hashlib
 import json
+import re
 
 from slugify import slugify
 
 from app.models.notebook_data import NotebookData
 from app.models.workflow_cell import Cell
-from app.services.base_image_tags import BaseImageTags
+from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.converter.converter import ConverterReactFlowChart
 
 
@@ -35,7 +36,7 @@ class Extractor(abc.ABC):
         self.base_image_name = notebook_data.base_image_name
 
     def get_cell(self) -> Cell:
-        title = self.cell_source.partition('\n')[0].strip()
+        title = self.cell_source.partition('\n')[0].strip().lower()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
 
@@ -78,9 +79,33 @@ class Extractor(abc.ABC):
             'base_container_image':
                 base_image_tags.base_image_tags[self.base_image_name],
             'chart_obj': chart,
-            'kernel': self.kernel
+            'kernel': self.kernel,
+            'original_source': self.clean_code()
         }
         return Cell.model_validate(cell_dict)
+
+    def clean_code(self):
+        indices_to_remove = []
+        lines = self.cell_source.split("\n")
+        for line_i in range(0, len(lines)):
+            line = lines[line_i]
+            # Do not remove line that startswith param_ if not in the
+            # self.params
+            if line.startswith('param_'):
+                # clean param name
+                pattern = r"\b(param_\w+)\b"
+                param_name = re.findall(pattern, line)[0]
+                if param_name in self.cell_params:
+                    indices_to_remove.append(line_i)
+            regex = r'^\s*(#|import|from)'
+            if re.match(regex, line):
+                indices_to_remove.append(line_i)
+        for ir in sorted(indices_to_remove, reverse=True):
+            lines.pop(ir)
+        original_source = "\n".join(lines)
+        # Remove \n from the start and end of the string
+        original_source = original_source.strip("\n")
+        return original_source
 
     @abc.abstractmethod
     def get_cell_inputs(self) -> list[dict]:

@@ -11,7 +11,7 @@ from pydantic_settings import BaseSettings
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
 from app.models.notebook_data import NotebookData
-from app.services.base_image_tags import BaseImageTags
+from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.cell_extractor.extractor import DummyExtractor
 from app.services.cell_extractor.py_extractor import PyExtractor
 from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
