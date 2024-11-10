@@ -123,7 +123,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     gh = _get_github_service()
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
-                             path=containerize_payload.cell.task_name,
+                             path=containerize_payload.cell.title,
                              file_name="task" + conteinerizer.file_extension)
 
     image_version = get_content_hash(cell_contents)[:7]
@@ -131,15 +131,15 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if conteinerizer.visualization_cell:
         notebook_contents = conteinerizer.extract_notebook()
         notebook_updated = gh.commit(local_content=notebook_contents,
-                                     path=containerize_payload.cell.task_name,
+                                     path=containerize_payload.cell.title,
                                      file_name="task.ipynb")
     environment_contents = conteinerizer.build_environment()
     environment_updated = gh.commit(local_content=environment_contents,
-                                    path=containerize_payload.cell.task_name,
+                                    path=containerize_payload.cell.title,
                                     file_name="environment.yaml")
     docker_template = conteinerizer.build_docker()
     dockerfile_updated = gh.commit(local_content=docker_template,
-                                   path=containerize_payload.cell.task_name,
+                                   path=containerize_payload.cell.title,
                                    file_name="Dockerfile")
     containerization_workflow_resp = {"workflow_id": None,
                                       "dispatched_github_workflow": False,
@@ -149,7 +149,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if (cell_updated or environment_updated or dockerfile_updated or
             notebook_updated):
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
-            task_name=containerize_payload.cell.task_name,
+            title=containerize_payload.cell.title,
             image_version=image_version)
     containerize_payload.cell.image_version = image_version
 

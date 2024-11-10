@@ -14,7 +14,7 @@ client = TestClient(app)
 
 
 def test_extract_cell():
-    cells_json_path = os.path.join(base_path, 'notebooks')
+    cells_json_path = os.path.join(base_path, 'notebook_cells')
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)

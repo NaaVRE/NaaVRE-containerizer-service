@@ -1,7 +1,6 @@
 import os
 from abc import abstractmethod
 
-import autopep8
 import requests
 from jinja2 import Environment, PackageLoader
 
@@ -23,11 +22,6 @@ class Containerizer():
 
     def __init__(self, cell: Cell):
         self.cell = cell
-        self.cell.clean_code()
-        self.cell.clean_title()
-        self.cell.clean_task_name()
-        self.check_has_type()
-        self.check_has_base_image()
         loader = PackageLoader('app', 'templates')
         self.template_env = Environment(loader=loader, trim_blocks=True,
                                         lstrip_blocks=True)
@@ -39,34 +33,15 @@ class Containerizer():
         self.template_conda_env = 'conda_env_template.jinja2'
         self.dockerfile_template = 'dockerfile_template_conda.jinja2'
 
-    def check_has_type(self):
-        all_vars = self.cell.params + self.cell.inputs + self.cell.outputs
-        for param_name in all_vars:
-            if param_name not in self.cell.types:
-                raise ValueError(param_name + ' has not type')
-        pass
-
-    def check_has_base_image(self):
-        if self.cell.base_container_image is None:
-            raise ValueError('base_image is not set')
-        pass
-
     @abstractmethod
     def build_script(self):
         template_script = self.template_env.get_template(self.template_script)
-        deps = self.cell.generate_dependencies()
-        types = self.cell.types
-        conf = self.cell.generate_configuration_dict()
-        self.cell.container_source = autopep8.fix_code(
-            template_script.render(cell=self.cell,
-                                   deps=deps,
-                                   types=types,
-                                   confs=conf))
+        deps = self.cell.dependencies
+        conf = self.cell.confs
+
         return template_script.render(cell=self.cell,
-                                      deps=self.cell.generate_dependencies(),
-                                      types=self.cell.types,
-                                      confs=self.cell.
-                                      generate_configuration_dict())
+                                      deps=deps,
+                                      confs=conf)
 
     @abstractmethod
     def extract_notebook(self):
@@ -93,7 +68,7 @@ class Containerizer():
         template_dockerfile = self.template_env.get_template(
             self.dockerfile_template)
         return template_dockerfile.render(
-            task_name=self.cell.task_name,
+            title=self.cell.title,
             base_image=self.cell.base_container_image)
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):

@@ -15,15 +15,15 @@ print('option_list')
 option_list = list(
 
 {% for in_var in cell.all_inputs|sort %}
-{% if types[in_var] == list or types[in_var] == 'list' %}
+{% if in_var['type'] == list or in_var['type'] == 'list' %}
 {% set type = 'character' %}
-{% elif types[in_var] == str or types[in_var] == 'str' %}
+{% elif in_var['type'] == str or in_var['type'] == 'str' %}
 {% set type = 'character' %}
-{% elif types[in_var] == int or types[in_var] == 'int' %}
+{% elif in_var['type'] == int or in_var['type'] == 'int' %}
 {% set type = 'integer' %}
-{% elif types[in_var] == float or types[in_var] == 'float' %}
+{% elif in_var['type'] == float or in_var['type'] == 'float' %}
 {% set type = 'numeric' %}
-{% elif types[in_var] == bool or types[in_var] == 'bool' %}
+{% elif in_var['type'] == bool or in_var['type'] == 'bool' %}
 {% set type = 'logical' %}
 {% else %}
 {% set type = 'character' %}
@@ -75,13 +75,13 @@ print(var)
 var_len = length(var)
 print(paste("Variable {{ in_var }} has length", var_len))
 
-{% if types[in_var] == list  or types[in_var] == 'list' %}
+{% if in_var['type'] == list  or in_var['type'] == 'list' %}
 print("------------------------Running var_serialization for {{ in_var }}-----------------------")
 print(opt${{ in_var }})
 {{ in_var }} = var_serialization(opt${{ in_var }})
 print("---------------------------------------------------------------------------------")
 
-{% elif types[in_var] == str or  types[in_var] == 'str' %}
+{% elif in_var['type'] == str or  in_var['type'] == 'str' %}
 {{ in_var }} <- gsub("\"", "", opt${{ in_var }})
 {% else %}
 {{ in_var }} = opt${{ in_var }}
