@@ -229,6 +229,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.18"
         },
-        "original_source": "count <- 0\n# Strips the newline character\nfor (l in lines) {\n    count <- count + 1\n    cat(sprintf(\"Line %d: %s\\n\", count, trimws(l)))\n}\n"
+        "original_source": "count <- 0\nfor (l in lines) {\n    count <- count + 1\n    cat(sprintf(\"Line %d: %s\\n\", count, trimws(l)))\n}"
     }
 }

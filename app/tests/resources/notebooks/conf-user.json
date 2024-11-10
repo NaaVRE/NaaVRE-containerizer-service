@@ -218,7 +218,7 @@
     "params": [],
     "secrets": [],
     "title": "conf-test-user-2",
-    "original_source": "import os\n\nconf_data_folder = os.path.join('/tmp','data')\n\nconf_feature_name = 'perc_95_normalized_height'\nconf_validate_precision = '0.001'\nconf_tile_mesh_size = '10.'\nconf_filter_type= 'select_equal'\nconf_attribute = 'raw_classification'\nconf_min_x = '-113107.81'\nconf_max_x = '398892.19'\nconf_min_y = '214783.87'\nconf_max_y = '726783.87'\nconf_n_tiles_side = '512'\nconf_apply_filter_value = '1'\nconf_laz_compression_factor = '7'\nconf_max_filesize = '262144000'  # desired max file size (in bytes)\n\n",
+    "original_source": "conf_data_folder = os.path.join('/tmp','data')\n\nconf_feature_name = 'perc_95_normalized_height'\nconf_validate_precision = '0.001'\nconf_tile_mesh_size = '10.'\nconf_filter_type= 'select_equal'\nconf_attribute = 'raw_classification'\nconf_min_x = '-113107.81'\nconf_max_x = '398892.19'\nconf_min_y = '214783.87'\nconf_max_y = '726783.87'\nconf_n_tiles_side = '512'\nconf_apply_filter_value = '1'\nconf_laz_compression_factor = '7'\nconf_max_filesize = '262144000'  # desired max file size (in bytes)",
     "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
       "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"

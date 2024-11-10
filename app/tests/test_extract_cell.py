@@ -35,9 +35,7 @@ def test_extract_cell():
         )
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
-        # We don't need to compare the chart_obj
-        del cell_dict['chart_obj']
-        del expected_cell_dict['chart_obj']
+
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
@@ -76,5 +74,4 @@ def test_extract_cell():
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)
-
         assert returned_cell.original_source == expected_cell.original_source

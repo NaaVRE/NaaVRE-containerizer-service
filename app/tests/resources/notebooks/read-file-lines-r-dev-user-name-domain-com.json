@@ -234,6 +234,5 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.18"
         },
-        "original_source": "onlyfiles <- list.files(conf_data_folder, full.names = TRUE)\n\nprint(onlyfiles)\n\n# Read file lines\nf <- file(file_path, \"r\")\nlines <- readLines(f)\nclose(f)\n\n"
-    }
+        "original_source": "onlyfiles <- list.files(conf_data_folder, full.names = TRUE)\n\nprint(onlyfiles)\n\nf <- file(file_path, \"r\")\nlines <- readLines(f)\nclose(f)"    }
 }

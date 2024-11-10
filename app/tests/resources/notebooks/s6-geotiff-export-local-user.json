@@ -324,22 +324,22 @@
             "hovered": {},
             "links": {},
             "nodes": {
-                "fbfb80a": {
-                    "id": "fbfb80a",
+                "11d7bd6": {
+                    "id": "11d7bd6",
                     "ports": {
-                        "S5_done": {
-                            "id": "S5_done",
+                        "S3_done": {
+                            "id": "S3_done",
                             "properties": {
-                                "color": "#86702d"
-                            },
-                            "type": "left"
-                        },
-                        "S6_done": {
-                            "id": "S6_done",
-                            "properties": {
-                                "color": "#2d35d2"
+                                "color": "#ac53a9"
                             },
                             "type": "right"
+                        },
+                        "split_laz_files": {
+                            "id": "split_laz_files",
+                            "properties": {
+                                "color": "#5382ac"
+                            },
+                            "type": "left"
                         }
                     },
                     "position": {
@@ -348,30 +348,26 @@
                     },
                     "properties": {
                         "inputs": [
-                            "S5_done"
+                            "split_laz_files"
                         ],
-                        "og_node_id": "fbfb80a",
+                        "og_node_id": "11d7bd6",
                         "outputs": [
-                            "S6_done"
+                            "S3_done"
                         ],
-                        "params": [
-                            "param_hostname",
-                            "param_username",
-                            "param_password"
-                        ],
+                        "params": [],
                         "secrets": [],
-                        "title": "s6-geotiff-export-local-test-user-2",
+                        "title": "s3-retiling-local-test-user-2",
                         "vars": [
                             {
-                                "color": "#86702d",
+                                "color": "#5382ac",
                                 "direction": "input",
-                                "name": "S5_done",
+                                "name": "split_laz_files",
                                 "type": "datatype"
                             },
                             {
-                                "color": "#2d35d2",
+                                "color": "#ac53a9",
                                 "direction": "output",
-                                "name": "S6_done",
+                                "name": "S3_done",
                                 "type": "datatype"
                             }
                         ]
@@ -445,6 +441,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
         },
-        "original_source": "S5_done\\n\\ngeotiff_export_input = {\\n    'setup_local_fs': {\\n        'input_folder': conf_local_path_targets,\\n         'output_folder': conf_local_path_geotiff\\n        },\\n    'parse_point_cloud': {},\\n    'data_split': {'xSub': 1, 'ySub': 1},\\n    'create_subregion_geotiffs': {'output_handle': 'geotiff'},\\n    'pushremote': conf_remote_path_geotiffs.as_posix(),\\n}\\n\\nwriter = GeotiffWriter(input_dir=conf_feature_name, bands=conf_feature_name, label=conf_feature_name).config(geotiff_export_input).setup_webdav_client(conf_wd_opts)\\nwriter.run()\\n\\nremote_path_geotiffs = str(conf_remote_path_geotiffs)\\nS6_done = 'True'"
+        "original_source": "S5_done\n\ngeotiff_export_input = {\n    'setup_local_fs': {\n        'input_folder': conf_local_path_targets,\n         'output_folder': conf_local_path_geotiff\n        },\n    'parse_point_cloud': {},\n    'data_split': {'xSub': 1, 'ySub': 1},\n    'create_subregion_geotiffs': {'output_handle': 'geotiff'},\n    'pushremote': conf_remote_path_geotiffs.as_posix(),\n}\n\nwriter = GeotiffWriter(input_dir=conf_feature_name, bands=conf_feature_name, label=conf_feature_name).config(geotiff_export_input).setup_webdav_client(conf_wd_opts)\nwriter.run()\n\nremote_path_geotiffs = str(conf_remote_path_geotiffs)\nS6_done = 'True'"
     }
 }

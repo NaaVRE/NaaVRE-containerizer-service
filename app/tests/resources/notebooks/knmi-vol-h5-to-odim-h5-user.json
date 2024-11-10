@@ -264,6 +264,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
         },
-        "original_source": "import os\nprint(a)\ncmd = \"KNMI_vol_h5_to_ODIM_h5 \"\n\nout = os.system(cmd)  # returns the exit code in unix"
+        "original_source": "print(a)\ncmd = \"KNMI_vol_h5_to_ODIM_h5 \"\n\nout = os.system(cmd)  # returns the exit code in unix"
     }
 }

@@ -173,7 +173,7 @@
             "outputs": [],
             "params": [],
             "secrets": [],
-            "title": "Add1-R-test-user-2",
+            "title": "add1-r-test-user-2",
             "vars": [
               {
                 "color": "#783d3a",
@@ -205,7 +205,7 @@
     "outputs": [],
     "params": [],
     "secrets": [],
-    "title": "Add1-R-test-user-2",
+    "title": "add1-r-test-user-2",
     "original_source": "a = count + 1",
     "base_container_image": {
       "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",

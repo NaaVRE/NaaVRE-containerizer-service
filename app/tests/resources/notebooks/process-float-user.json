@@ -238,6 +238,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
         },
-        "original_source": "d = c / 1.0\n"
+        "original_source": "d = c / 1.0"
     }
 }

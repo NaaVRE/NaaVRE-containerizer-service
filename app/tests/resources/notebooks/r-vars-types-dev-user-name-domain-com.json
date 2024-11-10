@@ -224,6 +224,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.18"
         },
-        "original_source": "# R vars types\n\n# ---\n# NaaVRE:\n#  cell:\n#   outputs:\n#    - var_string: String\n#    - var_string_with_comment: String\n#    - var_int: Integer\n#    - var_float: Float\n#    - var_list_int: List\n#    - var_list_str: List\n# ...\n\nvar_string <- 'var_string value'\nvar_string_with_comment <- 'var_string value'  # comment\nvar_int <- 1\nvar_float <- 1.1\nvar_list_int <- list(1, 2, 3)\nvar_list_str <- list(\"list_str\", \"space in elem\", \"3\")\nprint(class(var_list_int))"
+        "original_source": "var_string <- 'var_string value'\nvar_string_with_comment <- 'var_string value'  # comment\nvar_int <- 1\nvar_float <- 1.1\nvar_list_int <- list(1, 2, 3)\nvar_list_str <- list(\"list_str\", \"space in elem\", \"3\")\nprint(class(var_list_int))"
     }
 }

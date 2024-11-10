@@ -258,6 +258,6 @@
             "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
             "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
         },
-        "original_source": "count = 0\n# Strips the newline character\nfor l in lines:\n    count += 1\n    print(\"Line{}: {}\".format(count, l.strip()))"
+        "original_source": "count = 0\nfor l in lines:\n    count += 1\n    print(\"Line{}: {}\".format(count, l.strip()))"
     }
 }
