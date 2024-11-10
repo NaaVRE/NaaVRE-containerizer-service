@@ -19,6 +19,7 @@ class Cell(BaseModel):
     chart_obj: dict | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c']
     original_source: str
+    image_version: str | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
