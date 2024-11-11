@@ -39,9 +39,9 @@ class Extractor(abc.ABC):
         title = self.cell_source.partition('\n')[0].strip()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
-
+        title = title.lower()
         cell_identity_dict = {
-            'title': title.lower(),
+            'title': title,
             'params': self.cell_params,
             'secrets': self.cell_secrets,
             'inputs': self.cell_inputs,
