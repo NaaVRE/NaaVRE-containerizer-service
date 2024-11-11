@@ -36,12 +36,12 @@ class Extractor(abc.ABC):
         self.base_image_name = notebook_data.base_image_name
 
     def get_cell(self) -> Cell:
-        title = self.cell_source.partition('\n')[0].strip().lower()
+        title = self.cell_source.partition('\n')[0].strip()
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
 
         cell_identity_dict = {
-            'title': title,
+            'title': title.lower(),
             'params': self.cell_params,
             'secrets': self.cell_secrets,
             'inputs': self.cell_inputs,
