@@ -21,3 +21,4 @@ pytype==2023.10.31
 antlr4-python3-runtime==4.13.2
 colorhash==2.0.0
 pytest==8.3.3
+nbformat==5.10.4

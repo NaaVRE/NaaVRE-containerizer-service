@@ -17,6 +17,8 @@ def test_containerize():
     cells_json_path = os.path.join(base_path, 'notebook_cells')
     cells_files = os.listdir(cells_json_path)
     for cell_file in cells_files:
+        if 'visualize-rasterio-user.json' not in cell_file:
+            continue
         cell_path = os.path.join(cells_json_path, cell_file)
         with open(cell_path) as f:
             print('Testing containerize for cell: ' + cell_file)

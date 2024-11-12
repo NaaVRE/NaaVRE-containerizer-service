@@ -4,6 +4,7 @@ import sys
 from abc import ABC
 
 import distro
+import nbformat as nbf
 
 from app.models.workflow_cell import Cell
 from app.services.containerizers.containerizer import Containerizer
@@ -20,7 +21,11 @@ class PyContainerizer(Containerizer, ABC):
             self.template_script = 'R_cell_template.jinja2'
 
     def extract_notebook(self):
-        return json.dumps(self.cell.notebook_dict, indent=4)
+        # Build a notebook from the cell
+        nb = nbf.v4.new_notebook()
+        cells = [nbf.v4.new_code_cell(self.cell.original_source)]
+        nb.cells.extend(cells)
+        return json.dumps(nb, indent=2)
 
     def is_standard_module(self, module_name=None):
         if module_name in sys.builtin_module_names:

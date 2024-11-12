@@ -133,6 +133,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
         notebook_updated = gh.commit(local_content=notebook_contents,
                                      path=containerize_payload.cell.title,
                                      file_name="task.ipynb")
+
     environment_contents = conteinerizer.build_environment()
     environment_updated = gh.commit(local_content=environment_contents,
                                     path=containerize_payload.cell.title,
