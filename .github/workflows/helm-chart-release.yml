@@ -37,7 +37,7 @@ jobs:
 
       - name: Package Helm charts
         run: |
-          helm package helm/dajs-api -d .charts-packages/
+          helm package helm/naavre-containerizer-service -d .charts-packages/
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
