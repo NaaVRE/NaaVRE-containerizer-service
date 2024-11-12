@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.models.cell import Cell
+from app.models.workflow_cell import Cell
 
 
 class ContainerizerPayload(BaseModel):

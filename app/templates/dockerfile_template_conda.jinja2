@@ -8,7 +8,7 @@ RUN conda-pack -p /opt/conda/envs/venv -o /tmp/env.tar && \
     rm /tmp/env.tar
 RUN /venv/bin/conda-unpack
 
-{% if task_name.startswith('visualize-')%}
+{% if title.startswith('visualize-')%}
 FROM jupyter/base-notebook AS runtime
 {% else %}
 FROM {{ base_image.runtime }} AS runtime

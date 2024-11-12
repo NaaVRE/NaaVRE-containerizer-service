@@ -2,13 +2,18 @@
 
 ## Running locally
 
-Install dependencies:
+Create conda environment:
 
 ```shell
-virtualenv venv
-. venv/bin/activate
-pip install -r requirements.txt
+conda env create -f environment.yaml
 ```
+
+Activate the environment:
+
+```shell
+conda activate naavre-containerizer-service
+```
+
 
 Run the dev server
 

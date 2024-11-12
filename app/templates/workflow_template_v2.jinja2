@@ -30,30 +30,30 @@ spec:
         {% set is_special_node = nodes[nid]['type'] == 'splitter' or nodes[nid]['type'] == 'merger' or nodes[nid]['type'] == 'visualizer' %}
         {% set is_splitter = nodes[nid]['type'] == 'splitter' %}
         {% set is_visualizer = nodes[nid]['type'] == 'visualizer' %}
-        {% set task_name =  nodes[nid]['type'] + "-" + nid[:7] if is_special_node else cells[nid]['task_name']+ "-" + nid[:7] %}
+        {% set title =  nodes[nid]['type'] + "-" + nid[:7] if is_special_node else cells[nid]['title']+ "-" + nid[:7] %}
         {% set params =  [] if is_special_node else cells[nid]['params'] %}
-        {# {% if 'visualize-' in task_name %}
-        - name: {{ task_name }}-server
-          dependencies: [{{ task_name }}]
-          template: {{ task_name }}-server-tmp
+        {# {% if 'visualize-' in title %}
+        - name: {{ title }}-server
+          dependencies: [{{ title }}]
+          template: {{ title }}-server-tmp
         {% endif %} #}
-        - name: {{ task_name }}
+        - name: {{ title }}
           {% if deps_dag[nid]|length > 0 %}
-          dependencies: [{% for d in deps_dag[nid] %} {{ d['task_name'] }}{% if not loop.last %},{% endif %} {% endfor %}]
+          dependencies: [{% for d in deps_dag[nid] %} {{ d['title'] }}{% if not loop.last %},{% endif %} {% endfor %}]
           {% endif %}
-          template: {{ task_name }}-tmp
+          template: {{ title }}-tmp
           {% if deps_dag[nid]|length > 0 or params|length > 0 %}
           arguments:
             parameters:
             {% for d in deps_dag[nid] %}
-            - {name: {{ d['port_id'] }}, value: {% if d['type'] == "splitter" %}{{ '"{{item}}"' }}{% else %}{{ '"{{tasks.' }}{{ d['task_name'] }}{{ '.outputs.parameters.' }}{{ d['port_id'] }}{{'}}"'}}{% endif %}}
+            - {name: {{ d['port_id'] }}, value: {% if d['type'] == "splitter" %}{{ '"{{item}}"' }}{% else %}{{ '"{{tasks.' }}{{ d['title'] }}{{ '.outputs.parameters.' }}{{ d['port_id'] }}{{'}}"'}}{% endif %}}
             {% endfor %}
             {% for p in params %}
             - {name: {{ p }}, value: {{ '"{{workflow.parameters.' }}{{ p }}{{ '}}"' }}}
             {% endfor %}
           {% for d in deps_dag[nid] %}
           {% if d['type'] == "splitter" %}
-          withParam: {{ '"{{tasks.' }}{{ d['task_name'] }}{{ '.outputs.parameters.' }}{{ d['port_id'] }}{{'}}"'}}
+          withParam: {{ '"{{tasks.' }}{{ d['title'] }}{{ '.outputs.parameters.' }}{{ d['port_id'] }}{{'}}"'}}
           {% endif %}
           {% endfor %}
           {% endif %}
@@ -62,12 +62,12 @@ spec:
     {% set is_special_node = nodes[nid]['type'] == 'splitter' or nodes[nid]['type'] == 'merger' or nodes[nid]['type'] == 'visualizer' %}
     {% set is_splitter = nodes[nid]['type'] == 'splitter' %}
     {% set is_visualizer = nodes[nid]['type'] == 'visualizer' %}
-    {% set task_name = nodes[nid]['type'] + "-" + nid[:7] if is_special_node else cells[nid]['task_name'] + "-" + nid[:7] %}
+    {% set title = nodes[nid]['type'] + "-" + nid[:7] if is_special_node else cells[nid]['title'] + "-" + nid[:7] %}
     {% set params = [] if is_special_node else cells[nid]['params'] %}
     {% set secrets = [] if is_special_node else cells[nid]['secrets'] %}
     {% set ports = nodes[nid]['ports'] %}
-    {# {% if 'visualize-' in task_name %}
-    - name: {{ task_name }}-server-tmp
+    {# {% if 'visualize-' in title %}
+    - name: {{ title }}-server-tmp
       container:
         image: busybox
         imagePullPolicy: IfNotPresent
@@ -75,7 +75,7 @@ spec:
         args:
           - echo "Starting server"
     {% endif %} #}
-    - name: {{ task_name }}-tmp
+    - name: {{ title }}-tmp
       {% if deps_dag[nid]|length > 0 %}
       inputs:
         parameters:
@@ -146,7 +146,7 @@ spec:
           app: naavre-visualizer
       {% else %}
       container:
-        image: "{{ image_repo }}/{{ cells[nid]['task_name'] }}:{{ cells[nid]['image_version'] }}"
+        image: "{{ image_repo }}/{{ cells[nid]['title'] }}:{{ cells[nid]['image_version'] }}"
         imagePullPolicy: Always
         volumeMounts:
         - name: workdir
@@ -161,7 +161,7 @@ spec:
         {%  endfor %}
         command: ["/bin/bash", "-c"]
         args:
-        {% if 'visualize-' in cells[nid]['task_name']%}
+        {% if 'visualize-' in cells[nid]['title']%}
           - source /venv/bin/activate; ipython kernel install --user; python /app/task.py
             {% for d in deps_dag[nid] %}
             {% set is_from_special = d['type'] == 'splitter' or  d['type'] == 'merger' %}
@@ -175,7 +175,7 @@ spec:
             --id {{' '}}{{cells[nid]['node_id']}}{{''}}{{";"}}
             jupyter execute /app/task-output.ipynb --allow-errors;
             jupyter nbconvert --no-input --execute /app/task-output.ipynb --to html;
-            cp /app/task-output.html /tmp/data/{{ task_name }}-output.html;
+            cp /app/task-output.html /tmp/data/{{ title }}-output.html;
             jupyter notebook --port 5173 --NotebookApp.ip='0.0.0.0' --NotebookApp.allow_origin='*' --NotebookApp.base_url=/naavre-visualizer-notebook
       metadata:
         labels:

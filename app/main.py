@@ -9,7 +9,14 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic_settings import BaseSettings
 
 from app.models.containerizer_payload import ContainerizerPayload
-from app.services.base_image_tags import BaseImageTags
+from app.models.extractor_payload import ExtractorPayload
+from app.models.notebook_data import NotebookData
+from app.services.base_image.base_image_tags import BaseImageTags
+from app.services.cell_extractor.extractor import DummyExtractor
+from app.services.cell_extractor.py_extractor import PyExtractor
+from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
+from app.services.cell_extractor.r_extractor import RExtractor
+from app.services.cell_extractor.r_header_extractor import RHeaderExtractor
 from app.services.containerizers.c_containerizer import CContainerizer
 from app.services.containerizers.julia_containerizer import JuliaContainerizer
 from app.services.containerizers.py_containerizer import PyContainerizer
@@ -77,6 +84,38 @@ def _get_github_service():
     return GithubService(repository_url=repository_url, token=token)
 
 
+def _get_extractor(notebook_data: NotebookData):
+    extractor = None
+    notebook = notebook_data.notebook
+    cell_index = notebook_data.cell_index
+    kernel = notebook_data.kernel
+    if notebook.cells[cell_index].cell_type != 'code':
+        # dummy extractor for non-code cells (e.g. markdown)
+        extractor = DummyExtractor(notebook_data)
+    elif 'r' in kernel.lower():
+        extractor = RHeaderExtractor(notebook_data)
+    elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
+        extractor = PyHeaderExtractor(notebook_data)
+    if kernel.lower() == 'irkernel':
+        code_extractor = RExtractor(notebook_data)
+    elif kernel == 'ipython' or kernel == 'python':
+        code_extractor = PyExtractor(notebook_data)
+    else:
+        raise HTTPException(status_code=400,
+                            detail="Unsupported kernel: " + kernel)
+    extractor.mearge_values(code_extractor)
+    return extractor
+
+
+@app.post("/extract_cell")
+def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
+                 extractor_payload: ExtractorPayload):
+    extractor_payload.data.set_user_name(access_token['preferred_username'])
+    extractor = _get_extractor(extractor_payload.data)
+    cell = extractor.get_cell()
+    return cell
+
+
 @app.post("/containerize")
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                  containerize_payload: ContainerizerPayload):
@@ -84,7 +123,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     gh = _get_github_service()
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
-                             path=containerize_payload.cell.task_name,
+                             path=containerize_payload.cell.title,
                              file_name="task" + conteinerizer.file_extension)
 
     image_version = get_content_hash(cell_contents)[:7]
@@ -92,15 +131,16 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if conteinerizer.visualization_cell:
         notebook_contents = conteinerizer.extract_notebook()
         notebook_updated = gh.commit(local_content=notebook_contents,
-                                     path=containerize_payload.cell.task_name,
+                                     path=containerize_payload.cell.title,
                                      file_name="task.ipynb")
+
     environment_contents = conteinerizer.build_environment()
     environment_updated = gh.commit(local_content=environment_contents,
-                                    path=containerize_payload.cell.task_name,
+                                    path=containerize_payload.cell.title,
                                     file_name="environment.yaml")
     docker_template = conteinerizer.build_docker()
     dockerfile_updated = gh.commit(local_content=docker_template,
-                                   path=containerize_payload.cell.task_name,
+                                   path=containerize_payload.cell.title,
                                    file_name="Dockerfile")
     containerization_workflow_resp = {"workflow_id": None,
                                       "dispatched_github_workflow": False,
@@ -110,7 +150,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if (cell_updated or environment_updated or dockerfile_updated or
             notebook_updated):
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
-            task_name=containerize_payload.cell.task_name,
+            title=containerize_payload.cell.title,
             image_version=image_version)
     containerize_payload.cell.image_version = image_version
 

@@ -89,6 +89,7 @@ jobs:
       test: ${{ matrix.test }}
     secrets:
       cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
+      auth_token: ${{ secrets.AUTH_TOKEN }}
 
   call-build-container:
     needs: [call-pytest]
@@ -104,5 +105,7 @@ jobs:
     needs: [call-build-container]
     uses: ./.github/workflows/helm-chart-release.yml
     with:
+      oci_repo: ghcr.io/qcdis/charts
+      version: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       push: ${{ github.event_name == 'release' }}
 

@@ -78,7 +78,7 @@ class GithubService(GitRepository, ABC):
             content_updated = True
         return content_updated
 
-    def dispatch_containerization_workflow(self, task_name=None,
+    def dispatch_containerization_workflow(self, title=None,
                                            image_version=None):
         wf_id = str(uuid.uuid4())
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
@@ -87,10 +87,10 @@ class GithubService(GitRepository, ABC):
             json={
                 'ref': 'refs/heads/main',
                 'inputs': {
-                    'build_dir': task_name,
+                    'build_dir': title,
                     'dockerfile': 'Dockerfile',
                     'image_repo': self.registry.registry_url,
-                    'image_tag': task_name,
+                    'image_tag': title,
                     'id': wf_id,
                     'image_version': image_version,
                 }
