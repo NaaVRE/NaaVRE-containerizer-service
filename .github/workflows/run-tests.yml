@@ -50,6 +50,7 @@ env:
   DISABLE_AUTH: ${{ inputs.disable_auth }}
   MODULE_MAPPING_URL: ${{ inputs.module_mapping_url }}
   ROOT_PATH: ${{ inputs.root_path }}
+  AUTH_TOKEN: ${{ secrets.auth_token }}
 
 
 jobs:
