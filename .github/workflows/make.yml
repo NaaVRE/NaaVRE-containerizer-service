@@ -89,6 +89,7 @@ jobs:
       test: ${{ matrix.test }}
     secrets:
       cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
+      auth_token: ${{ secrets.AUTH_TOKEN }}
 
   call-build-container:
     needs: [call-pytest]
