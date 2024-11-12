@@ -114,3 +114,6 @@ env:
   DEBUG: "false"
   OIDC_CONFIGURATION_URL: ""
   VERIFY_SSL: "true"
+  MODULE_MAPPING_URL: "https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json"
+  CELL_GITHUB: ""
+  CELL_GITHUB_TOKEN: ""
