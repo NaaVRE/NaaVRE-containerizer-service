@@ -31,7 +31,7 @@ jobs:
           miniforge-variant: Mambaforge
           python-version: 3.11
           path: ${{ env.CONDA }}/envs
-          environment-file: environment.yml
+          environment-file: environment.yaml
           activate-environment: naavre-containerizer-service
           use-mamba: true
 
@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.CONDA }}/envs
-          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yaml') }}
           restore-keys: |
             conda-environment-${{ runner.os }}-
         id: cache-conda
