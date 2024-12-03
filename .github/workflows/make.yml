@@ -98,15 +98,12 @@ jobs:
       oci_tag: ghcr.io/naavre/naavre-containerizer-service
       version: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       push: ${{ github.event_name == 'release' }}
-    secrets:
-      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   call-helm-chart-release:
     needs: [call-build-container]
     uses: ./.github/workflows/helm-chart-release.yml
     with:
-      oci_repo: ghcr.io/naavre/naavre-containerizer-service-helm
+      oci_repo: ghcr.io/naavre/charts
       version: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       push: ${{ github.event_name == 'release' }}
 
