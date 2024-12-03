@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
+          file: docker/Dockerfile
           tags: ${{ inputs.oci_tag }}:${{ inputs.version }},${{ inputs.oci_tag }}:latest
           push: ${{ inputs.push }}
           cache-from: type=gha
