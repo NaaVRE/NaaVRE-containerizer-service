@@ -71,22 +71,9 @@ class Containerizer():
             title=self.cell.title,
             base_image=self.cell.base_container_image)
 
+    @abstractmethod
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
-        conda_deps = set()
-        pip_deps = set()
-        for dep in dependencies:
-            module_name = dep.get('module', dep.get('name'))
-            if not module_name:
-                continue
-            module_name = module_name.split('.')[
-                0] if '.' in module_name else module_name
-            if module_name in module_name_mapping['conda']:
-                conda_deps.add(module_name_mapping['conda'][module_name])
-            elif module_name in module_name_mapping['pip']:
-                pip_deps.add(module_name_mapping['pip'][module_name])
-            elif not self.is_standard_module(module_name):
-                conda_deps.add(module_name)
-        return {'conda_dependencies': conda_deps, 'pip_dependencies': pip_deps}
+        pass
 
     # def map_dependencies(self, dependencies=None, module_name_mapping=None):
     #     set_conda_deps = set([])
