@@ -32,7 +32,7 @@ jobs:
           python-version: 3.11
           path: ${{ env.CONDA }}/envs
           environment-file: environment.yaml
-#           activate-environment: naavre-containerizer-service
+          activate-environment: naavre-containerizer-service
 #           use-mamba: true
 
 #       - name: Cache Conda environment
