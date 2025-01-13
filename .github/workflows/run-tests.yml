@@ -63,14 +63,14 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
-          miniforge-version: latest
-          miniforge-variant: Mambaforge
-          python-version: 3.11
+#           auto-update-conda: true
+#           miniforge-version: latest
+#           miniforge-variant: Mambaforge
+#           python-version: 3.11
 #           path: ${{ env.CONDA }}/envs
           environment-file: environment.yaml
           activate-environment: jupyterlab
-          use-mamba: true
+#           use-mamba: true
 
 #       - name: Cache Conda environment
 #         uses: actions/cache@v4
