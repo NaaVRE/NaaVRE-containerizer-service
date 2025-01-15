@@ -33,7 +33,7 @@ jobs:
           path: ${{ env.CONDA }}/envs
           environment-file: environment.yaml
           activate-environment: naavre-containerizer-service
-#           use-mamba: true
+          use-mamba: true
 
 #       - name: Cache Conda environment
 #         uses: actions/cache@v4
