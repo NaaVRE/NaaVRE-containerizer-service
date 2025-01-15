@@ -258,20 +258,10 @@ class RExtractor(Extractor):
             dependencies.append(self.imports.get(name))
         return dependencies
 
-    # def infer_cell_conf_dependencies(self, confs)-> list[dict]:
-    #     dependencies = []
-    #     for ck in confs:
-    #         for name in self.__extract_cell_names(confs[ck]):
-    #             if name in self.imports:
-    #                 dependencies.append(self.imports.get(name))
-    #
-    #     return dependencies
-
     def __extract_cell_names(self, source) -> dict:
         tree = parse_text(source)
         visitor = ExtractNames()
         vars_r = visitor.visit(tree)
-
         return vars_r
 
     def __extract_cell_undefined(self, cell_source) -> dict:

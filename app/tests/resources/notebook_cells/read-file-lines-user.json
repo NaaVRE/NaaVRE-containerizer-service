@@ -281,8 +281,8 @@
         "secrets": [],
         "title": "read-file-lines-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.18",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.18"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20"
         },
         "original_source": "onlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)\n\nf = open(file_path, 'r')\nlines = f.readlines()\nf.close()"    }
 }
