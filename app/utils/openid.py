@@ -1,11 +1,11 @@
 import logging
 import os
 import ssl
-from functools import lru_cache
 from typing import Union
 
 import jwt
 import requests
+import cachetools.func
 
 logger = logging.getLogger()
 
@@ -28,7 +28,7 @@ class OpenIDValidator:
             return ssl.SSLContext(verify_mode=ssl.CERT_NONE)
 
     @staticmethod
-    @lru_cache
+    @cachetools.func.ttl_cache(ttl=60*60*12)
     def _get_openid_conf(verify_ssl: bool) -> Union[dict, None]:
         url = os.environ['OIDC_CONFIGURATION_URL']
         r = requests.get(url, verify=verify_ssl)
