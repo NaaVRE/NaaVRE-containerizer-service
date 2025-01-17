@@ -65,9 +65,9 @@ class ExtractNames(RVisitor):
             right = self.names[right]
 
         # Check if the left and right children are of the same type
-        if (left == "int" and right == "int"):
+        if left == "int" and right == "int":
             return "int"
-        elif (left == "float" or right == "float"):
+        elif left == "float" or right == "float":
             return "float"
         else:
             return None
@@ -81,10 +81,9 @@ class ExtractNames(RVisitor):
             left = self.names[left]
         if right in self.names:
             right = self.names[right]
-
-        if (left == "int" and right == "int"):
+        if left == "int" and right == "int":
             return "int"
-        elif (left == "float" or right == "float"):
+        elif left == "float" or right == "float":
             return "float"
         else:
             return None
