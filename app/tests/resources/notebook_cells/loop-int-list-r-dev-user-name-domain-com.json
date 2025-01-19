@@ -215,8 +215,8 @@
         "secrets": [],
         "title": "loop-int-list-r-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.1",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.1"
         },
         "original_source": "for (l in list_of_ints) {\n    print(l)\n}"
     }

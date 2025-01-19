@@ -262,8 +262,8 @@
     "title": "create-file-test-user-2",
     "original_source": "L = [\"a\\n\", \"b\\n\", \"c\\n\"]\nfile_path =  os.path.join(conf_data_folder,'hello.txt')\nfp = open(file_path, 'w')\nfp.writelines(L)\nfp.close()\n\nonlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.1",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.1"
     }
   }
 }

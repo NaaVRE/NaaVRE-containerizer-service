@@ -208,8 +208,8 @@
     "title": "add1-r-test-user-2",
     "original_source": "a = count + 1",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.1",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.1"
     }
   }
 }

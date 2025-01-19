@@ -274,8 +274,8 @@
     "title": "anti-pattern-test-user-2",
     "original_source": "some_list = range(count, a+1)\n\nmsg = '1'",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.1",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.1"
     }
   }
 }
