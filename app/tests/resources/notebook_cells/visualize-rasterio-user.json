@@ -397,8 +397,8 @@
         "secrets": [],
         "title": "visualize-rasterio-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.1",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.1"
         },
         "original_source": "S6_done\n\ngeo_tiff = os.path.join(conf_local_path_geotiff, 'geotiff_TILE_000_BAND_perc_95_normalized_height.tif')\nsrc = rasterio.open(geo_tiff)\nshow(src)\nfig, ax = pyplot.subplots(1, figsize=(30, 30))\nshow((src, 1), interpolation='none', ax=ax)\nshow((src, 1), contour=True, ax=ax)\npyplot.show()\nshow_hist(src, bins=50, lw=0.0, stacked=False, alpha=0.3, histtype='stepfilled', title=\"Histogram\")\npyplot.show()"
     }

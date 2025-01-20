@@ -67,7 +67,6 @@ jobs:
           echo $MATRIX
           echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
-
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
     needs: [configure-workflow,split-tests]
@@ -106,4 +105,3 @@ jobs:
       oci_repo: ghcr.io/naavre/charts
       version: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
       push: ${{ github.event_name == 'release' }}
-

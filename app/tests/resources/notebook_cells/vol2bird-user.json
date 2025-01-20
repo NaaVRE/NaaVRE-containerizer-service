@@ -261,8 +261,8 @@
         "secrets": [],
         "title": "vol2bird-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.1",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.1"
         },
         "original_source": "print(a)\ncmd = \"vol2bird --version\"\n\nmsg = os.system(cmd)  # returns the exit code in unix"
     }
