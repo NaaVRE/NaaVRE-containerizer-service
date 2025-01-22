@@ -157,7 +157,8 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     return {"workflow_id": containerization_workflow_resp["workflow_id"],
             "dispatched_github_workflow": (
                     cell_updated or environment_updated or dockerfile_updated
-                    or notebook_updated), "image_version": image_version,
+                    or notebook_updated),
+            "image_version": image_version,
             "workflow_url": containerization_workflow_resp["workflow_url"]}
 
 

@@ -158,8 +158,8 @@
         "secrets": [],
         "title": "multiplyvector-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.1",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.1"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.2",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.2"
         }
     }
 }

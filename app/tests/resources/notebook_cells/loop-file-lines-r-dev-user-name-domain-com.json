@@ -226,8 +226,8 @@
         "secrets": [],
         "title": "loop-file-lines-r-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.1",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.1"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.2",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.2"
         },
         "original_source": "count <- 0\nfor (l in lines) {\n    count <- count + 1\n    cat(sprintf(\"Line %d: %s\\n\", count, trimws(l)))\n}"
     }

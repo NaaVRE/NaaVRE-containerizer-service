@@ -446,8 +446,8 @@
         "secrets": [],
         "title": "s3-retiling-local-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.1",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.1"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.2",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.2"
         },
         "original_source": "split_laz_files\n\ngrid_retile = {\n    'min_x': float(conf_min_x),\n    'max_x': float(conf_max_x),\n    'min_y': float(conf_min_y),\n    'max_y': float(conf_max_y),\n    'n_tiles_side': int(conf_n_tiles_side)\n}\n\nretiling_input = {\n    'setup_local_fs': {\n        'input_folder': conf_local_path_split,\n        'output_folder': conf_local_path_retiled\n    },\n    'set_grid': grid_retile,\n    'split_and_redistribute': {},\n    'validate': {},\n}\n\nfor file in split_laz_files:\n    clean_file = file.replace('\"','').replace('[','').replace(']','')\n    print(clean_file)\n    retiler = Retiler(clean_file,label=clean_file).config(retiling_input)\n    retiler_output = retiler.run()\n\nS3_done = 'True'"
     }
