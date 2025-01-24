@@ -1,0 +1,99 @@
+{
+    "data": {
+        "save": false,
+        "kernel": "IRkernel",
+        "cell_index": 0,
+        "notebook": {
+            "metadata": {
+                "language_info": {
+                    "name": "R",
+                    "codemirror_mode": "r",
+                    "pygments_lexer": "r",
+                    "mimetype": "text/x-r-source",
+                    "file_extension": ".r",
+                    "version": "4.3.3"
+                },
+                "kernelspec": {
+                    "name": "conda-env-jupyterlab-r",
+                    "display_name": "R [conda env:jupyterlab] *",
+                    "language": "R"
+                }
+            },
+            "nbformat_minor": 5,
+            "nbformat": 4,
+            "cells": [
+                {
+                    "cell_type": "code",
+                    "source": "# for loop test \n\nlocal_file_paths <- c(\n  \"/path/to/file1.txt\",\n  \"/path/to/file2.csv\",\n  \"/path/to/file3.pdf\",\n  \"/path/to/directory/file4.jpg\"\n)\n\nfor (pvol_path in local_file_paths) {\n    print(pvol_path)\n}",
+                    "metadata": {
+                        "trusted": true
+                    },
+                    "execution_count": 1,
+                    "outputs": [
+                        {
+                            "name": "stdout",
+                            "text": "[1] \"/path/to/file1.txt\"\n[1] \"/path/to/file2.csv\"\n[1] \"/path/to/file3.pdf\"\n[1] \"/path/to/directory/file4.jpg\"\n",
+                            "output_type": "stream"
+                        }
+                    ],
+                    "id": "25a234d9-10d7-41e0-8f58-98374eb603c9"
+                },
+                {
+                    "cell_type": "code",
+                    "source": "",
+                    "metadata": {},
+                    "execution_count": null,
+                    "outputs": [],
+                    "id": "c1508134-6355-4f7a-b930-353b04bf982c"
+                }
+            ]
+        }
+    },
+    "cell": {
+        "all_inputs": [],
+        "chart_obj": {
+            "hovered": {},
+            "links": {},
+            "nodes": {
+                "bb6cfdd": {
+                    "id": "bb6cfdd",
+                    "ports": {},
+                    "position": {
+                        "x": 35,
+                        "y": 15
+                    },
+                    "properties": {
+                        "inputs": [],
+                        "og_node_id": "bb6cfdd",
+                        "outputs": [],
+                        "params": [],
+                        "secrets": [],
+                        "title": "for-loop-test-dev-user-name-domain-com",
+                        "vars": []
+                    },
+                    "type": "input-output"
+                }
+            },
+            "offset": {
+                "x": 0,
+                "y": 0
+            },
+            "scale": 1,
+            "selected": {}
+        },
+        "confs": [],
+        "dependencies": [],
+        "inputs": [],
+        "kernel": "IRkernel",
+        "original_source": "# for loop test \n\nlocal_file_paths <- c(\n  \"/path/to/file1.txt\",\n  \"/path/to/file2.csv\",\n  \"/path/to/file3.pdf\",\n  \"/path/to/directory/file4.jpg\"\n)\n\nfor (pvol_path in local_file_paths) {\n    print(pvol_path)\n}",
+        "outputs": [],
+        "params": [],
+        "secrets": [],
+        "title": "for-loop-test-test-user-2",
+        "types": {},
+        "base_container_image": {
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.2",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.2"
+        }
+    }
+}
