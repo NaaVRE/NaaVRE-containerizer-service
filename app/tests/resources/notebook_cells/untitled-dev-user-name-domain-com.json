@@ -109,8 +109,8 @@
         "secrets": [],
         "title": "untitled-test-user-2",
         "base_container_image": {
-            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.1",
-            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.1"
+            "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.2",
+            "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.2"
         },
         "original_source": "param_string <- 'param_string value'\nparam_string_with_comment <- 'param_string value'  # comment\nparam_int <- 1\nparam_float <- 1.1\nparam_list_int <- list(1, 2, 3)\nparam_list_str <- list(\"list_str\", \"space in elem\", \"3\")\n\nconf_string <- 'param_string value'\nconf_string_with_comment <- 'param_string value'  # comment\nconf_int <- 1\nconf_float <- 1.1\nconf_list_int <- list(1, 2, 3)\nconf_list_str <- list(\"list_str\", \"space in elem\", \"3\")"
     }
