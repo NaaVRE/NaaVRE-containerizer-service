@@ -18,7 +18,7 @@ class PyContainerizer(Containerizer, ABC):
         if self.visualization_cell:
             self.template_script = 'vis_cell_template.jinja2'
         else:
-            self.template_script = 'R_cell_template.jinja2'
+            self.template_script = 'py_cell_template.jinja2'
 
     def extract_notebook(self):
         # Build a notebook from the cell
@@ -56,3 +56,20 @@ class PyContainerizer(Containerizer, ABC):
             elif not self.is_standard_module(module_name):
                 conda_deps.add(module_name)
         return {'conda_dependencies': conda_deps, 'pip_dependencies': pip_deps}
+
+    def build_script(self):
+        template_script = self.template_env.get_template(self.template_script)
+        deps = self.cell.dependencies
+        conf = self.cell.confs
+        resolves = []
+        for d in deps:
+            resolve_to = "import %s" % d['name']
+            if d['module']:
+                resolve_to = "from %s %s" % (d['module'], resolve_to)
+            if d['asname']:
+                resolve_to += " as %s" % d['asname']
+            resolves.append(resolve_to)
+
+        return template_script.render(cell=self.cell,
+                                      deps=resolves,
+                                      confs=conf)

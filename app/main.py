@@ -31,10 +31,10 @@ base_image_tags = BaseImageTags()
 
 
 class Settings(BaseSettings):
-    root_path: str = "my-root-path"
-    if not root_path.startswith("/"):
-        root_path = "/" + root_path
-    if root_path.endswith("/"):
+    root_path: str = 'my-root-path'
+    if not root_path.startswith('/'):
+        root_path = '/' + root_path
+    if root_path.endswith('/'):
         root_path = root_path[:-1]
 
 
@@ -42,7 +42,7 @@ settings = Settings()
 
 app = FastAPI(root_path=settings.root_path)
 
-if os.getenv("DEBUG", "false").lower() == "true":
+if os.getenv('DEBUG', 'false').lower() == 'true':
     logging.basicConfig(level=10)
 
 
@@ -52,35 +52,35 @@ def valid_access_token(credentials: Annotated[
     try:
         return token_validator.validate(credentials.credentials)
     except (jwt.exceptions.InvalidTokenError, jwt.exceptions.PyJWKClientError):
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail='Not authenticated')
 
 
-@app.get("/base-image-tags")
+@app.get('/base-image-tags')
 def get_base_image_tags(
         access_token: Annotated[dict, Depends(valid_access_token)]):
     return base_image_tags.get()
 
 
 def _get_containerizer(cell):
-    if cell.kernel.lower() == "python" or cell.kernel == "ipython":
+    if cell.kernel.lower() == 'python' or cell.kernel == 'ipython':
         return PyContainerizer(cell)
-    elif cell.kernel.lower() == "r" or cell.kernel.lower() == "irkernel":
+    elif cell.kernel.lower() == 'r' or cell.kernel.lower() == 'irkernel':
         return RContainerizer(cell)
-    elif cell.kernel.lower() == "julia":
+    elif cell.kernel.lower() == 'julia':
         return JuliaContainerizer(cell)
-    elif cell.kernel.lower() == "c":
+    elif cell.kernel.lower() == 'c':
         return CContainerizer(cell)
     else:
-        raise ValueError("Unsupported kernel")
+        raise ValueError('Unsupported kernel')
 
 
 def _get_github_service():
-    repository_url = os.getenv("CELL_GITHUB")
+    repository_url = os.getenv('CELL_GITHUB')
     if repository_url is None:
-        raise ValueError("CELL_GITHUB environment variable is not set")
-    token = os.getenv("CELL_GITHUB_TOKEN")
+        raise ValueError('CELL_GITHUB environment variable is not set')
+    token = os.getenv('CELL_GITHUB_TOKEN')
     if token is None:
-        raise ValueError("CELL_GITHUB environment variable is not set")
+        raise ValueError('CELL_GITHUB environment variable is not set')
     return GithubService(repository_url=repository_url, token=token)
 
 
@@ -102,12 +102,12 @@ def _get_extractor(notebook_data: NotebookData):
         code_extractor = PyExtractor(notebook_data)
     else:
         raise HTTPException(status_code=400,
-                            detail="Unsupported kernel: " + kernel)
+                            detail='Unsupported kernel: ' + kernel)
     extractor.mearge_values(code_extractor)
     return extractor
 
 
-@app.post("/extract_cell")
+@app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
     extractor_payload.data.set_user_name(access_token['preferred_username'])
@@ -116,7 +116,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
     return cell
 
 
-@app.post("/containerize")
+@app.post('/containerize')
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                  containerize_payload: ContainerizerPayload):
     conteinerizer = _get_containerizer(containerize_payload.cell)
@@ -124,45 +124,48 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
                              path=containerize_payload.cell.title,
-                             file_name="task" + conteinerizer.file_extension)
-
-    image_version = get_content_hash(cell_contents)[:7]
+                             file_name='task' + conteinerizer.file_extension)
     notebook_updated = False
     if conteinerizer.visualization_cell:
         notebook_contents = conteinerizer.extract_notebook()
         notebook_updated = gh.commit(local_content=notebook_contents,
                                      path=containerize_payload.cell.title,
-                                     file_name="task.ipynb")
+                                     file_name='task.ipynb')
 
     environment_contents = conteinerizer.build_environment()
     environment_updated = gh.commit(local_content=environment_contents,
                                     path=containerize_payload.cell.title,
-                                    file_name="environment.yaml")
+                                    file_name='environment.yaml')
     docker_template = conteinerizer.build_docker()
     dockerfile_updated = gh.commit(local_content=docker_template,
                                    path=containerize_payload.cell.title,
-                                   file_name="Dockerfile")
-    containerization_workflow_resp = {"workflow_id": None,
-                                      "dispatched_github_workflow": False,
-                                      "image_version": image_version,
-                                      "workflow_url": None}
+                                   file_name='Dockerfile')
+
+    image_version = get_content_hash(cell_contents)[:7]
+    container_image = (gh.registry.registry_url + '/' +
+                       containerize_payload.cell.title + ':' + image_version)
+    containerization_workflow_resp = {'workflow_id': None,
+                                      'dispatched_github_workflow': False,
+                                      'container_image': container_image,
+                                      'workflow_url': None,
+                                      'source_url': None}
 
     if (cell_updated or environment_updated or dockerfile_updated or
             notebook_updated):
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
             image_version=image_version)
-    containerize_payload.cell.image_version = image_version
-
-    return {"workflow_id": containerization_workflow_resp["workflow_id"],
-            "dispatched_github_workflow": (
+    containerize_payload.cell.container_image = container_image
+    return {'workflow_id': containerization_workflow_resp['workflow_id'],
+            'dispatched_github_workflow': (
                     cell_updated or environment_updated or dockerfile_updated
                     or notebook_updated),
-            "image_version": image_version,
-            "workflow_url": containerization_workflow_resp["workflow_url"]}
+            'container_image': container_image,
+            'workflow_url': containerization_workflow_resp['workflow_url'],
+            'source_url': containerization_workflow_resp['source_url']}
 
 
-@app.get("/containerization-status/{workflow_id}")
+@app.get('/containerization-status/{workflow_id}')
 def containerization_status(
         access_token: Annotated[dict, Depends(valid_access_token)],
         workflow_id: str):
@@ -170,9 +173,9 @@ def containerization_status(
     job = gh.get_job(wf_id=workflow_id)
     if job is None:
         raise HTTPException(status_code=404,
-                            detail="containerization job not found")
+                            detail='containerization job not found')
     return job
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)

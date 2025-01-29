@@ -26,3 +26,23 @@ class RContainerizer(Containerizer, ABC):
         conda_deps.discard(None)
         conda_deps.discard(None)
         return {'conda_dependencies': conda_deps, 'pip_dependencies': pip_deps}
+
+    def build_script(self):
+        template_script = self.template_env.get_template(self.template_script)
+        deps = self.cell.dependencies
+        conf = self.cell.confs
+
+        r_dependencies = []
+        for dep in deps:
+            r_dep = dep.replace('import ', '')
+            install_packages = ('if (!requireNamespace("' + r_dep +
+                                '", quietly = TRUE)) {\n\tinstall.packages("' +
+                                r_dep +
+                                '", repos="http://cran.us.r-project.org")\n}')
+            r_dependencies.append(install_packages)
+            library = 'library(' + r_dep + ')'
+            r_dependencies.append(library)
+
+        return template_script.render(cell=self.cell,
+                                      deps=r_dependencies,
+                                      confs=conf)

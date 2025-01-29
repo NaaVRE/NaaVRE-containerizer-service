@@ -35,13 +35,7 @@ class Containerizer():
 
     @abstractmethod
     def build_script(self):
-        template_script = self.template_env.get_template(self.template_script)
-        deps = self.cell.dependencies
-        conf = self.cell.confs
-
-        return template_script.render(cell=self.cell,
-                                      deps=deps,
-                                      confs=conf)
+        pass
 
     @abstractmethod
     def extract_notebook(self):
