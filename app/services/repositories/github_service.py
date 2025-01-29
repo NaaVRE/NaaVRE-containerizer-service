@@ -9,7 +9,7 @@ from time import sleep
 
 import requests
 from github import Github
-from github.GithubException import UnknownObjectException
+from github.GithubException import UnknownObjectException, GithubException
 
 from app.services.container_registries.container_registry import \
     ContainerRegistry
@@ -54,6 +54,14 @@ class GithubService(GitRepository, ABC):
                 path=path + '/' + file_name).sha
         except UnknownObjectException:
             remote_hash = None
+        except GithubException as e:
+            # Workaround for https://github.com/PyGithub/PyGithub/issues/3179
+            # and
+            # https://github.com/NaaVRE/NaaVRE-containerizer-service/issues/26
+            if e.status == 404:
+                remote_hash = None
+            else:
+                raise e
         local_hash = get_content_hash(local_content)
         if remote_hash is None:
             self.gh_repository.create_file(
