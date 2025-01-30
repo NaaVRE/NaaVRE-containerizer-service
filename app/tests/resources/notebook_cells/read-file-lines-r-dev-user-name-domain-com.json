@@ -231,8 +231,8 @@
     "secrets": [],
     "title": "read-file-lines-r-test-user-2",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.20.2",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.20.2"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.21.1",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.21.1"
     },
     "original_source": "onlyfiles <- list.files(conf_data_folder, full.names = TRUE)\n\nprint(onlyfiles)\n\nf <- file(file_path, \"r\")\nlines <- readLines(f)\nclose(f)"
   }

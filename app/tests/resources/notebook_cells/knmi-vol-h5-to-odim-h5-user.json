@@ -261,8 +261,8 @@
     "secrets": [],
     "title": "knmi-vol-h5-to-odim-h5-test-user-2",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.20.2",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.20.2"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.21.1",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.21.1"
     },
     "original_source": "print(a)\ncmd = \"KNMI_vol_h5_to_ODIM_h5 \"\n\nout = os.system(cmd)  # returns the exit code in unix"
   }

@@ -100,10 +100,14 @@ def test_containerize():
                                'python')
         elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
                 cell_notebook_dict['cell']['kernel'].lower() == 'r':
+            with open(os.path.join(download_path, 'task.R')) as f:
+                task_code = f.read()
+            f.close()
             assert os.path.exists(os.path.join(download_path, 'task.R'))
             test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
 
-        assert cell_notebook_dict['cell']['original_source'] in task_code
+        assert task_code in cell_notebook_dict['cell'][
+            'original_source']
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
