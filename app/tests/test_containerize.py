@@ -93,6 +93,10 @@ def test_containerize():
         if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
                 cell_notebook_dict['cell']['kernel'] == 'ipython'):
             assert os.path.exists(os.path.join(download_path, 'task.py'))
+            # Check if code from cell is in 'task.py'
+            with open(os.path.join(download_path, 'task.py')) as f:
+                task_code = f.read()
+            f.close()
             test_script_syntax(os.path.join(download_path, 'task.py'),
                                'python')
         elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
@@ -100,6 +104,7 @@ def test_containerize():
             assert os.path.exists(os.path.join(download_path, 'task.R'))
             test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
 
+        assert cell_notebook_dict['cell']['original_source'] in task_code
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
@@ -109,14 +114,14 @@ def test_script_syntax(script_path: str = None, lang: str = None):
         command = ["R", "-e", f"source('{script_path}', echo=TRUE)"]
         # Run the command
         result = subprocess.run(command, capture_output=True, text=True)
-
-        assert result.returncode == 0, (f"R script syntax error:"
-                                        f"\n{result.stderr}")
+        assert result.returncode == 0, \
+            f"R script syntax error:" f"\n{result.stderr}"
     elif lang == 'python':
         command = ["python", script_path]
         # Run the command
         result = subprocess.run(command, capture_output=True, text=True)
-        assert result.returncode == 0, (f"Python script syntax error:"
-                                        f"\n{result.stderr}")
+        if 'usage: task.py [-h] --id ID' not in result.stderr:
+            assert result.returncode == 0, \
+                f"Python script syntax error:"f"\n{result.stderr}"
     else:
         raise ValueError(f"Unsupported language: {lang}")
