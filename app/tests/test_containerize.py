@@ -63,6 +63,7 @@ def test_containerize():
 
         workflow_id = containerize_response.json()['workflow_id']
         source_url = containerize_response.json()['source_url']
+        assert cell_notebook_dict['cell']['title'] in source_url
         containerization_status_response = client.get(
             '/containerization-status/' + workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
@@ -92,19 +93,30 @@ def test_containerize():
         if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
                 cell_notebook_dict['cell']['kernel'] == 'ipython'):
             assert os.path.exists(os.path.join(download_path, 'task.py'))
+            test_script_syntax(os.path.join(download_path, 'task.py'),
+                               'python')
         elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
                 cell_notebook_dict['cell']['kernel'].lower() == 'r':
             assert os.path.exists(os.path.join(download_path, 'task.R'))
-            test_r_script_syntax(os.path.join(download_path, 'task.R'))
+            test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
 
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
 
-def test_r_script_syntax(r_script_path: str = None):
-    command = ["R", "-e", f"source('{r_script_path}', echo=TRUE)"]
-    # Run the command
-    result = subprocess.run(command, capture_output=True, text=True)
+def test_script_syntax(script_path: str = None, lang: str = None):
+    if lang == 'R':
+        command = ["R", "-e", f"source('{script_path}', echo=TRUE)"]
+        # Run the command
+        result = subprocess.run(command, capture_output=True, text=True)
 
-    # Check if the command was successful (exit code 0 means no syntax errors)
-    assert result.returncode == 0, f"R script syntax error:\n{result.stderr}"
+        assert result.returncode == 0, (f"R script syntax error:"
+                                        f"\n{result.stderr}")
+    elif lang == 'python':
+        command = ["python", script_path]
+        # Run the command
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, (f"Python script syntax error:"
+                                        f"\n{result.stderr}")
+    else:
+        raise ValueError(f"Unsupported language: {lang}")

@@ -107,10 +107,8 @@ class GithubService(GitRepository, ABC):
             raise Exception('Error dispatching workflow: ' + resp.text)
         job = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc,
                            job_id=None)
-        commit = self.get_commit(wf_id=wf_id)
-        folder_name = commit.raw_data['files'][0]['filename'].split('/')[0]
         source_url = (self.repository_url.replace('.git', '') + '/tree/' +
-                      commit.sha + '/' + folder_name)
+                      job['head_sha'] + '/' + title)
         return {'workflow_id': wf_id,
                 'workflow_url': job['html_url'],
                 'source_url': source_url}
@@ -209,9 +207,3 @@ class GithubService(GitRepository, ABC):
                     job['head_sha'] = run['head_sha']
                     return job
         return None
-
-    def get_commit(self, wf_id=None):
-        job = self.get_job(wf_id=wf_id)
-        commit_sha = job['head_sha']
-        commit = self.gh_repository.get_commit(commit_sha)
-        return commit
