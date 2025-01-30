@@ -70,6 +70,9 @@ class PyContainerizer(Containerizer, ABC):
                 resolve_to += " as %s" % d['asname']
             resolves.append(resolve_to)
 
+        if resolves:
+            print(resolves)
+            print(deps)
         return template_script.render(cell=self.cell,
-                                      deps=resolves,
+                                      deps=deps,
                                       confs=conf)
