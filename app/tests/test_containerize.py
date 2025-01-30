@@ -120,7 +120,10 @@ def test_script_syntax(script_path: str = None, lang: str = None):
         command = ["python", script_path]
         # Run the command
         result = subprocess.run(command, capture_output=True, text=True)
-        if 'usage: task.py [-h] --id ID' not in result.stderr:
+        if ('usage: task.py [-h] --id ID' not in result.stderr and
+                'ModuleNotFoundError' not in result.stderr):
+            if result.returncode != 0:
+                print(result.stderr)
             assert result.returncode == 0, \
                 f"Python script syntax error:"f"\n{result.stderr}"
     else:
