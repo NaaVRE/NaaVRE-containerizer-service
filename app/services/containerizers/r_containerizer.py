@@ -34,13 +34,12 @@ class RContainerizer(Containerizer, ABC):
 
         r_dependencies = []
         for dep in deps:
-            r_dep = dep.replace('import ', '')
-            install_packages = ('if (!requireNamespace("' + r_dep +
+            install_packages = ('if (!requireNamespace("' + dep['name'] +
                                 '", quietly = TRUE)) {\n\tinstall.packages("' +
-                                r_dep +
+                                dep['name'] +
                                 '", repos="http://cran.us.r-project.org")\n}')
             r_dependencies.append(install_packages)
-            library = 'library(' + r_dep + ')'
+            library = 'library(' + dep['name'] + ')'
             r_dependencies.append(library)
         return template_script.render(cell=self.cell,
                                       deps=r_dependencies,

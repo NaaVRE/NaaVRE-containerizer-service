@@ -51,7 +51,6 @@ def test_containerize():
             print('Testing containerize for cell: ' + cell_file)
             cell_notebook_dict = json.load(f)
         f.close()
-
         containerizer_payload = {'cell': cell_notebook_dict['cell']}
 
         containerize_response = client.post(
