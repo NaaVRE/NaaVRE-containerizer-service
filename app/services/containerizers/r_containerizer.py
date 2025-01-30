@@ -42,11 +42,6 @@ class RContainerizer(Containerizer, ABC):
             r_dependencies.append(install_packages)
             library = 'library(' + r_dep + ')'
             r_dependencies.append(library)
-
-        if r_dependencies:
-            print(r_dependencies)
-            print(deps)
-
         return template_script.render(cell=self.cell,
-                                      deps=deps,
+                                      deps=r_dependencies,
                                       confs=conf)
