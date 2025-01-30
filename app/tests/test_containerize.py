@@ -1,7 +1,7 @@
 import json
 import os
 from time import sleep
-
+import subprocess
 import requests
 from fastapi.testclient import TestClient
 
@@ -22,26 +22,24 @@ def download_files_from_github(repo_url, download_path):
     list_url = (f"https://api.github.com/repos/{repo_owner}/{repo_name}"
                 f"/contents/{directory}?ref={branch}")
     response = requests.get(list_url)
-    all_files = []
     if response.status_code == 200:
-        file_data = {}
         for item in response.json():
-            if item["type"] == "file":  # Ensure it's a file
+            if item["type"] == "file":
                 file_url = item["download_url"]
                 file_response = requests.get(file_url)
                 if file_response.status_code == 200:
-                    file_data['name'] = item['name']
-                    file_data['content'] = file_response.text
+                    # Save the file in the download path
+                    file_name = item["name"]
+                    file_path = os.path.join(download_path, file_name)
+                    with open(file_path, 'wb') as f:
+                        f.write(file_response.content)
                 else:
                     raise Exception("Failed to fetch file. Status Code:",
                                     file_response.status_code, "Response:",
                                     file_response.text)
-            all_files.append(file_data)
     else:
         raise Exception("Failed to fetch files. Status Code:",
                         response.status_code, "Response:", response.text)
-
-    return all_files
 
 
 def test_containerize():
@@ -86,16 +84,27 @@ def test_containerize():
         assert containerization_status_response.json()[
                    'conclusion'] == 'success'
         # Download files from source_url
-        download_path = os.path.join('tmp', 'downloaded_files')
+        download_path = os.path.join('/tmp', 'downloaded_files')
         os.makedirs(download_path, exist_ok=True)
-        files = download_files_from_github(source_url, download_path)
+        download_files_from_github(source_url, download_path)
 
-        for file in files:
-            if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                    cell_notebook_dict['cell']['kernel'].lower() == 'ipython'):
-                assert file['name'] in ['Dockerfile', 'environment.yaml',
-                                        'task.py']
-            elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel':
-                assert file['name'] in ['Dockerfile', 'environment.yaml',
-                                        'task.R']
-            assert file['content'] is not None
+        # Check if the downloaded files are correct
+        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
+                cell_notebook_dict['cell']['kernel'] == 'ipython'):
+            assert os.path.exists(os.path.join(download_path, 'task.py'))
+        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
+                cell_notebook_dict['cell']['kernel'].lower() == 'r':
+            assert os.path.exists(os.path.join(download_path, 'task.R'))
+            test_r_script_syntax(os.path.join(download_path, 'task.R'))
+
+        assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
+        assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
+
+
+def test_r_script_syntax(r_script_path: str = None):
+    command = ["R", "-e", f"source('{r_script_path}', echo=TRUE)"]
+    # Run the command
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    # Check if the command was successful (exit code 0 means no syntax errors)
+    assert result.returncode == 0, f"R script syntax error:\n{result.stderr}"
