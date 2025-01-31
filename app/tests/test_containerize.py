@@ -96,15 +96,23 @@ def test_containerize():
             # with open(os.path.join(download_path, 'task.py')) as f:
             #     task_code = f.read()
             # f.close()
-            test_script_syntax(os.path.join(download_path, 'task.py'),
-                               'python')
+            try:
+                test_script_syntax(os.path.join(download_path, 'task.py'),
+                                   'python')
+            except Exception as e:
+                print('Testing file: ' + cell_file)
+                raise e
         elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
                 cell_notebook_dict['cell']['kernel'].lower() == 'r':
             # with open(os.path.join(download_path, 'task.R')) as f:
             #     task_code = f.read()
             # f.close()
             assert os.path.exists(os.path.join(download_path, 'task.R'))
-            test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
+            try:
+                test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
+            except Exception as e:
+                print('Testing file: ' + cell_file)
+                raise e
 
         # assert task_code in cell_notebook_dict['cell'][
         #     'original_source']
