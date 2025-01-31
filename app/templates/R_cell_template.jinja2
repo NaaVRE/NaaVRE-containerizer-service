@@ -2,19 +2,19 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
-{% for dep in deps%}
+{% for dep in deps %}
 {{ dep }}
 {% endfor %}
 
 
-{%  for secret in cell.secrets|sort %}
-{{ secret }} = Sys.getenv('{{ secret }}')
+{%  for secret in cell.secrets|sort(attribute='name')  %}
+{{ secret['name'] }} = Sys.getenv('{{ secret['name'] }}')
 {% endfor %}
 
 print('option_list')
 option_list = list(
 
-{% for in_var in cell.all_inputs|sort %}
+{% for in_var in cell.inputs|sort(attribute='name')  %}
 {% if in_var['type'] == list or in_var['type'] == 'list' %}
 {% set type = 'character' %}
 {% elif in_var['type'] == str or in_var['type'] == 'str' %}
@@ -28,7 +28,7 @@ option_list = list(
 {% else %}
 {% set type = 'character' %}
 {% endif %}
-{% set option = 'make_option(c("--' +  in_var+'"), action="store", default=NA, type="'+type+'", help="my description")'   %}
+{% set option = 'make_option(c("--' +  in_var['name']+'"), action="store", default=NA, type="'+type+'", help="my description")'   %}
 {% if not loop.last %}
 {% set option = option + ', '%}
 {% endif %}
@@ -68,23 +68,23 @@ var_serialization <- function(var){
     )
 }
 
-{% for in_var in cell.all_inputs|sort %}
-print("Retrieving {{ in_var }}")
-var = opt${{ in_var }}
+{% for in_var in cell.inputs|sort(attribute='name')  %}
+print("Retrieving {{ in_var['name'] }}")
+var = opt${{ in_var['name'] }}
 print(var)
 var_len = length(var)
-print(paste("Variable {{ in_var }} has length", var_len))
+print(paste("Variable {{ in_var['name'] }} has length", var_len))
 
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
-print("------------------------Running var_serialization for {{ in_var }}-----------------------")
-print(opt${{ in_var }})
-{{ in_var }} = var_serialization(opt${{ in_var }})
+print("------------------------Running var_serialization for {{ in_var['name'] }}-----------------------")
+print(opt${{ in_var['name'] }})
+{{ in_var['name'] }} = var_serialization(opt${{ in_var['name'] }})
 print("---------------------------------------------------------------------------------")
 
 {% elif in_var['type'] == str or  in_var['type'] == 'str' %}
-{{ in_var }} <- gsub("\"", "", opt${{ in_var }})
+{{ in_var['name'] }} <- gsub("\"", "", opt${{ in_var['name'] }})
 {% else %}
-{{ in_var }} = opt${{ in_var }}
+{{ in_var['name'] }} = opt${{ in_var['name'] }}
 {% endif %}
 {% endfor %}
 
@@ -97,9 +97,9 @@ print("Running the cell")
 {% if cell.outputs|length > 0 %}
 # capturing outputs
 {% for out in cell.outputs %}
-print('Serialization of {{ out }}')
-file <- file(paste0('/tmp/{{out}}_', id, '.json'))
-writeLines(toJSON({{out}}, auto_unbox=TRUE), file)
+print('Serialization of {{ out['name'] }}')
+file <- file(paste0('/tmp/{{out['name']}}_', id, '.json'))
+writeLines(toJSON({{out['name']}}, auto_unbox=TRUE), file)
 close(file)
 {% endfor %}
 {% endif %}
