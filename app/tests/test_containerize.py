@@ -1,7 +1,8 @@
 import json
 import os
-from time import sleep
 import subprocess
+from time import sleep
+
 import requests
 from fastapi.testclient import TestClient
 
@@ -96,23 +97,17 @@ def test_containerize():
             # with open(os.path.join(download_path, 'task.py')) as f:
             #     task_code = f.read()
             # f.close()
-            try:
-                test_script_syntax(os.path.join(download_path, 'task.py'),
-                                   'python')
-            except Exception as e:
-                print('Testing file: ' + cell_file)
-                raise e
+            test_script_syntax(os.path.join(download_path, 'task.py'),
+                               'python', cell_file)
         elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
                 cell_notebook_dict['cell']['kernel'].lower() == 'r':
             # with open(os.path.join(download_path, 'task.R')) as f:
             #     task_code = f.read()
             # f.close()
             assert os.path.exists(os.path.join(download_path, 'task.R'))
-            try:
-                test_script_syntax(os.path.join(download_path, 'task.R'), 'R')
-            except Exception as e:
-                print('Testing file: ' + cell_file)
-                raise e
+
+            test_script_syntax(os.path.join(download_path, 'task.R'),
+                               'R', cell_file)
 
         # assert task_code in cell_notebook_dict['cell'][
         #     'original_source']
@@ -120,7 +115,8 @@ def test_containerize():
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
 
-def test_script_syntax(script_path: str = None, lang: str = None):
+def test_script_syntax(script_path: str = None, lang: str = None,
+                       test_file: str = None):
     if lang == 'R':
         command = ["R", "-e", f"source('{script_path}', echo=TRUE)"]
         # Run the command
@@ -138,4 +134,5 @@ def test_script_syntax(script_path: str = None, lang: str = None):
             assert result.returncode == 0, \
                 f"Python script syntax error:"f"\n{result.stderr}"
     else:
+        print('Test file: ' + test_file)
         raise ValueError(f"Unsupported language: {lang}")
