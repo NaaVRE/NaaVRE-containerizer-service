@@ -9,26 +9,26 @@ import json
 import os
 arg_parser = argparse.ArgumentParser()
 
-{%  for secret in cell.secrets|sort %}
-{{ secret }} = os.getenv('{{ secret }}')
+{%  for secret in cell.secrets|sort(attribute='name') %}
+{{ secret['name'] }} = os.getenv('{{ secret['name'] }}')
 {% endfor %}
 
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
-{% for in_var in cell.inputs|sort %}
+{% for in_var in cell.inputs|sort(attribute='name') %}
 
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
-arg_parser.add_argument('--{{ in_var }}', action='store', type=str, required=True, dest='{{ in_var }}')
+arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type=str, required=True, dest='{{ in_var['name'] }}')
 {% else %}
-arg_parser.add_argument('--{{ in_var }}', action='store', type={{ in_var['type'] }}, required=True, dest='{{ in_var }}')
+arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type={{ in_var['type'] }}, required=True, dest='{{ in_var['name'] }}')
 {% endif %}
 {% endfor %}
 
-{% for param in cell.params|sort %}
-{% if types[param] == list  or types[param] == 'list' %}
-arg_parser.add_argument('--{{ param }}', action='store', type=str, required=True, dest='{{ param }}')
+{% for param in cell.params|sort(attribute='name') %}
+{% if param['type'] == list  or param['type'] == 'list' %}
+arg_parser.add_argument('--{{ param['name'] }}', action='store', type=str, required=True, dest='{{ param['name'] }}')
 {% else %}
-arg_parser.add_argument('--{{ param }}', action='store', type={{ types[param] }}, required=True, dest='{{ param }}')
+arg_parser.add_argument('--{{ param['name'] }}', action='store', type={{ param['type'] }}, required=True, dest='{{ param['name'] }}')
 {% endif %}
 {% endfor %}
 
@@ -37,50 +37,47 @@ print(args)
 
 id = args.id
 
-{% for in_var in cell.inputs|sort %}
+{% for in_var in cell.inputs|sort(attribute='name') %}
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
-{{ in_var }} = json.loads(args.{{ in_var }})
+{{ in_var['name']  }} = json.loads(args.{{ in_var['name']  }})
 {% elif in_var['type'] == str or  in_var['type'] == 'str' %}
-{{ in_var }} = args.{{ in_var }}.replace('"','')
+{{ in_var['name']  }} = args.{{ in_var['name']  }}.replace('"','')
 {% else %}
-{{ in_var }} = args.{{ in_var }}
+{{ in_var['name']  }} = args.{{ in_var['name']  }}
 {% endif %}
 {% endfor %}
 
-{% for param in cell.params|sort %}
-{% if types[param] == list  or types[param] == 'list' %}
-print(args.{{ param }})
-print(type(args.{{ param }}))
+{% for param in cell.params|sort(attribute='name') %}
+{% if param['type'] == list  or param['type'] == 'list' %}
+print(args.{{ param['name']  }})
+print(type(args.{{ param['name']  }}))
 try:
-    {{ param }} = json.loads(args.{{ param }})
+    {{ param['name']  }} = json.loads(args.{{ param['name'] }})
 except Exception as e:
     if e.__class__.__name__ == 'JSONDecodeError':
         import ast
-        {{ param }} = ast.literal_eval(args.{{ param }}.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
+        {{ param['name'] }} = ast.literal_eval(args.{{ param['name'] }}.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
     else:
         raise e
-{% elif types[param] == dict  or types[param] == 'dict' %}
+{% elif param['type'] == dict  or param['type'] == 'dict' %}
 {{ param }} = json.loads(args.{{ param }})
-{% elif types[param] == str or  types[param] == 'str' %}
-{{ param }} = args.{{ param }}.replace('"','')
+{% elif param['type'] == str or  param['type'] == 'str' %}
+{{ param['name'] }} = args.{{ param['name'] }}.replace('"','')
 {% else %}
-{{ param }} = args.{{ param }}
+{{ param['name'] }} = args.{{ param['name'] }}
 {% endif %}
 {% endfor %}
 
-{% for c in confs %}
-{% for c_name in c %}
-{{ c_name }} = {{ c[c_name] }}
-{% endfor %}
-
+{% for conf in confs %}
+{{ conf['name'] }} = {{ conf['assignation'] }}
 {% endfor %}
 
 {{ cell.original_source }}
 
 {% if cell.outputs|length > 0 %}
 {% for out in cell.outputs %}
-file_{{out}} = open("/tmp/{{out}}_" + id + ".json", "w")
-file_{{out}}.write(json.dumps({{out}}))
-file_{{out}}.close()
+file_{{out['name']}} = open("/tmp/{{out['name']}}_" + id + ".json", "w")
+file_{{out['name']}}.write(json.dumps({{out['name']}}))
+file_{{out['name']}}.close()
 {% endfor %}
 {% endif %}

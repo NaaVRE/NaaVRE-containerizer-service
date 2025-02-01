@@ -5,6 +5,7 @@ import requests
 
 
 class ContainerRegistry:
+
     def __init__(self):
         self.registry_url = os.getenv('REGISTRY_URL')
         if not self.registry_url:

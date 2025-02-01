@@ -14,7 +14,6 @@ Activate the environment:
 conda activate naavre-containerizer-service
 ```
 
-
 Run the dev server
 
 ```shell
@@ -43,4 +42,5 @@ We use Helm for the deployment:
 helm -n naavre-containerizer-service upgrade --install --create-namespace naavre-containerizer-service ./helm/naavre-containerizer-service -f values.yaml
 ```
 
-`values.yaml` should contain ingress, OAuth2, and other configuration (checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre-containerizer-service/values-example.yaml)).
+`values.yaml` should contain ingress, OAuth2, and other configuration (
+checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre-containerizer-service/values-example.yaml)).

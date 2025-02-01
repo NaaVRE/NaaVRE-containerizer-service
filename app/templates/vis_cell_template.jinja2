@@ -11,16 +11,16 @@ arg_parser = argparse.ArgumentParser()
 
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
-{% for in_var in cell.inputs|sort %}
+{% for in_var in cell.inputs|sort(attribute='name') %}
 
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
-arg_parser.add_argument('--{{ in_var }}', action='store', type=str, required=True, dest='{{ in_var }}')
+arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type=str, required=True, dest='{{ in_var['name'] }}')
 {% else %}
-arg_parser.add_argument('--{{ in_var }}', action='store', type={{ in_var['type'] }}, required=True, dest='{{ in_var }}')
+arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type={{ in_var['type'] }}, required=True, dest='{{ in_var['name'] }}')
 {% endif %}
 {% endfor %}
 
-{% for param in cell.params|sort %}
+{% for param in cell.params|sort(attribute='name') %}
 arg_parser.add_argument('--{{ param }}', action='store', type={{ types[param] }}, required=True, dest='{{ param }}')
 {% endfor %}
 
@@ -30,28 +30,26 @@ print(args)
 id = args.id
 parameters = {}
 
-{% for in_var in cell.inputs|sort %}
+{% for in_var in cell.inputs|sort(attribute='name') %}
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
 import json
-{{ in_var }} = json.loads(args.{{ in_var }})
+{{ in_var['name'] }} = json.loads(args.{{ in_var['name'] }})
 {% elif in_var['type'] == str or  in_var['type'] == 'str' %}
-{{ in_var }} = args.{{ in_var }}.replace('"','')
+{{ in_var['name'] }} = args.{{ in_var['name'] }}.replace('"','')
 {% else %}
-{{ in_var }} = args.{{ in_var }}
+{{ in_var['name'] }} = args.{{ in_var['name'] }}
 {% endif %}
-parameters['{{ in_var}}'] = {{ in_var }}
+parameters['{{ in_var['name']}}'] = {{ in_var['name'] }}
 {% endfor %}
 
-{% for param in cell.params|sort %}
-{{ param }} = args.{{ param }}
-parameters['{{ param}}'] = {{ param }}
+{% for param in cell.params|sort(attribute='name') %}
+{{ param['name'] }} = args.{{ param['name'] }}
+parameters['{{ param['name']}}'] = {{ param['name'] }}
 {% endfor %}
 
-{% for c in confs %}
-{% for c_name in c %}
-{{ c_name }} = {{ c[c_name] }}
-parameters['{{ c_name }}'] = {{ c_name }}
-{% endfor %}
+{% for conf in confs %}
+{{ conf['name'] }} = {{ conf['assignation'] }}
+parameters['{{ conf['name'] }}'] = {{ conf['name'] }}
 {% endfor %}
 
 pm.execute_notebook(
@@ -64,9 +62,9 @@ pm.execute_notebook(
 {% if cell.outputs|length > 0 %}
 import json
 {% for out in cell.outputs %}
-filename = "/tmp/{{out}}_" + id + ".json"
-file_{{out}} = open(filename, "w")
-file_{{out}}.write(json.dumps({{out}}))
-file_{{out}}.close()
+filename = "/tmp/{{out['name']}}_" + id + ".json"
+file_{{['name']}} = open(filename, "w")
+file_{{['name']}}.write(json.dumps({{['name']}}))
+file_{{['name']}}.close()
 {% endfor %}
 {% endif %}

@@ -35,13 +35,7 @@ class Containerizer():
 
     @abstractmethod
     def build_script(self):
-        template_script = self.template_env.get_template(self.template_script)
-        deps = self.cell.dependencies
-        conf = self.cell.confs
-
-        return template_script.render(cell=self.cell,
-                                      deps=deps,
-                                      confs=conf)
+        pass
 
     @abstractmethod
     def extract_notebook(self):
@@ -74,36 +68,3 @@ class Containerizer():
     @abstractmethod
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         pass
-
-    # def map_dependencies(self, dependencies=None, module_name_mapping=None):
-    #     set_conda_deps = set([])
-    #     set_pip_deps = set([])
-    #     for dep in dependencies:
-    #         module_name = None
-    #         if 'module' in dep and dep['module']:
-    #             if '.' in dep['module']:
-    #                 module_name = dep['module'].split('.')[0]
-    #             else:
-    #                 module_name = dep['module']
-    #         elif 'name' in dep and dep['name']:
-    #             module_name = dep['name']
-    #         if module_name:
-    #             conda_package = True
-    #             pip_package = False
-    #             if module_name in module_name_mapping['conda'].keys():
-    #                 module_name = module_name_mapping['conda'][module_name]
-    #                 pip_package = False
-    #                 conda_package = True
-    #             if module_name in module_name_mapping['pip'].keys():
-    #                 module_name = module_name_mapping['pip'][module_name]
-    #                 pip_package = True
-    #                 conda_package = False
-    #             if module_name is None:
-    #                 continue
-    #             if not self.is_standard_module(module_name):
-    #                 if conda_package:
-    #                     set_conda_deps.add(module_name)
-    #                 if pip_package:
-    #                     set_pip_deps.add(module_name)
-    #     return {'conda_dependencies': set_conda_deps,
-    #             'pip_dependencies': set_pip_deps}
