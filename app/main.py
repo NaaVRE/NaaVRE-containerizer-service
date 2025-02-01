@@ -1,12 +1,14 @@
 import logging
 import os
+import shutil
 from typing import Annotated
+from urllib.parse import urlparse
 
 import jwt
+import requests
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic_settings import BaseSettings
 
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
@@ -23,24 +25,49 @@ from app.services.containerizers.py_containerizer import PyContainerizer
 from app.services.containerizers.r_containerizer import RContainerizer
 from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
+from app.settings import Settings
 from app.utils.openid import OpenIDValidator
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
-base_image_tags = BaseImageTags()
 
 
-class Settings(BaseSettings):
-    root_path: str = 'my-root-path'
-    if not root_path.startswith('/'):
-        root_path = '/' + root_path
-    if root_path.endswith('/'):
-        root_path = root_path[:-1]
+def download_file(source, destination):
+    # Check if source is a URL
+    parsed_url = urlparse(source)
+
+    if parsed_url.scheme in ("http", "https"):  # Remote URL
+        try:
+            response = requests.get(source, stream=True)
+            response.raise_for_status()
+            with open(destination, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            print(f"File downloaded from {source} to {destination}")
+        except requests.RequestException as e:
+            print(f"Error downloading remote file: {e}")
+
+    elif os.path.exists(source):  # Local file (relative or absolute path)
+        try:
+            shutil.copy(source, destination)
+            print(f"File copied from local path: {source} to {destination}")
+        except Exception as e:
+            print(f"Error copying local file: {e}")
+
+    else:
+        print(f"Invalid path or URL: {source}")
 
 
-settings = Settings()
+download_file(os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
+                                           'naavrehub/'
+                                           'naavre-containerizer-service/'
+                                           'main/conf.json'),
+              'conf.json')
 
-app = FastAPI(root_path=settings.root_path)
+settings = Settings(config_file='conf.json')
+
+app = FastAPI(root_path=os.getenv('ROOT_PATH',
+                                  '/NaaVRE-containerizer-service'))
 
 if os.getenv('DEBUG', 'false').lower() == 'true':
     logging.basicConfig(level=10)
@@ -57,7 +84,10 @@ def valid_access_token(credentials: Annotated[
 
 @app.get('/base-image-tags')
 def get_base_image_tags(
-        access_token: Annotated[dict, Depends(valid_access_token)]):
+        access_token: Annotated[dict, Depends(valid_access_token)],
+        virtual_lab: str):
+    vl_conf = settings.get_vl_config(virtual_lab)
+    base_image_tags = BaseImageTags(vl_conf.base_image_tags_url)
     return base_image_tags.get()
 
 
@@ -74,13 +104,14 @@ def _get_containerizer(cell):
         raise ValueError('Unsupported kernel')
 
 
-def _get_github_service():
-    repository_url = os.getenv('CELL_GITHUB')
+def _get_github_service(virtual_lab: str):
+    vl_conf = settings.get_vl_config(virtual_lab)
+    repository_url = vl_conf.cell_github
     if repository_url is None:
-        raise ValueError('CELL_GITHUB environment variable is not set')
-    token = os.getenv('CELL_GITHUB_TOKEN')
+        raise ValueError('repository_url not set')
+    token = vl_conf.cell_github_token
     if token is None:
-        raise ValueError('CELL_GITHUB environment variable is not set')
+        raise ValueError('cell_github_token is not set')
     return GithubService(repository_url=repository_url, token=token)
 
 
@@ -118,9 +149,10 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
 
 @app.post('/containerize')
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
-                 containerize_payload: ContainerizerPayload):
+                 containerize_payload: ContainerizerPayload,
+                 virtual_lab: str):
     conteinerizer = _get_containerizer(containerize_payload.cell)
-    gh = _get_github_service()
+    gh = _get_github_service(virtual_lab)
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
                              path=containerize_payload.cell.title,
@@ -168,8 +200,9 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
 @app.get('/containerization-status/{workflow_id}')
 def containerization_status(
         access_token: Annotated[dict, Depends(valid_access_token)],
-        workflow_id: str):
-    gh = _get_github_service()
+        workflow_id: str,
+        virtual_lab: str):
+    gh = _get_github_service(virtual_lab)
     job = gh.get_job(wf_id=workflow_id)
     if job is None:
         raise HTTPException(status_code=404,
