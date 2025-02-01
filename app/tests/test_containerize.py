@@ -100,7 +100,6 @@ def test_containerize():
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
-
 # def test_script_syntax(script_path: str = None, lang: str = None):
 #     if not lang:
 #         pass
