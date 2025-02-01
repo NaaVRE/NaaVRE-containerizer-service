@@ -46,7 +46,10 @@ class GithubService(GitRepository, ABC):
         self.dispatches_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                                self.repository_name + '/actions/workflows/' +
                                GITHUB_WORKFLOW_FILENAME + '/dispatches')
+        self.commits_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
+                            self.repository_name + '/commits')
         self.registry = ContainerRegistry()
+        self.repository_url = repository_url
 
     def commit(self, local_content=None, path=None, file_name=None):
         try:
@@ -104,8 +107,11 @@ class GithubService(GitRepository, ABC):
             raise Exception('Error dispatching workflow: ' + resp.text)
         job = self.get_job(wf_id=wf_id, wf_creation_utc=wf_creation_utc,
                            job_id=None)
-
-        return {'workflow_id': wf_id, 'workflow_url': job['html_url']}
+        source_url = (self.repository_url.replace('.git', '') + '/tree/' +
+                      job['head_sha'] + '/' + title)
+        return {'workflow_id': wf_id,
+                'workflow_url': job['html_url'],
+                'source_url': source_url}
 
     def get_job(self,
                 wf_id=None,
@@ -115,10 +121,12 @@ class GithubService(GitRepository, ABC):
         f""" Find Github workflow job
 
         If job_id is set, retrieve it through
-        https://api.github.com/repos/{self.owner}/{self.repository_name}/actions/jobs/{job_id}
+        https://api.github.com/repos/{self.owner}/{self.repository_name}
+        /actions/jobs/{job_id}
 
         Else, get all workflows runs created around wf_creation_utc through
-        https://api.github.com/repos/{self.owner}/{self.repository_name}/actions/runs
+        https://api.github.com/repos/{self.owner}/{self.repository_name}
+        /actions/runs
         and find the one matching {wf_id}
         """
         if job_id:
