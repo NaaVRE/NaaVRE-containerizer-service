@@ -70,7 +70,9 @@ app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'))
 
 if os.getenv('DEBUG', 'false').lower() == 'true':
-    logging.basicConfig(level=10)
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 
 def valid_access_token(credentials: Annotated[
