@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import shutil
 from typing import Annotated
 from urllib.parse import urlparse
 
@@ -32,39 +32,42 @@ security = HTTPBearer()
 token_validator = OpenIDValidator()
 
 
-def download_file(source, destination):
+def load_configuration(source):
     # Check if source is a URL
     parsed_url = urlparse(source)
-
     if parsed_url.scheme in ("http", "https"):  # Remote URL
-        try:
-            response = requests.get(source, stream=True)
-            response.raise_for_status()
-            with open(destination, 'wb') as file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    file.write(chunk)
-            print(f"File downloaded from {source} to {destination}")
-        except requests.RequestException as e:
-            print(f"Error downloading remote file: {e}")
-
+        response = requests.get(source)
+        return response.json()
     elif os.path.exists(source):  # Local file (relative or absolute path)
-        try:
-            shutil.copy(source, destination)
-            print(f"File copied from local path: {source} to {destination}")
-        except Exception as e:
-            print(f"Error copying local file: {e}")
+        with open(source, "r", encoding="utf-8") as file:
+            data_dict = json.load(file)
+        file.close()
+        return data_dict
 
     else:
-        print(f"Invalid path or URL: {source}")
+        raise Exception('Invalid configuration source')
 
 
-download_file(os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
+config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
                                            'naavrehub/'
-                                           'naavre-containerizer-service/'
-                                           'main/conf.json'),
-              'conf.json')
+                                           'naavre-workflow-service/'
+                                           'main/conf.json')
 
-settings = Settings(config_file='conf.json')
+conf = None
+if os.path.exists(config_file):
+    conf = load_configuration(config_file)
+else:
+    # Start going up the directory tree until we find the configuration file
+    current_dir = os.getcwd()
+    print(current_dir)
+    while current_dir != 'NaaVRE-containerizer-service':
+        config_path = os.path.join(current_dir, 'configuration.json')
+        if os.path.exists(config_path):
+            conf = load_configuration(config_path)
+            break
+        current_dir = os.path.dirname(current_dir)
+
+settings = Settings(config=conf)
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'))
@@ -93,15 +96,16 @@ def get_base_image_tags(
     return base_image_tags.get()
 
 
-def _get_containerizer(cell):
+def _get_containerizer(cell, virtual_lab: str):
+    vl_conf = settings.get_vl_config(virtual_lab)
     if cell.kernel.lower() == 'python' or cell.kernel == 'ipython':
-        return PyContainerizer(cell)
+        return PyContainerizer(cell, vl_conf.module_mapping_url)
     elif cell.kernel.lower() == 'r' or cell.kernel.lower() == 'irkernel':
-        return RContainerizer(cell)
+        return RContainerizer(cell, vl_conf.module_mapping_url)
     elif cell.kernel.lower() == 'julia':
-        return JuliaContainerizer(cell)
+        return JuliaContainerizer(cell, vl_conf.module_mapping_url)
     elif cell.kernel.lower() == 'c':
-        return CContainerizer(cell)
+        return CContainerizer(cell, vl_conf.module_mapping_url)
     else:
         raise ValueError('Unsupported kernel')
 
@@ -153,7 +157,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                  containerize_payload: ContainerizerPayload,
                  virtual_lab: str):
-    conteinerizer = _get_containerizer(containerize_payload.cell)
+    conteinerizer = _get_containerizer(containerize_payload.cell, virtual_lab)
     gh = _get_github_service(virtual_lab)
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,

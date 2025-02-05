@@ -43,12 +43,10 @@ on:
 env:
   CELL_GITHUB: ${{ inputs.cell_github }}
   CELL_GITHUB_TOKEN: ${{ secrets.cell_github_token }}
-  BASE_IMAGE_TAGS_URL: ${{ inputs.base_image_tags_url }}
   DEBUG: ${{ inputs.debug }}
   OIDC_CONFIGURATION_URL: ${{ inputs.oidc_configuration_url }}
   VERIFY_SSL: ${{ inputs.verify_ssl }}
   DISABLE_AUTH: ${{ inputs.disable_auth }}
-  MODULE_MAPPING_URL: ${{ inputs.module_mapping_url }}
   ROOT_PATH: ${{ inputs.root_path }}
   AUTH_TOKEN: ${{ secrets.auth_token }}
 

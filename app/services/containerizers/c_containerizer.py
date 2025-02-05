@@ -6,8 +6,8 @@ from app.services.containerizers.containerizer import Containerizer
 
 class CContainerizer(Containerizer, ABC):
 
-    def __init__(self, cell: Cell):
-        super().__init__(cell)
+    def __init__(self, cell: Cell, module_mapping_url=None):
+        super().__init__(cell, module_mapping_url)
         raise NotImplementedError
 
     def build_script(self):
