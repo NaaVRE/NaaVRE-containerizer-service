@@ -114,7 +114,7 @@ class RExtractor(Extractor):
     notebook_secrets: list[dict]
     undefined: dict
 
-    def __init__(self, notebook_data: NotebookData):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         notebook = notebook_data.notebook
         sources = [nbcell.source for nbcell in notebook.cells if
                    nbcell.cell_type == 'code' and len(nbcell.source) > 0]
@@ -133,7 +133,7 @@ class RExtractor(Extractor):
         for source in sources:
             self.undefined.update(self.__extract_cell_undefined(source))
 
-        super().__init__(notebook_data)
+        super().__init__(notebook_data, base_image_tags_url)
 
     def __extract_imports(self, sources: list[str]) -> dict:
         imports = {}

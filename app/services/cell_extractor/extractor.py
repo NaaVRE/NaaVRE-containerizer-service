@@ -22,7 +22,7 @@ class Extractor(abc.ABC):
     cell_dependencies: list
     kernel: str
 
-    def __init__(self, notebook_data: NotebookData):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.user_name = notebook_data.user_name
@@ -34,6 +34,7 @@ class Extractor(abc.ABC):
         self.cell_confs = self.get_cell_confs()
         self.cell_dependencies = self.get_cell_dependencies(self.cell_confs)
         self.base_image_name = notebook_data.base_image_name
+        self.base_image_tags_url = base_image_tags_url
 
     def get_cell(self) -> Cell:
         title = self.cell_source.partition('\n')[0].strip()
@@ -67,7 +68,7 @@ class Extractor(abc.ABC):
             'selected': {},
             'hovered': {},
         }
-        base_image_tags = BaseImageTags()
+        base_image_tags = BaseImageTags(self.base_image_tags_url)
         cell_dict = {
             'title': title,
             'params': self.cell_params,
