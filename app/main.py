@@ -121,22 +121,24 @@ def _get_github_service(virtual_lab: str):
     return GithubService(repository_url=repository_url, token=token)
 
 
-def _get_extractor(notebook_data: NotebookData):
+def _get_extractor(notebook_data: NotebookData, virtual_lab: str = None):
     extractor = None
     notebook = notebook_data.notebook
     cell_index = notebook_data.cell_index
     kernel = notebook_data.kernel
+    vl_conf = settings.get_vl_config(virtual_lab)
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
-        extractor = DummyExtractor(notebook_data)
+        extractor = DummyExtractor(notebook_data, vl_conf.base_image_tags_url)
     elif 'r' in kernel.lower():
         extractor = RHeaderExtractor(notebook_data)
     elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
         extractor = PyHeaderExtractor(notebook_data)
     if kernel.lower() == 'irkernel':
-        code_extractor = RExtractor(notebook_data)
+        code_extractor = RExtractor(notebook_data, vl_conf.base_image_tags_url)
     elif kernel == 'ipython' or kernel == 'python':
-        code_extractor = PyExtractor(notebook_data)
+        code_extractor = PyExtractor(notebook_data,
+                                     vl_conf.base_image_tags_url)
     else:
         raise HTTPException(status_code=400,
                             detail='Unsupported kernel: ' + kernel)
@@ -146,9 +148,11 @@ def _get_extractor(notebook_data: NotebookData):
 
 @app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
-                 extractor_payload: ExtractorPayload):
+                 extractor_payload: ExtractorPayload,
+                 virtual_lab: str):
+    access_token = token_validator.validate(access_token)
     extractor_payload.data.set_user_name(access_token['preferred_username'])
-    extractor = _get_extractor(extractor_payload.data)
+    extractor = _get_extractor(extractor_payload.data, virtual_lab)
     cell = extractor.get_cell()
     return cell
 
