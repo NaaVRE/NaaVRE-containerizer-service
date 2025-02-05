@@ -6,8 +6,6 @@ from app.models.vl_config import VLConfig
 
 
 class ServiceSettings(BaseSettings):
-    root_path: str
-    debug: bool
     vl_configurations: List[VLConfig]
 
 
