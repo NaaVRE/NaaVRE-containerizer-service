@@ -12,7 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
-from app.models.notebook_data import NotebookData
+from app.models.vl_config import VLConfig
 from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.cell_extractor.extractor import DummyExtractor
 from app.services.cell_extractor.py_extractor import PyExtractor
@@ -25,7 +25,7 @@ from app.services.containerizers.py_containerizer import PyContainerizer
 from app.services.containerizers.r_containerizer import RContainerizer
 from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
-from app.settings import Settings
+from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
 
 security = HTTPBearer()
@@ -96,22 +96,27 @@ def get_base_image_tags(
     return base_image_tags.get()
 
 
-def _get_containerizer(cell, virtual_lab: str):
-    vl_conf = settings.get_vl_config(virtual_lab)
-    if cell.kernel.lower() == 'python' or cell.kernel == 'ipython':
-        return PyContainerizer(cell, vl_conf.module_mapping_url)
-    elif cell.kernel.lower() == 'r' or cell.kernel.lower() == 'irkernel':
-        return RContainerizer(cell, vl_conf.module_mapping_url)
-    elif cell.kernel.lower() == 'julia':
-        return JuliaContainerizer(cell, vl_conf.module_mapping_url)
-    elif cell.kernel.lower() == 'c':
-        return CContainerizer(cell, vl_conf.module_mapping_url)
+def _get_containerizer(containerize_payload: ContainerizerPayload):
+    vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
+    if (containerize_payload.cell.kernel.lower() == 'python' or
+            containerize_payload.cell.kernel == 'ipython'):
+        return PyContainerizer(containerize_payload.cell,
+                               vl_conf.module_mapping_url)
+    elif (containerize_payload.cell.kernel.lower() == 'r' or
+          containerize_payload.cell.kernel.lower() == 'irkernel'):
+        return RContainerizer(containerize_payload.cell,
+                              vl_conf.module_mapping_url)
+    elif containerize_payload.cell.kernel.lower() == 'julia':
+        return JuliaContainerizer(containerize_payload.cell,
+                                  vl_conf.module_mapping_url)
+    elif containerize_payload.cell.kernel.lower() == 'c':
+        return CContainerizer(containerize_payload.cell,
+                              vl_conf.module_mapping_url)
     else:
         raise ValueError('Unsupported kernel')
 
 
-def _get_github_service(virtual_lab: str):
-    vl_conf = settings.get_vl_config(virtual_lab)
+def _get_github_service(vl_conf: VLConfig):
     repository_url = vl_conf.cell_github
     if repository_url is None:
         raise ValueError('repository_url not set')
@@ -121,24 +126,26 @@ def _get_github_service(virtual_lab: str):
     return GithubService(repository_url=repository_url, token=token)
 
 
-def _get_extractor(notebook_data: NotebookData, virtual_lab: str = None):
+def _get_extractor(extractor_payload: ExtractorPayload):
     extractor = None
-    notebook = notebook_data.notebook
-    cell_index = notebook_data.cell_index
-    kernel = notebook_data.kernel
-    vl_conf = settings.get_vl_config(virtual_lab)
+    notebook = extractor_payload.data.notebook
+    cell_index = extractor_payload.data.cell_index
+    kernel = extractor_payload.data.kernel
+    vl_settings = settings.get_vl_config(extractor_payload.virtual_lab)
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
-        extractor = DummyExtractor(notebook_data, vl_conf.base_image_tags_url)
+        extractor = DummyExtractor(extractor_payload.data,
+                                   vl_settings.base_image_tags_url)
     elif 'r' in kernel.lower():
-        extractor = RHeaderExtractor(notebook_data)
+        extractor = RHeaderExtractor(extractor_payload.data)
     elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
-        extractor = PyHeaderExtractor(notebook_data)
+        extractor = PyHeaderExtractor(extractor_payload.data)
     if kernel.lower() == 'irkernel':
-        code_extractor = RExtractor(notebook_data, vl_conf.base_image_tags_url)
+        code_extractor = RExtractor(extractor_payload.data,
+                                    vl_settings.base_image_tags_url)
     elif kernel == 'ipython' or kernel == 'python':
-        code_extractor = PyExtractor(notebook_data,
-                                     vl_conf.base_image_tags_url)
+        code_extractor = PyExtractor(extractor_payload.data,
+                                     vl_settings.base_image_tags_url)
     else:
         raise HTTPException(status_code=400,
                             detail='Unsupported kernel: ' + kernel)
@@ -148,21 +155,21 @@ def _get_extractor(notebook_data: NotebookData, virtual_lab: str = None):
 
 @app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
-                 extractor_payload: ExtractorPayload,
-                 virtual_lab: str):
+                 extractor_payload: ExtractorPayload):
+
     access_token = token_validator.validate(access_token)
     extractor_payload.data.set_user_name(access_token['preferred_username'])
-    extractor = _get_extractor(extractor_payload.data, virtual_lab)
+    extractor = _get_extractor(extractor_payload)
     cell = extractor.get_cell()
     return cell
 
 
 @app.post('/containerize')
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
-                 containerize_payload: ContainerizerPayload,
-                 virtual_lab: str):
-    conteinerizer = _get_containerizer(containerize_payload.cell, virtual_lab)
-    gh = _get_github_service(virtual_lab)
+                 containerize_payload: ContainerizerPayload):
+    conteinerizer = _get_containerizer(containerize_payload)
+    vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
+    gh = _get_github_service(vl_conf)
     cell_contents = conteinerizer.build_script()
     cell_updated = gh.commit(local_content=cell_contents,
                              path=containerize_payload.cell.title,
@@ -212,7 +219,8 @@ def containerization_status(
         access_token: Annotated[dict, Depends(valid_access_token)],
         workflow_id: str,
         virtual_lab: str):
-    gh = _get_github_service(virtual_lab)
+    vl_conf = settings.get_vl_config(virtual_lab)
+    gh = _get_github_service(vl_conf)
     job = gh.get_job(wf_id=workflow_id)
     if job is None:
         raise HTTPException(status_code=404,
