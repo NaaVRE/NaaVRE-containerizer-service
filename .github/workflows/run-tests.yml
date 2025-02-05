@@ -7,9 +7,6 @@ on:
       runs-on:
         default: ubuntu-latest
         type: string
-      base_image_tags_url:
-        required: true
-        type: string
       debug:
         required: true
         type: string
