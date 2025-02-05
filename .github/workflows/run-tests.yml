@@ -19,9 +19,6 @@ on:
       disable_auth :
         required: true
         type: string
-      module_mapping_url:
-        required: true
-        type: string
       cell_github:
         required: true
         type: string
