@@ -45,6 +45,7 @@ jobs:
         run: |
           conda activate naavre-containerizer-service
           pip install pytest
+          pytest --collect-only -q
           pytest --collect-only -q | grep 'tests/' | jq -R . | jq -s . > test_list.json
           cat test_list.json
 
