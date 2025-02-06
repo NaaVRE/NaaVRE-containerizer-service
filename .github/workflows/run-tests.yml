@@ -73,6 +73,5 @@ jobs:
         run: |
            echo "${{ inputs.configuration_example }}" > "${{ env.CONFIG_FILE_URL }}"
            cat ${{ env.CONFIG_FILE_URL }}
-#            echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
            conda activate naavre-containerizer-service
            pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header
