@@ -37,7 +37,6 @@ env:
   ROOT_PATH: ${{ inputs.root_path }}
   AUTH_TOKEN: ${{ secrets.auth_token }}
   CONFIG_FILE_URL: /configuration.json
-  CONFIG_FILE: ${{ secrets.configuration }}
 
 jobs:
   test:
@@ -70,6 +69,6 @@ jobs:
       - name: pytest
         shell: bash -l {0}
         run: |
-           echo ${{ CONFIG_FILE }} > ${{ CONFIG_FILE_URL }}
+           echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
            conda activate naavre-containerizer-service
            pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header
