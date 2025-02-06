@@ -51,7 +51,7 @@ class GithubService(GitRepository, ABC):
         self.commits_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                             self.repository_name + '/commits')
         self.registry = ContainerRegistry(registry_url=vl_conf.registry_url,
-                                          token=cell_github_url)
+                                          token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
     def commit(self, local_content=None, path=None, file_name=None):
