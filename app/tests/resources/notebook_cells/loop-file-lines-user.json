@@ -1,4 +1,5 @@
 {
+  "virtual_lab": "virtual_lab_1",
   "data": {
     "save": false,
     "kernel": "ipython",
