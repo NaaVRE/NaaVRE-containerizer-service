@@ -8,12 +8,12 @@ class ContainerRegistry:
 
     def __init__(self, registry_url: str, token: str):
         self.registry_url = registry_url
-        if not self.registry_url:
+        if not self.registry_url or 'ghcr.io/' not in registry_url:
             parts = registry_url.split('https://github.com/')
             parts = parts[1].split('/')
             self.registry_url = 'ghcr.io/' + parts[0].lower() + '/' + parts[
                 1].replace('.git', '').lower()
-        else:
+        elif 'ghcr.io/' not in registry_url:
             self.owner = self.registry_url.split('/')[0]
         self.token = token
 

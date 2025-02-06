@@ -127,7 +127,7 @@ def _get_github_service(vl_conf: VLConfig):
     token = vl_conf.cell_github_token
     if token is None:
         raise ValueError('cell_github_token is not set')
-    return GithubService(repository_url=repository_url, token=token)
+    return GithubService(vl_conf)
 
 
 def _get_extractor(extractor_payload: ExtractorPayload):
