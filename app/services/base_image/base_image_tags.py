@@ -25,5 +25,5 @@ class BaseImageTags:
                    f'{base_image_tags_url}\n{e}')
             logger.debug(msg)
 
-    def get(self):
+    def get_base_image_tags(self):
         return self.base_image_tags

@@ -227,7 +227,7 @@ class HeaderExtractor(Extractor):
         if header is None:
             return []
         vars = []
-        items = header['NaaVRE']['cell'].get(item_type)
+        items = header['NaaVRE']['cell'].get_base_image_tags(item_type)
         if items is None:
             return []
         for item in items:
@@ -266,14 +266,14 @@ class HeaderExtractor(Extractor):
     def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get('confs')
+        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags('confs')
         if items is None:
             return []
         confs = []
         for item in items:
             for k, v in item.items():
                 if 'assignation' in v:
-                    assignation = v.get('assignation')
+                    assignation = v.get_base_image_tags('assignation')
                     if '[' in assignation and ']' in assignation:
                         # Replace to R list format
                         assignation = assignation.replace('[',
@@ -286,13 +286,14 @@ class HeaderExtractor(Extractor):
     def get_cell_dependencies(self, confs) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get('dependencies')
+        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags(
+            'dependencies')
         if items is None:
             return []
         return [
             {
-                'name': it.get('name'),
-                'asname': it.get('asname', None),
-                'module': it.get('module', ''),
+                'name': it.get_base_image_tags('name'),
+                'asname': it.get_base_image_tags('asname', None),
+                'module': it.get_base_image_tags('module', ''),
             }
             for it in items]

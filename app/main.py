@@ -93,7 +93,7 @@ def get_base_image_tags(
         virtual_lab: str):
     vl_conf = settings.get_vl_config(virtual_lab)
     base_image_tags = BaseImageTags(vl_conf.base_image_tags_url)
-    return base_image_tags.get()
+    return base_image_tags.get_base_image_tags()
 
 
 def _get_containerizer(containerize_payload: ContainerizerPayload):
@@ -156,7 +156,6 @@ def _get_extractor(extractor_payload: ExtractorPayload):
 @app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
-
     access_token = token_validator.validate(access_token)
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload)

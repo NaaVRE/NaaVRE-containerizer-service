@@ -15,6 +15,6 @@ class Settings:
         self.service_settings = ServiceSettings(**config)
 
     def get_vl_config(self, virtual_lab) -> VLConfig:
-        for setting in self.service_settings.vl_configs:
+        for setting in self.service_settings.vl_configurations:
             if setting.name == virtual_lab:
                 return setting

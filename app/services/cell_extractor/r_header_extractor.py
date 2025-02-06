@@ -9,14 +9,14 @@ class RHeaderExtractor(HeaderExtractor):
     def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get('confs')
+        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags('confs')
         if items is None:
             return []
         confs = []
         for item in items:
             for k, v in item.items():
                 if 'assignation' in v:
-                    assignation = v.get('assignation')
+                    assignation = v.get_base_image_tags('assignation')
                     if '[' in assignation and ']' in assignation:
                         # Replace to R list format
                         assignation = assignation.replace('[',
