@@ -83,8 +83,7 @@ jobs:
       root_path: ${{ vars.ROOT_PATH }}
       test: ${{ matrix.test }}
     secrets:
-      cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
-      auth_token: ${{ secrets.AUTH_TOKEN }}
+      configuration: ${{ secrets.CONFIG_FILE }}
 
   call-build-container:
     needs: [call-pytest]
