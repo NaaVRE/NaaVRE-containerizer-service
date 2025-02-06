@@ -44,9 +44,7 @@ class PyContainerizer(Containerizer, ABC):
         conda_deps = set()
         pip_deps = set()
         for dep in dependencies:
-            module_name = dep.get_base_image_tags('module',
-                                                  dep.get_base_image_tags(
-                                                      'name'))
+            module_name = dep.get('module', dep.get('name'))
             if not module_name:
                 continue
             module_name = module_name.split('.')[
