@@ -31,6 +31,8 @@ def test_extract_cell():
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
             json=extractor_json_payload,
         )
+        if cell_extractor_response.status_code != 200:
+            print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
 
