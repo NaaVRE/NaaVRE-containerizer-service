@@ -94,7 +94,6 @@ def valid_access_token(credentials: Annotated[
 
 @app.get('/base-image-tags')
 def get_base_image_tags(
-        access_token: Annotated[dict, Depends(valid_access_token)],
         virtual_lab: str):
     vl_conf = settings.get_vl_config(virtual_lab)
     base_image_tags = BaseImageTags(vl_conf.base_image_tags_url)
