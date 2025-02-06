@@ -85,6 +85,7 @@ else:
 def valid_access_token(credentials: Annotated[
     HTTPAuthorizationCredentials, Depends(security)],
                        ):
+    logging.debug('Validating access token')
     try:
         return token_validator.validate(credentials.credentials)
     except (jwt.exceptions.InvalidTokenError, jwt.exceptions.PyJWKClientError):
