@@ -36,7 +36,7 @@ env:
   VERIFY_SSL: ${{ inputs.verify_ssl }}
   ROOT_PATH: ${{ inputs.root_path }}
   AUTH_TOKEN: ${{ secrets.auth_token }}
-  CONFIG_FILE_URL: /configuration.json
+  CONFIG_FILE_URL: /tmp/configuration.json
 
 jobs:
   test:
