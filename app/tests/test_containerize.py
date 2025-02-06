@@ -66,7 +66,9 @@ def test_containerize():
         source_url = containerize_response.json()['source_url']
         assert cell_notebook_dict['cell']['title'] in source_url
         containerization_status_response = client.get(
-            '/containerization-status/' + workflow_id,
+            '/containerization-status/' +
+            containerizer_json_payload['virtual_lab'] + '/' +
+            workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
         assert containerization_status_response.status_code == 200
@@ -76,7 +78,9 @@ def test_containerize():
                and count <= 30):
             sleep(sleep_time)
             containerization_status_response = client.get(
-                '/containerization-status/' + workflow_id,
+                '/containerization-status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
                 headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
             )
             assert containerization_status_response.status_code == 200
