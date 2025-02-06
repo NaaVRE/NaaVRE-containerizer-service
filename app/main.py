@@ -4,6 +4,7 @@ import os
 from typing import Annotated
 from urllib.parse import urlparse
 
+import cachetools.func
 import jwt
 import requests
 import uvicorn
@@ -32,6 +33,7 @@ security = HTTPBearer()
 token_validator = OpenIDValidator()
 
 
+@cachetools.func.ttl_cache(ttl=6 * 3600)
 def load_configuration(source):
     # Check if source is a URL
     parsed_url = urlparse(source)
@@ -61,7 +63,9 @@ else:
     current_dir = os.getcwd()
     print(current_dir)
     while current_dir != 'NaaVRE-containerizer-service':
-        config_path = os.path.join(current_dir, 'configuration.json')
+        config_path = os.path.join(current_dir,
+                                   os.getenv('CONFIG_FILE_URL',
+                                             'configuration.json'))
         if os.path.exists(config_path):
             conf = load_configuration(config_path)
             break
@@ -117,7 +121,7 @@ def _get_containerizer(containerize_payload: ContainerizerPayload):
 
 
 def _get_github_service(vl_conf: VLConfig):
-    repository_url = vl_conf.cell_github
+    repository_url = vl_conf.cell_github_url
     if repository_url is None:
         raise ValueError('repository_url not set')
     token = vl_conf.cell_github_token
@@ -137,9 +141,11 @@ def _get_extractor(extractor_payload: ExtractorPayload):
         extractor = DummyExtractor(extractor_payload.data,
                                    vl_settings.base_image_tags_url)
     elif 'r' in kernel.lower():
-        extractor = RHeaderExtractor(extractor_payload.data)
+        extractor = RHeaderExtractor(extractor_payload.data,
+                                     vl_settings.base_image_tags_url)
     elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
-        extractor = PyHeaderExtractor(extractor_payload.data)
+        extractor = PyHeaderExtractor(extractor_payload.data,
+                                      vl_settings.base_image_tags_url)
     if kernel.lower() == 'irkernel':
         code_extractor = RExtractor(extractor_payload.data,
                                     vl_settings.base_image_tags_url)
@@ -156,7 +162,6 @@ def _get_extractor(extractor_payload: ExtractorPayload):
 @app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
-    access_token = token_validator.validate(access_token)
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload)
     cell = extractor.get_cell()

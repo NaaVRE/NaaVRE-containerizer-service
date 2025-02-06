@@ -19,9 +19,6 @@ on:
       disable_auth :
         required: true
         type: string
-      cell_github:
-        required: true
-        type: string
       root_path:
         required: true
         type: string
@@ -35,7 +32,6 @@ on:
         required: true
 
 env:
-  CELL_GITHUB: ${{ inputs.cell_github }}
   CELL_GITHUB_TOKEN: ${{ secrets.cell_github_token }}
   DEBUG: ${{ inputs.debug }}
   OIDC_CONFIGURATION_URL: ${{ inputs.oidc_configuration_url }}

@@ -3,8 +3,8 @@ from .header_extractor import HeaderExtractor
 
 class RHeaderExtractor(HeaderExtractor):
 
-    def __init__(self, notebook_data):
-        super().__init__(notebook_data)
+    def __init__(self, notebook_data, base_image_tags_url: str):
+        super().__init__(notebook_data, base_image_tags_url)
 
     def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:

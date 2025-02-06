@@ -49,7 +49,7 @@ class HeaderExtractor(Extractor):
     re_yaml_doc_in_comment: re.Pattern
     cell_header: Union[dict, None]
 
-    def __init__(self, notebook_data: NotebookData):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         self.re_yaml_doc_in_comment = re.compile(
             (r"^(?:.*\n)*"
              r"\s*#\s*---\s*\n"
@@ -61,10 +61,7 @@ class HeaderExtractor(Extractor):
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.cell_header = self._extract_header()
-        super().__init__(notebook_data)
-        #
-        # self._external_extract_cell_params = None
-        # self._external_extract_cell_secrets = None
+        super().__init__(notebook_data, base_image_tags_url)
 
     @staticmethod
     def _load_schema() -> dict:

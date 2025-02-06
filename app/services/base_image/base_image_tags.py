@@ -1,5 +1,6 @@
 import logging
 
+import cachetools.func
 import requests
 
 logger = logging.getLogger('base_image_tags')
@@ -11,6 +12,7 @@ class BaseImageTags:
             base_image_tags_url)
 
     @staticmethod
+    @cachetools.func.ttl_cache(ttl=6 * 3600)
     def _download_base_image_tags(base_image_tags_url=None):
         try:
             res = requests.get(base_image_tags_url)

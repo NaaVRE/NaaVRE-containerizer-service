@@ -1,11 +1,13 @@
 from abc import abstractmethod
 
+import cachetools.func
 import requests
 from jinja2 import Environment, PackageLoader
 
 from app.models.workflow_cell import Cell
 
 
+@cachetools.func.ttl_cache(ttl=6 * 3600)
 def get_module_name_mapping(module_mapping_url: str = None):
     try:
         return requests.get(module_mapping_url).json()

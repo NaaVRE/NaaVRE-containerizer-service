@@ -6,16 +6,16 @@ import requests
 
 class ContainerRegistry:
 
-    def __init__(self):
-        self.registry_url = os.getenv('REGISTRY_URL')
+    def __init__(self, registry_url: str, token: str):
+        self.registry_url = registry_url
         if not self.registry_url:
-            parts = os.getenv('CELL_GITHUB').split('https://github.com/')
+            parts = registry_url.split('https://github.com/')
             parts = parts[1].split('/')
             self.registry_url = 'ghcr.io/' + parts[0].lower() + '/' + parts[
                 1].replace('.git', '').lower()
         else:
             self.owner = self.registry_url.split('/')[0]
-        self.token = os.getenv('OCI_TOKEN')
+        self.token = token
 
     def query_registry_for_image(self, image_name):
         if 'docker' in self.registry_url:

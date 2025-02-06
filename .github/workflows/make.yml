@@ -81,7 +81,6 @@ jobs:
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
       root_path: ${{ vars.ROOT_PATH }}
-      cell_github: ${{ vars.CELL_GITHUB }}
       test: ${{ matrix.test }}
     secrets:
       cell_github_token:  ${{ secrets.CELL_GITHUB_TOKEN }}
