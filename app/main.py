@@ -89,6 +89,8 @@ def valid_access_token(credentials: Annotated[
         return token_validator.validate(credentials.credentials)
     except (jwt.exceptions.InvalidTokenError, jwt.exceptions.PyJWKClientError):
         raise HTTPException(status_code=401, detail='Not authenticated')
+    except Exception as e:
+        print(e)
 
 
 @app.get('/base-image-tags')
