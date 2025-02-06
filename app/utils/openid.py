@@ -67,6 +67,7 @@ class OpenIDValidator:
         This expects a jwt token using the HMAC+SHA (HS) algorithm and the
         secret 'fake-secret'
         """
+        logger.debug("Validating fake token")
         token_header = jwt.get_unverified_header(access_token)
         try:
             data = jwt.decode(
