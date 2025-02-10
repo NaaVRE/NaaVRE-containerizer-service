@@ -21,4 +21,4 @@ repos:
         name: Check for limited testing
         entry: "bash -c 'if grep -q \"if \\'\\'.*\\.json\\'\\' not in cell_file: continue\" \"$@\"; then echo \"You only test on file!\"; exit 1; fi'"
         language: system
-        files: .py$
+        files: ^(.*\.py|test_.*\.py)$
