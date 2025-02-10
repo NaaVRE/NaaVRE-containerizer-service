@@ -25,10 +25,10 @@ on:
       test:
         required: true
         type: string
-      configuration_example:
-        type: string
     secrets:
       configuration:
+        required: true
+      auth_token:
         required: true
 
 env:

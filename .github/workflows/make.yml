@@ -82,9 +82,9 @@ jobs:
       disable_auth: ${{ vars.DISABLE_AUTH }}
       root_path: ${{ vars.ROOT_PATH }}
       test: ${{ matrix.test }}
-      configuration_example: ${{ vars.CONFIG_FILE_EXAMPLE }}
     secrets:
       configuration: ${{ secrets.CONFIG_FILE }}
+      auth_token: ${{ secrets.AUTH_TOKEN }}
 
   call-build-container:
     needs: [call-pytest]
