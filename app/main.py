@@ -218,8 +218,8 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
             'source_url': containerization_workflow_resp['source_url']}
 
 
-@app.get('/containerization-status/{virtual_lab}/{workflow_id}')
-def containerization_status(
+@app.get('/status/{virtual_lab}/{workflow_id}')
+def status(
         access_token: Annotated[dict, Depends(valid_access_token)],
         workflow_id: str,
         virtual_lab: str):
