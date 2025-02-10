@@ -219,7 +219,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
 
 
 @app.get('/status/{virtual_lab}/{workflow_id}')
-def status(
+def get_status(
         access_token: Annotated[dict, Depends(valid_access_token)],
         workflow_id: str,
         virtual_lab: str):
