@@ -224,7 +224,7 @@ class HeaderExtractor(Extractor):
         if header is None:
             return []
         vars = []
-        items = header['NaaVRE']['cell'].get_base_image_tags(item_type)
+        items = header['NaaVRE']['cell'].get(item_type)
         if items is None:
             return []
         for item in items:
@@ -263,7 +263,7 @@ class HeaderExtractor(Extractor):
     def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags('confs')
+        items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
             return []
         confs = []
@@ -283,7 +283,7 @@ class HeaderExtractor(Extractor):
     def get_cell_dependencies(self, confs) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags(
+        items = self.cell_header['NaaVRE']['cell'].get(
             'dependencies')
         if items is None:
             return []

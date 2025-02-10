@@ -9,7 +9,7 @@ class RHeaderExtractor(HeaderExtractor):
     def get_cell_confs(self) -> list[dict]:
         if self.cell_header is None:
             return []
-        items = self.cell_header['NaaVRE']['cell'].get_base_image_tags('confs')
+        items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
             return []
         confs = []
