@@ -16,7 +16,7 @@ class RHeaderExtractor(HeaderExtractor):
         for item in items:
             for k, v in item.items():
                 if 'assignation' in v:
-                    assignation = v.get_base_image_tags('assignation')
+                    assignation = v.get('assignation')
                     if '[' in assignation and ']' in assignation:
                         # Replace to R list format
                         assignation = assignation.replace('[',
