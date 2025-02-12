@@ -18,9 +18,6 @@ def test_extract_cell():
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
         notebook_path = os.path.join(cells_json_path, notebook_file)
-        # if 'multiplyvector-dev-user-name-domain-com.json' not
-        # in notebook_file:
-        #     continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
@@ -34,6 +31,8 @@ def test_extract_cell():
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
             json=extractor_json_payload,
         )
+        if cell_extractor_response.status_code != 200:
+            print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
 

@@ -51,12 +51,14 @@ def test_containerize():
             print('Testing containerize for cell: ' + cell_file)
             cell_notebook_dict = json.load(f)
         f.close()
-        containerizer_payload = {'cell': cell_notebook_dict['cell']}
+
+        containerizer_json_payload = cell_notebook_dict.copy()
+        del containerizer_json_payload['data']
 
         containerize_response = client.post(
             '/containerize/',
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            json=containerizer_payload,
+            json=containerizer_json_payload,
         )
         assert containerize_response.status_code == 200
 
@@ -64,7 +66,9 @@ def test_containerize():
         source_url = containerize_response.json()['source_url']
         assert cell_notebook_dict['cell']['title'] in source_url
         containerization_status_response = client.get(
-            '/containerization-status/' + workflow_id,
+            '/status/' +
+            containerizer_json_payload['virtual_lab'] + '/' +
+            workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
         assert containerization_status_response.status_code == 200
@@ -74,7 +78,9 @@ def test_containerize():
                and count <= 30):
             sleep(sleep_time)
             containerization_status_response = client.get(
-                '/containerization-status/' + workflow_id,
+                '/status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
                 headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
             )
             assert containerization_status_response.status_code == 200
@@ -99,7 +105,6 @@ def test_containerize():
         #     'original_source']
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
-
 
 # def test_script_syntax(script_path: str = None, lang: str = None):
 #     if not lang:

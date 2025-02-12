@@ -11,6 +11,7 @@ import requests
 from github import Github
 from github.GithubException import UnknownObjectException
 
+from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
     ContainerRegistry
 from app.services.repositories.git_repository import GitRepository
@@ -33,12 +34,13 @@ def get_content_hash(contents):
 
 class GithubService(GitRepository, ABC):
 
-    def __init__(self, repository_url=None, token=None):
-        self.github = Github(token)
-        self.token = token
-        self.owner = repository_url.split(GITHUB_PREFIX)[1].split('/')[0]
+    def __init__(self, vl_conf: VLConfig):
+        self.github = Github(vl_conf.cell_github_token)
+        cell_github_url = vl_conf.cell_github_url
+        self.token = vl_conf.cell_github_token
+        self.owner = cell_github_url.split(GITHUB_PREFIX)[1].split('/')[0]
         self.repository_name = \
-            repository_url.split(GITHUB_PREFIX)[1].split('/')[1]
+            cell_github_url.split(GITHUB_PREFIX)[1].split('/')[1]
         if '.git' in self.repository_name:
             self.repository_name = self.repository_name.split('.git')[0]
         self.gh_repository = self.github.get_repo(
@@ -48,8 +50,9 @@ class GithubService(GitRepository, ABC):
                                GITHUB_WORKFLOW_FILENAME + '/dispatches')
         self.commits_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                             self.repository_name + '/commits')
-        self.registry = ContainerRegistry()
-        self.repository_url = repository_url
+        self.registry = ContainerRegistry(registry_url=vl_conf.registry_url,
+                                          token=vl_conf.cell_github_token)
+        self.repository_url = cell_github_url
 
     def commit(self, local_content=None, path=None, file_name=None):
         try:

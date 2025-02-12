@@ -24,7 +24,7 @@ class PyExtractor(Extractor):
     notebook_secrets: dict
     undefined: dict
 
-    def __init__(self, notebook_data: NotebookData):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         notebook = notebook_data.notebook
         notebook_sources = []
         for nb_cell in notebook.cells:
@@ -49,7 +49,7 @@ class PyExtractor(Extractor):
         self.undefined = dict()
         for source in notebook_sources:
             self.undefined.update(self.__extract_cell_undefined(source))
-        super().__init__(notebook_data)
+        super().__init__(notebook_data, base_image_tags_url)
 
     def __parse_code(self, source_code, infer_types=False):
         if infer_types:

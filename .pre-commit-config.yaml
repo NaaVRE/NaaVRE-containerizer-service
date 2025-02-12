@@ -14,3 +14,11 @@ repos:
     rev: v2.0.0
     hooks:
       - id: flake8
+
+  - repo: local
+    hooks:
+      - id: check-limited-testing-code
+        name: Check for limited testing
+        entry: "bash -c 'if grep -q \"if \\'\\'.*\\.json\\'\\' not in cell_file: continue\" \"$@\"; then echo \"You only test on file!\"; exit 1; fi'"
+        language: system
+        files: .py

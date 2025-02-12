@@ -1,16 +1,14 @@
-import os
 from abc import abstractmethod
 
+import cachetools.func
 import requests
 from jinja2 import Environment, PackageLoader
 
 from app.models.workflow_cell import Cell
 
 
-def get_module_name_mapping():
-    module_mapping_url = os.getenv('MODULE_MAPPING_URL',
-                                   'https://raw.githubusercontent.com/QCDIS'
-                                   '/NaaVRE-conf/main/module_mapping.json')
+@cachetools.func.ttl_cache(ttl=6 * 3600)
+def get_module_name_mapping(module_mapping_url: str = None):
     try:
         return requests.get(module_mapping_url).json()
     except Exception as e:
@@ -20,7 +18,7 @@ def get_module_name_mapping():
 
 class Containerizer():
 
-    def __init__(self, cell: Cell):
+    def __init__(self, cell: Cell, module_mapping_url=None):
         self.cell = cell
         loader = PackageLoader('app', 'templates')
         self.template_env = Environment(loader=loader, trim_blocks=True,
@@ -32,6 +30,7 @@ class Containerizer():
         self.template_script = ''
         self.template_conda_env = 'conda_env_template.jinja2'
         self.dockerfile_template = 'dockerfile_template_conda.jinja2'
+        self.module_mapping_url = module_mapping_url
 
     @abstractmethod
     def build_script(self):
@@ -46,7 +45,9 @@ class Containerizer():
             self.template_conda_env)
         mapped_dependencies = self.map_dependencies(
             dependencies=self.cell.dependencies,
-            module_name_mapping=get_module_name_mapping())
+            module_name_mapping=get_module_name_mapping
+            (self.module_mapping_url)
+        )
         return template_conda.render(base_image=self.cell.base_container_image,
                                      conda_deps=list(
                                          mapped_dependencies[

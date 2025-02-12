@@ -44,3 +44,14 @@ helm -n naavre-containerizer-service upgrade --install --create-namespace naavre
 
 `values.yaml` should contain ingress, OAuth2, and other configuration (
 checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre-containerizer-service/values-example.yaml)).
+
+
+## Configuration
+
+### Test on GitHub
+
+The secrets.CONFIG_FILE should have quotes escaped:
+
+```commandline
+{   \"vl_configurations\": [     {       \"name\": \"virtual_lab_1\",       \"base_image_tags_url\": \"https://github.com/QCDIS/NaaVRE-flavors/releases/latest/download/base_image_tags.json\",       \"module_mapping_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json\",       \"cell_github_url\": \"https://github.com/QCDIS/NaaVRE-cells-test-3.git\",       \"cell_github_token\": \"TOKEN\",       \"registry_url\": \"ghcr.io/qcdis/naavre-cells-test-3\"     },     {       \"name\": \"virtual_lab_2\",       \"base_image_tags_url\": \"https://github.com/QCDIS/NaaVRE-flavors/releases/latest/download/base_image_tags.json\",       \"module_mapping_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json\",       \"cell_github_url\": \"\",       \"cell_github_token\": \"\",       \"registry_url\": \"https://registry.naavre.com\"     }   ] }
+```
