@@ -1,6 +1,4 @@
 import abc
-import hashlib
-import json
 import re
 
 from slugify import slugify
@@ -40,15 +38,6 @@ class Extractor(abc.ABC):
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
         title = title.lower()
-        cell_identity_dict = {
-            'title': title,
-            'params': self.cell_params,
-            'secrets': self.cell_secrets,
-            'inputs': self.cell_inputs,
-            'outputs': self.cell_outputs,
-        }
-        cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
-        node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
         base_image_tags = BaseImageTags(self.base_image_tags_url)
         cell_dict = {
             'title': title,
