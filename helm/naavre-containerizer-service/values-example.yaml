@@ -12,7 +12,8 @@ ingress:
 
 conf:
   rootPath: /my-root-path
-  rawJson: |    
+  virtual_labs_configuration:
+    rawJson: |    
       {
         "vl_configurations": [
           {
