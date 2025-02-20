@@ -175,53 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "6466964": {
-          "id": "6466964",
-          "ports": {
-            "a": {
-              "id": "a",
-              "properties": {
-                "color": "#77862d"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "a"
-            ],
-            "og_node_id": "6466964",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "process-int-test-user-2",
-            "vars": [
-              {
-                "color": "#77862d",
-                "direction": "input",
-                "name": "a",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [

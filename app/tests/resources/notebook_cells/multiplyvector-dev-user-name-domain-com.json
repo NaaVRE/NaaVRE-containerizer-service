@@ -75,53 +75,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "747b6f2": {
-          "id": "747b6f2",
-          "ports": {
-            "run_time": {
-              "id": "run_time",
-              "properties": {
-                "color": "#3a783d"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "747b6f2",
-            "outputs": [
-              "run_time"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "multiplyvector-test-user-2",
-            "vars": [
-              {
-                "color": "#3a783d",
-                "direction": "output",
-                "name": "run_time",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [
       {

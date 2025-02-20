@@ -321,68 +321,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "2a6f509": {
-          "id": "2a6f509",
-          "ports": {
-            "S2_done": {
-              "id": "S2_done",
-              "properties": {
-                "color": "#862d56"
-              },
-              "type": "left"
-            },
-            "split_laz_files": {
-              "id": "split_laz_files",
-              "properties": {
-                "color": "#5382ac"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "S2_done"
-            ],
-            "og_node_id": "2a6f509",
-            "outputs": [
-              "split_laz_files"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "s21-fetch-laz-files-local-test-user-2",
-            "vars": [
-              {
-                "color": "#862d56",
-                "direction": "input",
-                "name": "S2_done",
-                "type": "datatype"
-              },
-              {
-                "color": "#5382ac",
-                "direction": "output",
-                "name": "split_laz_files",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_local_path_split",

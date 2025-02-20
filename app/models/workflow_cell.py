@@ -16,7 +16,6 @@ class Cell(BaseModel):
     secrets: Optional[list[dict]] | None = None
     confs: Optional[list[dict]] | None = None
     dependencies: Optional[list[dict]] | None = None
-    chart_obj: dict | None = None
     kernel: Literal['python', 'IRkernel', 'ipython', 'c']
     original_source: str
     source_url: Optional[str] | None = None

@@ -146,67 +146,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "b0258e9": {
-          "id": "b0258e9",
-          "ports": {
-            "list_of_ints": {
-              "id": "list_of_ints",
-              "properties": {
-                "color": "#5f1f93"
-              },
-              "type": "right"
-            },
-            "list_of_paths": {
-              "id": "list_of_paths",
-              "properties": {
-                "color": "#79c5d2"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "b0258e9",
-            "outputs": [
-              "list_of_paths",
-              "list_of_ints"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "input-lists-R-test-user-2",
-            "vars": [
-              {
-                "color": "#79c5d2",
-                "direction": "output",
-                "name": "list_of_paths",
-                "type": "datatype"
-              },
-              {
-                "color": "#5f1f93",
-                "direction": "output",
-                "name": "list_of_ints",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [],

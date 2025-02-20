@@ -175,68 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "b463c46": {
-          "id": "b463c46",
-          "ports": {
-            "a": {
-              "id": "a",
-              "properties": {
-                "color": "#77862d"
-              },
-              "type": "left"
-            },
-            "msg": {
-              "id": "msg",
-              "properties": {
-                "color": "#7bd279"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "a"
-            ],
-            "og_node_id": "b463c46",
-            "outputs": [
-              "msg"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "vol2bird-test-user-2",
-            "vars": [
-              {
-                "color": "#77862d",
-                "direction": "input",
-                "name": "a",
-                "type": "datatype"
-              },
-              {
-                "color": "#7bd279",
-                "direction": "output",
-                "name": "msg",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [
       {

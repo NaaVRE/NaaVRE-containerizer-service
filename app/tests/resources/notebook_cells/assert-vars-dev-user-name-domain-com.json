@@ -75,60 +75,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "748a243": {
-          "id": "748a243",
-          "ports": {
-            "done": {
-              "id": "done",
-              "properties": {
-                "color": "#ac8a53"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "done"
-            ],
-            "og_node_id": "748a243",
-            "outputs": [],
-            "params": [
-              "param_string",
-              "param_string_with_comment",
-              "param_int",
-              "param_float",
-              "param_list_int",
-              "param_list_str"
-            ],
-            "secrets": [],
-            "title": "assert-vars-test-user-2",
-            "vars": [
-              {
-                "color": "#ac8a53",
-                "direction": "input",
-                "name": "done",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_float",
