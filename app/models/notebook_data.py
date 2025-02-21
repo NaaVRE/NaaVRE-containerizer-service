@@ -12,7 +12,6 @@ class NotebookData(BaseModel):
     cell_index: int
     kernel: str
     notebook: Notebook
-    save: bool
     user_name: str | None = None
     base_image_name: str | None = None
 

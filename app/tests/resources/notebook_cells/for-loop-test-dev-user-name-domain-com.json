@@ -52,36 +52,6 @@
   },
   "cell": {
     "all_inputs": [],
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "bb6cfdd": {
-          "id": "bb6cfdd",
-          "ports": {},
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "bb6cfdd",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "for-loop-test-dev-user-name-domain-com",
-            "vars": []
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [],

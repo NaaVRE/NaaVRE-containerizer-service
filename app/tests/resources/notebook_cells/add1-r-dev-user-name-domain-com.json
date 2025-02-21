@@ -147,53 +147,6 @@
     "base_image_name": "r"
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "a62fe24": {
-          "id": "a62fe24",
-          "ports": {
-            "count": {
-              "id": "count",
-              "properties": {
-                "color": "#783d3a"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "count"
-            ],
-            "og_node_id": "a62fe24",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "add1-r-test-user-2",
-            "vars": [
-              {
-                "color": "#783d3a",
-                "direction": "input",
-                "name": "count",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [

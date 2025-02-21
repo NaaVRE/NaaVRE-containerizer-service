@@ -146,68 +146,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "7e6c4be": {
-          "id": "7e6c4be",
-          "ports": {
-            "file_path": {
-              "id": "file_path",
-              "properties": {
-                "color": "#663a78"
-              },
-              "type": "left"
-            },
-            "lines": {
-              "id": "lines",
-              "properties": {
-                "color": "#ac535c"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "file_path"
-            ],
-            "og_node_id": "7e6c4be",
-            "outputs": [
-              "lines"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "read-file-lines-R-test-user-2",
-            "vars": [
-              {
-                "color": "#663a78",
-                "direction": "input",
-                "name": "file_path",
-                "type": "datatype"
-              },
-              {
-                "color": "#ac535c",
-                "direction": "output",
-                "name": "lines",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_data_folder",

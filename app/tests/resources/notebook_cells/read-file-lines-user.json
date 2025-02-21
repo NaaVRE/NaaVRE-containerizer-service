@@ -175,68 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "36c573b": {
-          "id": "36c573b",
-          "ports": {
-            "file_path": {
-              "id": "file_path",
-              "properties": {
-                "color": "#663a78"
-              },
-              "type": "left"
-            },
-            "lines": {
-              "id": "lines",
-              "properties": {
-                "color": "#ac535c"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "file_path"
-            ],
-            "og_node_id": "36c573b",
-            "outputs": [
-              "lines"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "read-file-lines-test-user-2",
-            "vars": [
-              {
-                "color": "#663a78",
-                "direction": "input",
-                "name": "file_path",
-                "type": "datatype"
-              },
-              {
-                "color": "#ac535c",
-                "direction": "output",
-                "name": "lines",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_data_folder",

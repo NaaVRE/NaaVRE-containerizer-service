@@ -175,53 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "c82b344": {
-          "id": "c82b344",
-          "ports": {
-            "file_path": {
-              "id": "file_path",
-              "properties": {
-                "color": "#663a78"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "c82b344",
-            "outputs": [
-              "file_path"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "Create-file-test-user-2",
-            "vars": [
-              {
-                "color": "#663a78",
-                "direction": "output",
-                "name": "file_path",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_data_folder",

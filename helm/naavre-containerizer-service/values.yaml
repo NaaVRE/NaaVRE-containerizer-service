@@ -109,10 +109,10 @@ affinity: {}
 conf:
   rootPath: /
   virtual_labs_configuration:
-  rawJson: |
+    rawJson: |
       {}
-       
-    
+
+
 
 env:
   DEBUG: "false"

@@ -1,6 +1,4 @@
 import abc
-import hashlib
-import json
 import re
 
 from slugify import slugify
@@ -8,7 +6,6 @@ from slugify import slugify
 from app.models.notebook_data import NotebookData
 from app.models.workflow_cell import Cell
 from app.services.base_image.base_image_tags import BaseImageTags
-from app.services.converter.converter import ConverterReactFlowChart
 
 
 class Extractor(abc.ABC):
@@ -41,33 +38,6 @@ class Extractor(abc.ABC):
         title = slugify(title) if title and title[0] == "#" else "Untitled"
         title += '-' + slugify(self.user_name)
         title = title.lower()
-        cell_identity_dict = {
-            'title': title,
-            'params': self.cell_params,
-            'secrets': self.cell_secrets,
-            'inputs': self.cell_inputs,
-            'outputs': self.cell_outputs,
-        }
-        cell_identity_str = json.dumps(cell_identity_dict, sort_keys=True)
-        node_id = hashlib.sha1(cell_identity_str.encode()).hexdigest()[:7]
-        node = ConverterReactFlowChart.get_node(
-            title,
-            self.cell_inputs,
-            self.cell_outputs,
-            self.cell_params,
-            self.cell_secrets,
-        )
-        chart = {
-            'offset': {
-                'x': 0,
-                'y': 0,
-            },
-            'scale': 1,
-            'nodes': {node_id: node},
-            'links': {},
-            'selected': {},
-            'hovered': {},
-        }
         base_image_tags = BaseImageTags(self.base_image_tags_url)
         cell_dict = {
             'title': title,
@@ -79,7 +49,6 @@ class Extractor(abc.ABC):
             'dependencies': self.cell_dependencies,
             'base_container_image':
                 base_image_tags.base_image_tags[self.base_image_name],
-            'chart_obj': chart,
             'kernel': self.kernel,
             'original_source': self.clean_code()
         }

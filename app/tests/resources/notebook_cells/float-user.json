@@ -175,53 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "f7d62bc": {
-          "id": "f7d62bc",
-          "ports": {
-            "c": {
-              "id": "c",
-              "properties": {
-                "color": "#2dc5d2"
-              },
-              "type": "right"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "f7d62bc",
-            "outputs": [
-              "c"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "float-test-user-2",
-            "vars": [
-              {
-                "color": "#2dc5d2",
-                "direction": "output",
-                "name": "c",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [],

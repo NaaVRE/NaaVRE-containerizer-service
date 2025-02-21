@@ -71,36 +71,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "dda84f1": {
-          "id": "dda84f1",
-          "ports": {},
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "dda84f1",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "Untitled-test-user-2",
-            "vars": []
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [],

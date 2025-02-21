@@ -175,36 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "1e8a933": {
-          "id": "1e8a933",
-          "ports": {},
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [],
-            "og_node_id": "1e8a933",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "conf-test-user-2",
-            "vars": []
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [
       {

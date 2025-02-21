@@ -301,53 +301,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "6f80b59": {
-          "id": "6f80b59",
-          "ports": {
-            "S6_done": {
-              "id": "S6_done",
-              "properties": {
-                "color": "#2d35d2"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "S6_done"
-            ],
-            "og_node_id": "6f80b59",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "visualize-rasterio-test-user-2",
-            "vars": [
-              {
-                "color": "#2d35d2",
-                "direction": "input",
-                "name": "S6_done",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_local_path_geotiff",

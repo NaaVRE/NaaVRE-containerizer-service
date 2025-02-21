@@ -175,53 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "d3a3178": {
-          "id": "d3a3178",
-          "ports": {
-            "list_of_paths": {
-              "id": "list_of_paths",
-              "properties": {
-                "color": "#79c5d2"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "list_of_paths"
-            ],
-            "og_node_id": "d3a3178",
-            "outputs": [],
-            "params": [],
-            "secrets": [],
-            "title": "loop-list-test-user-2",
-            "vars": [
-              {
-                "color": "#79c5d2",
-                "direction": "input",
-                "name": "list_of_paths",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [

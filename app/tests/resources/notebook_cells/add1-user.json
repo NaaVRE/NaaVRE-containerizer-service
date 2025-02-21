@@ -175,68 +175,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "c7a7c9b": {
-          "id": "c7a7c9b",
-          "ports": {
-            "a": {
-              "id": "a",
-              "properties": {
-                "color": "#77862d"
-              },
-              "type": "right"
-            },
-            "count": {
-              "id": "count",
-              "properties": {
-                "color": "#783d3a"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "count"
-            ],
-            "og_node_id": "c7a7c9b",
-            "outputs": [
-              "a"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "add1-test-user-2",
-            "vars": [
-              {
-                "color": "#783d3a",
-                "direction": "input",
-                "name": "count",
-                "type": "datatype"
-              },
-              {
-                "color": "#77862d",
-                "direction": "output",
-                "name": "a",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [],
     "dependencies": [],
     "inputs": [

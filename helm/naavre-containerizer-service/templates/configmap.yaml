@@ -7,4 +7,4 @@ metadata:
 
 data:
   configuration.json: |
-    {{ .Values.conf.virtual_labs_configuration.rawJson | nindent 2 }}
+    {{- .Values.conf.virtual_labs_configuration.rawJson | nindent 4 }}

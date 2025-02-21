@@ -321,68 +321,6 @@
     }
   },
   "cell": {
-    "chart_obj": {
-      "hovered": {},
-      "links": {},
-      "nodes": {
-        "11d7bd6": {
-          "id": "11d7bd6",
-          "ports": {
-            "S3_done": {
-              "id": "S3_done",
-              "properties": {
-                "color": "#ac53a9"
-              },
-              "type": "right"
-            },
-            "split_laz_files": {
-              "id": "split_laz_files",
-              "properties": {
-                "color": "#5382ac"
-              },
-              "type": "left"
-            }
-          },
-          "position": {
-            "x": 35,
-            "y": 15
-          },
-          "properties": {
-            "inputs": [
-              "split_laz_files"
-            ],
-            "og_node_id": "11d7bd6",
-            "outputs": [
-              "S3_done"
-            ],
-            "params": [],
-            "secrets": [],
-            "title": "s3-retiling-local-test-user-2",
-            "vars": [
-              {
-                "color": "#5382ac",
-                "direction": "input",
-                "name": "split_laz_files",
-                "type": "datatype"
-              },
-              {
-                "color": "#ac53a9",
-                "direction": "output",
-                "name": "S3_done",
-                "type": "datatype"
-              }
-            ]
-          },
-          "type": "input-output"
-        }
-      },
-      "offset": {
-        "x": 0,
-        "y": 0
-      },
-      "scale": 1,
-      "selected": {}
-    },
     "confs": [
       {
         "name": "conf_local_path_geotiff",
