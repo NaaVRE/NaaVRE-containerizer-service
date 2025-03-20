@@ -361,8 +361,8 @@
     "secrets": [],
     "title": "s21-fetch-laz-files-local-test-user-2",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:v0.21.1",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:v0.21.1"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
     },
     "original_source": "S2_done \n\nsplit_laz_folder = glob.glob(os.path.join(conf_local_path_split, '*.LAZ'))\nsplit_laz_files = []\nprint(\"File names ending with .LAZ:\")\nfor file_path in split_laz_folder:\n    split_laz_files.append(os.path.basename(file_path))\n\nprint(split_laz_files)\nS21_done = 'True'"
   }

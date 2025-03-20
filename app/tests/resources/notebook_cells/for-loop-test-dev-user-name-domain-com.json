@@ -63,8 +63,8 @@
     "title": "for-loop-test-test-user-2",
     "types": {},
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.21.1",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.21.1"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
     }
   }
 }
