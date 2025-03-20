@@ -2,7 +2,7 @@
   "vl_configurations": [
     {
       "name": "virtual_lab_1",
-      "base_image_tags_url": "https://github.com/QCDIS/NaaVRE-flavors/releases/download/v0.21.1/base_image_tags.json",
+      "base_image_tags_url": "https://github.com/QCDIS/NaaVRE-flavors/releases/latest/download/base_image_tags.json",
       "module_mapping_url": "https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json",
       "cell_github_url": "https://github.com/QCDIS/NaaVRE-cells-test-3.git",
       "cell_github_token": "TOKEN",
@@ -10,7 +10,7 @@
     },
     {
       "name": "virtual_lab_2",
-      "base_image_tags_url": "https://github.com/QCDIS/NaaVRE-flavors/releases/download/v0.21.1/base_image_tags.json",
+      "base_image_tags_url": "https://github.com/QCDIS/NaaVRE-flavors/releases/latest/download/base_image_tags.json",
       "module_mapping_url": "https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json",
       "cell_github_url": "",
       "cell_github_token": "",
