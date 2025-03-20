@@ -164,8 +164,8 @@
     "secrets": [],
     "title": "input-lists-r-test-user-2",
     "base_container_image": {
-      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:v0.21.1",
-      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:v0.21.1"
+      "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
+      "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
     },
     "original_source": "list_of_paths <- c(\n  \"/webdav/LAZ/targets_myname\",\n  \"/webdav/LAZ/targets_myname\",\n  \"/webdav/LAZ/targets_myname\",\n  \"/webdav/LAZ/targets_myname\"\n)\n\nlist_of_ints <- c(1, 2, 35, 6, 65)\n\n\nprint(list_of_paths)\nprint(list_of_ints)"
   }
