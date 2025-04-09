@@ -28,12 +28,10 @@ option_list = list(
 {% else %}
 {% set type = 'character' %}
 {% endif %}
-{% set option = 'make_option(c("--' +  in_var['name']+'"), action="store", default=NA, type="'+type+'", help="my description")'   %}
-{% if not loop.last %}
-{% set option = option + ', '%}
-{% endif %}
+{% set option = 'make_option(c("--' +  in_var['name']+'"), action="store", default=NA, type="'+type+'", help="my description"),'   %}
 {{ option }}
 {% endfor %}
+make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
 
@@ -87,6 +85,7 @@ print("-------------------------------------------------------------------------
 {{ in_var['name'] }} = opt${{ in_var['name'] }}
 {% endif %}
 {% endfor %}
+id <- gsub('"', '', opt$id)
 
 {% for c in confs %}
 {{ c }}
