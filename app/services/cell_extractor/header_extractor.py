@@ -289,8 +289,8 @@ class HeaderExtractor(Extractor):
             return []
         return [
             {
-                'name': it.get_base_image_tags('name'),
-                'asname': it.get_base_image_tags('asname', None),
-                'module': it.get_base_image_tags('module', ''),
+                'name': it.get('name'),
+                'asname': it.get('asname', None),
+                'module': it.get('module', ''),
             }
             for it in items]
