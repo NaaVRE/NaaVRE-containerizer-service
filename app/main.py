@@ -145,16 +145,17 @@ def _get_extractor(extractor_payload: ExtractorPayload):
     elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
         extractor = PyHeaderExtractor(extractor_payload.data,
                                       vl_settings.base_image_tags_url)
-    if kernel.lower() == 'irkernel':
-        code_extractor = RExtractor(extractor_payload.data,
-                                    vl_settings.base_image_tags_url)
-    elif kernel == 'ipython' or kernel == 'python':
-        code_extractor = PyExtractor(extractor_payload.data,
-                                     vl_settings.base_image_tags_url)
-    else:
-        raise HTTPException(status_code=400,
-                            detail='Unsupported kernel: ' + kernel)
-    extractor.add_missing_values(code_extractor)
+    if not extractor.is_complete():
+        if kernel.lower() == 'irkernel':
+            code_extractor = RExtractor(extractor_payload.data,
+                                        vl_settings.base_image_tags_url)
+        elif kernel == 'ipython' or kernel == 'python':
+            code_extractor = PyExtractor(extractor_payload.data,
+                                         vl_settings.base_image_tags_url)
+        else:
+            raise HTTPException(status_code=400,
+                                detail='Unsupported kernel: ' + kernel)
+        extractor.add_missing_values(code_extractor)
     return extractor
 
 
