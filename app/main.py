@@ -154,7 +154,7 @@ def _get_extractor(extractor_payload: ExtractorPayload):
     else:
         raise HTTPException(status_code=400,
                             detail='Unsupported kernel: ' + kernel)
-    extractor.mearge_values(code_extractor)
+    extractor.add_missing_values(code_extractor)
     return extractor
 
 
