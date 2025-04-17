@@ -67,6 +67,7 @@ class GithubService(GitRepository, ABC):
                 message=path + ' creation',
                 content=local_content,
             )
+            content_updated = True
         elif remote_hash != local_hash:
             self.gh_repository.update_file(
                 path=path + '/' + file_name,
@@ -74,7 +75,9 @@ class GithubService(GitRepository, ABC):
                 content=local_content,
                 sha=remote_hash,
             )
-        content_updated = False
+            content_updated = True
+        else:
+            content_updated = False
         if os.getenv('DEBUG') and os.getenv('DEBUG').lower() == 'true':
             content_updated = True
         image_info = None
