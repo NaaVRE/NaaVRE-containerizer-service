@@ -103,46 +103,22 @@ class HeaderExtractor(Extractor):
             raise e
         return header
 
-    def mearge_values(self, extractor: Extractor):
+    def add_missing_values(self, extractor: Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
         if not self.cell_inputs:
             self.cell_inputs = extractor.cell_inputs
-        else:
-            for var in extractor.cell_inputs:
-                if var not in self.cell_inputs:
-                    self.cell_inputs.append(var)
         if not self.cell_outputs:
             self.cell_outputs = extractor.cell_outputs
-        else:
-            for var in extractor.cell_outputs:
-                if var not in self.cell_outputs:
-                    self.cell_outputs.append(var)
         if not self.cell_params:
             self.cell_params = extractor.cell_params
-        else:
-            for var in extractor.cell_params:
-                if var not in self.cell_params:
-                    self.cell_params.append(var)
         if not self.cell_secrets:
             self.cell_secrets = extractor.cell_secrets
-        else:
-            for var in extractor.cell_secrets:
-                if var not in self.cell_secrets:
-                    self.cell_secrets.append(var)
         if not self.cell_confs:
             self.cell_confs = extractor.cell_confs
-        else:
-            for var in extractor.cell_confs:
-                if var not in self.cell_confs:
-                    self.cell_confs.append(var)
         if not self.cell_dependencies:
             self.cell_dependencies = extractor.cell_dependencies
-        else:
-            for var in extractor.cell_dependencies:
-                if var not in self.cell_dependencies:
-                    self.cell_dependencies.append(var)
 
     @staticmethod
     def _parse_interface_vars_items(
