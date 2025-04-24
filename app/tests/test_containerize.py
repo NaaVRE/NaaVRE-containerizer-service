@@ -119,6 +119,8 @@ def test_race_conditions():
     with open(cell_path_1) as f:
         print('Testing containerize for cell: ' + cell_file_1)
         cell_notebook_dict_1 = json.load(f)
+    f.close()
+    containerizer_json_payload_1 = cell_notebook_dict_1.copy()
     del containerizer_json_payload_1['data']
 
     random_index_2 = random.randint(0, len(cells_files) - 1)
