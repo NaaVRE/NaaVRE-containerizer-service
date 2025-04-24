@@ -107,17 +107,17 @@ class HeaderExtractor(Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
-        if not self.cell_inputs:
+        if self.cell_inputs is None:
             self.cell_inputs = extractor.cell_inputs
-        if not self.cell_outputs:
+        if self.cell_outputs is None:
             self.cell_outputs = extractor.cell_outputs
-        if not self.cell_params:
+        if self.cell_params is None:
             self.cell_params = extractor.cell_params
-        if not self.cell_secrets:
+        if self.cell_secrets is None:
             self.cell_secrets = extractor.cell_secrets
-        if not self.cell_confs:
+        if self.cell_confs is None:
             self.cell_confs = extractor.cell_confs
-        if not self.cell_dependencies:
+        if self.cell_dependencies is None:
             self.cell_dependencies = extractor.cell_dependencies
 
     @staticmethod
