@@ -179,12 +179,6 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     commit_list.append({'contents': cell_contents,
                         'path': containerize_payload.cell.title,
                         'file_name': 'task' + conteinerizer.file_extension})
-    if conteinerizer.visualization_cell:
-        notebook_contents = conteinerizer.extract_notebook()
-        commit_list.append({'contents': notebook_contents,
-                            'path': containerize_payload.cell.title,
-                            'file_name': 'task.ipynb'})
-
     environment_contents = conteinerizer.build_environment()
     commit_list.append({'contents': environment_contents,
                         'path': containerize_payload.cell.title,
