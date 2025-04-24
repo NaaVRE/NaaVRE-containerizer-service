@@ -6,10 +6,12 @@ import os
 import uuid
 from abc import ABC
 from time import sleep
+from retry import retry
 
 import requests
+
 from github import Github
-from github.GithubException import UnknownObjectException
+from github.GithubException import UnknownObjectException, GithubException
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -54,6 +56,7 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
+    @retry(GithubException, tries=3, delay=1, backoff=2)
     def commit(self, local_content=None, path=None, file_name=None):
         try:
             remote_hash = self.gh_repository.get_contents(
