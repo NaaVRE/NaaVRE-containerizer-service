@@ -242,19 +242,8 @@ class HeaderExtractor(Extractor):
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
             return None
-        confs = []
-        for item in items:
-            for k, v in item.items():
-                if 'assignation' in v:
-                    assignation = v.get('assignation')
-                    if '[' in assignation and ']' in assignation:
-                        # Replace to R list format
-                        assignation = assignation.replace('[',
-                                                          'list(').replace(']',
-                                                                           ')')
-                        item[k]['assignation'] = assignation
-            confs.append({k: v['assignation'] for k, v in item.items()})
-        return confs
+        return [{'name': k, 'assignation': v['assignation']} for it in items
+                for k, v in it.items()]
 
     def get_cell_dependencies(self, confs) -> list[dict] | None:
         if self.cell_header is None:
