@@ -24,8 +24,6 @@ class Containerizer():
         self.template_env = Environment(loader=loader, trim_blocks=True,
                                         lstrip_blocks=True)
         self.visualization_cell = False
-        if self.cell.title.lower().startswith('visualize-'):
-            self.visualization_cell = True
         self.file_extension = ''
         self.template_script = ''
         self.template_conda_env = 'conda_env_template.jinja2'
