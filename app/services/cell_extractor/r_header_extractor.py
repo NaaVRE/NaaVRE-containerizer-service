@@ -6,12 +6,12 @@ class RHeaderExtractor(HeaderExtractor):
     def __init__(self, notebook_data, base_image_tags_url: str):
         super().__init__(notebook_data, base_image_tags_url)
 
-    def get_cell_confs(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict] | None:
         if self.cell_header is None:
-            return []
+            return None
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
-            return []
+            return None
         confs = []
         for item in items:
             for k, v in item.items():

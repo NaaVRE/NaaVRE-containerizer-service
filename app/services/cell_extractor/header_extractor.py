@@ -196,52 +196,52 @@ class HeaderExtractor(Extractor):
             self,
             header: Union[dict, None],
             item_type: Literal['inputs', 'outputs', 'params', 'secrets'],
-    ) -> list[dict]:
+    ) -> list[dict] | None:
         if header is None:
-            return []
+            return None
         vars = []
         items = header['NaaVRE']['cell'].get(item_type)
         if items is None:
-            return []
+            return None
         for item in items:
             var = self._parse_interface_vars_items(item, item_type)
             vars.append(var)
         return vars
 
-    def get_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict] | None:
         inputs = self._infer_cell_interface_vars(
             self.cell_header,
             'inputs',
         )
         return inputs
 
-    def get_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict] | None:
         outputs = self._infer_cell_interface_vars(
             self.cell_header,
             'outputs',
         )
         return outputs
 
-    def get_cell_params(self) -> list[dict]:
+    def get_cell_params(self) -> list[dict] | None:
         params = self._infer_cell_interface_vars(
             self._extract_header(),
             'params',
         )
         return params
 
-    def get_cell_secrets(self) -> list[dict]:
+    def get_cell_secrets(self) -> list[dict] | None:
         secrets = self._infer_cell_interface_vars(
             self._extract_header(),
             'secrets',
         )
         return secrets
 
-    def get_cell_confs(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict] | None:
         if self.cell_header is None:
-            return []
+            return None
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
-            return []
+            return None
         confs = []
         for item in items:
             for k, v in item.items():
@@ -256,13 +256,13 @@ class HeaderExtractor(Extractor):
             confs.append({k: v['assignation'] for k, v in item.items()})
         return confs
 
-    def get_cell_dependencies(self, confs) -> list[dict]:
+    def get_cell_dependencies(self, confs) -> list[dict] | None:
         if self.cell_header is None:
-            return []
+            return None
         items = self.cell_header['NaaVRE']['cell'].get(
             'dependencies')
         if items is None:
-            return []
+            return None
         return [
             {
                 'name': it.get('name'),
