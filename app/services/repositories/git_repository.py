@@ -4,7 +4,7 @@ from abc import abstractmethod
 class GitRepository:
 
     @abstractmethod
-    def commit(self, content):
+    def commit(self, commit_list: list[{}]):
         pass
 
     @abstractmethod

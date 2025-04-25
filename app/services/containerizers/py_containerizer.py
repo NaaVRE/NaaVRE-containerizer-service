@@ -15,10 +15,7 @@ class PyContainerizer(Containerizer, ABC):
     def __init__(self, cell: Cell, module_mapping_url=None):
         super().__init__(cell, module_mapping_url)
         self.file_extension = '.py'
-        if self.visualization_cell:
-            self.template_script = 'vis_cell_template.jinja2'
-        else:
-            self.template_script = 'py_cell_template.jinja2'
+        self.template_script = 'py_cell_template.jinja2'
 
     def extract_notebook(self):
         # Build a notebook from the cell
