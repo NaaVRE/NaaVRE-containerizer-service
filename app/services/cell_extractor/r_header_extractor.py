@@ -6,23 +6,16 @@ class RHeaderExtractor(HeaderExtractor):
     def __init__(self, notebook_data, base_image_tags_url: str):
         super().__init__(notebook_data, base_image_tags_url)
 
-    def get_cell_confs(self) -> list[dict]:
-        if self.cell_header is None:
-            return []
-        items = self.cell_header['NaaVRE']['cell'].get('confs')
-        if items is None:
-            return []
-        confs = []
-        for item in items:
-            for k, v in item.items():
-                if 'assignation' in v:
-                    assignation = v.get('assignation')
-                    if '[' in assignation and ']' in assignation:
-                        # Replace to R list format
-                        assignation = assignation.replace('[',
-                                                          'list(').replace(']',
-                                                                           ')')
-                        item[k]['assignation'] = assignation
-                conf = {'name': k, 'assignation': item[k]['assignation']}
-                confs.append(conf)
+    def get_cell_confs(self) -> list[dict] | None:
+        confs = super().get_cell_confs()
+
+        # Convert lists to R format, because the parent HeaderExtractor
+        # produces JSON/YAML/Python lists.
+        # e.g. [1, 2, ...] to list(1, 2, ...)
+        if confs is not None:
+            for conf in confs:
+                conf['assignation'] = (conf['assignation']
+                                       .replace('[', 'list(')
+                                       .replace(']', ')'))
+
         return confs

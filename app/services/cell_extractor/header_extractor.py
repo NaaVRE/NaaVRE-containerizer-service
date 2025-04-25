@@ -107,17 +107,17 @@ class HeaderExtractor(Extractor):
         """ Add values not specified in the header from another extractor
         (e.g. PyExtractor or RExtractor)
         """
-        if not self.cell_inputs:
+        if self.cell_inputs is None:
             self.cell_inputs = extractor.cell_inputs
-        if not self.cell_outputs:
+        if self.cell_outputs is None:
             self.cell_outputs = extractor.cell_outputs
-        if not self.cell_params:
+        if self.cell_params is None:
             self.cell_params = extractor.cell_params
-        if not self.cell_secrets:
+        if self.cell_secrets is None:
             self.cell_secrets = extractor.cell_secrets
-        if not self.cell_confs:
+        if self.cell_confs is None:
             self.cell_confs = extractor.cell_confs
-        if not self.cell_dependencies:
+        if self.cell_dependencies is None:
             self.cell_dependencies = extractor.cell_dependencies
 
     @staticmethod
@@ -196,73 +196,62 @@ class HeaderExtractor(Extractor):
             self,
             header: Union[dict, None],
             item_type: Literal['inputs', 'outputs', 'params', 'secrets'],
-    ) -> list[dict]:
+    ) -> list[dict] | None:
         if header is None:
-            return []
+            return None
         vars = []
         items = header['NaaVRE']['cell'].get(item_type)
         if items is None:
-            return []
+            return None
         for item in items:
             var = self._parse_interface_vars_items(item, item_type)
             vars.append(var)
         return vars
 
-    def get_cell_inputs(self) -> list[dict]:
+    def get_cell_inputs(self) -> list[dict] | None:
         inputs = self._infer_cell_interface_vars(
             self.cell_header,
             'inputs',
         )
         return inputs
 
-    def get_cell_outputs(self) -> list[dict]:
+    def get_cell_outputs(self) -> list[dict] | None:
         outputs = self._infer_cell_interface_vars(
             self.cell_header,
             'outputs',
         )
         return outputs
 
-    def get_cell_params(self) -> list[dict]:
+    def get_cell_params(self) -> list[dict] | None:
         params = self._infer_cell_interface_vars(
             self._extract_header(),
             'params',
         )
         return params
 
-    def get_cell_secrets(self) -> list[dict]:
+    def get_cell_secrets(self) -> list[dict] | None:
         secrets = self._infer_cell_interface_vars(
             self._extract_header(),
             'secrets',
         )
         return secrets
 
-    def get_cell_confs(self) -> list[dict]:
+    def get_cell_confs(self) -> list[dict] | None:
         if self.cell_header is None:
-            return []
+            return None
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
-            return []
-        confs = []
-        for item in items:
-            for k, v in item.items():
-                if 'assignation' in v:
-                    assignation = v.get('assignation')
-                    if '[' in assignation and ']' in assignation:
-                        # Replace to R list format
-                        assignation = assignation.replace('[',
-                                                          'list(').replace(']',
-                                                                           ')')
-                        item[k]['assignation'] = assignation
-            confs.append({k: v['assignation'] for k, v in item.items()})
-        return confs
+            return None
+        return [{'name': k, 'assignation': v['assignation']} for it in items
+                for k, v in it.items()]
 
-    def get_cell_dependencies(self, confs) -> list[dict]:
+    def get_cell_dependencies(self, confs) -> list[dict] | None:
         if self.cell_header is None:
-            return []
+            return None
         items = self.cell_header['NaaVRE']['cell'].get(
             'dependencies')
         if items is None:
-            return []
+            return None
         return [
             {
                 'name': it.get('name'),
