@@ -3,15 +3,11 @@ import hashlib
 import json
 import logging
 import os
+import requests
 import uuid
 from abc import ABC
-from time import sleep
-from retry import retry
-
-import requests
-
 from github import Github, InputGitTreeElement
-from github.GithubException import GithubException
+from time import sleep
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -58,7 +54,7 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    @retry(GithubException, tries=3, delay=1, backoff=2)
+    # @retry(GithubException, tries=3, delay=1, backoff=2)
     def commit(self, commit_list=None):
         content_updated = False
         image_info = None
@@ -89,7 +85,7 @@ class GithubService(GitRepository, ABC):
                                                       ))
         if base_tree.sha != new_tree.sha:
             git_commit = self.gh_repository.create_git_commit(
-                message="Added: "+commit_list[0]['path'],
+                message="Added: " + commit_list[0]['path'],
                 tree=self.gh_repository.get_git_tree(sha=new_tree.sha),
                 parents=[self.gh_repository.get_git_commit(
                     self.gh_repository.get_branch('main').commit.sha)],
