@@ -10,8 +10,8 @@ from retry import retry
 
 import requests
 
-from github import Github, InputGitTreeElement
-from github.GithubException import GithubException
+from github import Github
+from github.GithubException import UnknownObjectException, GithubException
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -34,15 +34,17 @@ def get_content_hash(contents):
     return s.hexdigest()
 
 
+class JobNotFoundError(Exception):
+    pass
+
+
 class GithubService(GitRepository, ABC):
 
     def __init__(self, vl_conf: VLConfig):
         self.github = Github(vl_conf.cell_github_token)
         cell_github_url = vl_conf.cell_github_url
         self.token = vl_conf.cell_github_token
-        logger.debug('cell_github_url: ' + cell_github_url)
         self.owner = cell_github_url.split(GITHUB_PREFIX)[1].split('/')[0]
-        logger.debug('owner: ' + self.owner)
         self.repository_name = \
             cell_github_url.split(GITHUB_PREFIX)[1].split('/')[1]
         if '.git' in self.repository_name:
@@ -59,51 +61,37 @@ class GithubService(GitRepository, ABC):
         self.repository_url = cell_github_url
 
     @retry(GithubException, tries=3, delay=1, backoff=2)
-    def commit(self, commit_list=None):
-        content_updated = False
-        image_info = None
-        git_tree = []
-        for commit_item in commit_list:
-            local_hash = get_content_hash(commit_item['contents'])
-            logger.debug('Creating blob for: ' + commit_item['path'])
-            tree_elem = InputGitTreeElement(
-                path=commit_item['path'] + '/' + commit_item['file_name'],
-                mode='100644',
-                type='blob',
-                sha=local_hash
+    def commit(self, local_content=None, path=None, file_name=None):
+        try:
+            remote_hash = self.gh_repository.get_contents(
+                path=path + '/' + file_name).sha
+        except UnknownObjectException:
+            remote_hash = None
+        local_hash = get_content_hash(local_content)
+        if remote_hash is None:
+            self.gh_repository.create_file(
+                path=path + '/' + file_name,
+                message=path + ' creation',
+                content=local_content,
             )
-            git_tree.append(tree_elem)
-            if not content_updated:
-                image_info = self.registry.query_registry_for_image(
-                    commit_item['path'])
-            if not image_info:
-                content_updated = True
-
-        base_tree = self.gh_repository.get_git_tree(sha='main')
-
-        new_tree = self.gh_repository.create_git_tree(tree=git_tree,
-                                                      base_tree=self.
-                                                      gh_repository.
-                                                      get_git_tree(
-                                                          sha='main'
-                                                      ))
-        if base_tree.sha != new_tree.sha:
-            git_commit = self.gh_repository.create_git_commit(
-                message="Added: "+commit_list[0]['path'],
-                tree=self.gh_repository.get_git_tree(sha=new_tree.sha),
-                parents=[self.gh_repository.get_git_commit(
-                    self.gh_repository.get_branch('main').commit.sha)],
-            )
-
-            # Push that commit to the main branch by editing the reference
-            main_branch_ref = (self.gh_repository.get_git_ref
-                               (ref='heads/main'))
-            main_branch_ref.edit(sha=git_commit.sha)
             content_updated = True
-
+        elif remote_hash != local_hash:
+            self.gh_repository.update_file(
+                path=path + '/' + file_name,
+                message=path + ' update',
+                content=local_content,
+                sha=remote_hash,
+            )
+            content_updated = True
+        else:
+            content_updated = False
         if os.getenv('DEBUG') and os.getenv('DEBUG').lower() == 'true':
             content_updated = True
-
+        image_info = None
+        if not content_updated:
+            image_info = self.registry.query_registry_for_image(path)
+        if not image_info:
+            content_updated = True
         return content_updated
 
     def dispatch_containerization_workflow(self, title=None,
@@ -161,18 +149,8 @@ class GithubService(GitRepository, ABC):
             job = self.get_github_workflow_jobs(jobs_url)
             return job
         self.wait_for_github_api_resources()
-        sleep_time = 3
-        sleep(sleep_time)
         job = self.find_job_by_name(job_name=wf_id,
                                     wf_creation_utc=wf_creation_utc)
-        count = 0
-        while not job and count <= 4:
-            sleep(sleep_time)
-            logger.debug('Calling find_job_by_name. Count: ' + str(count))
-            job = self.find_job_by_name(job_name=wf_id,
-                                        wf_creation_utc=wf_creation_utc)
-            count += 1
-            sleep_time += 2
         return job
 
     def wait_for_github_api_resources(self):
@@ -219,6 +197,7 @@ class GithubService(GitRepository, ABC):
             raise Exception(
                 'Error getting jobs for workflow run: ' + jobs.text)
 
+    @retry(JobNotFoundError, tries=6, delay=1, backoff=2)
     def find_job_by_name(self, job_name=None, wf_creation_utc=None):
         runs = self.get_github_workflow_runs(
             t_utc=wf_creation_utc)
@@ -231,4 +210,4 @@ class GithubService(GitRepository, ABC):
                 if job['name'] == job_name:
                     job['head_sha'] = run['head_sha']
                     return job
-        return None
+        raise JobNotFoundError
