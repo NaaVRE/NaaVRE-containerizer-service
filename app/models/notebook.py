@@ -1,4 +1,5 @@
 import logging
+
 from pydantic import BaseModel
 
 from app.models.notebook_cell import NotebookCell

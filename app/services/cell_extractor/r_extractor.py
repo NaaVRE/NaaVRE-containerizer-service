@@ -1,9 +1,10 @@
 import os
+import tempfile
+from typing import Literal
+
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
-import tempfile
 from rpy2.robjects.packages import importr
-from typing import Literal
 
 from .extractor import Extractor
 from .parseR.parsing import parse_text

@@ -1,5 +1,6 @@
 import abc
 import re
+
 from slugify import slugify
 
 from app.models.notebook_data import NotebookData

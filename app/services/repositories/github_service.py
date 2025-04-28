@@ -3,11 +3,12 @@ import hashlib
 import json
 import logging
 import os
-import requests
 import uuid
 from abc import ABC
-from github import Github, InputGitTreeElement
 from time import sleep
+
+import requests
+from github import Github, InputGitTreeElement
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -57,44 +58,39 @@ class GithubService(GitRepository, ABC):
     # @retry(GithubException, tries=3, delay=1, backoff=2)
     def commit(self, commit_list=None):
         content_updated = False
-        image_info = None
-        git_tree = []
+        tree_elements = []
         for commit_item in commit_list:
-            local_hash = get_content_hash(commit_item['contents'])
-            logger.debug('Creating blob for: ' + commit_item['path'])
-            tree_elem = InputGitTreeElement(
-                path=commit_item['path'] + '/' + commit_item['file_name'],
-                mode='100644',
-                type='blob',
-                sha=local_hash
-            )
-            git_tree.append(tree_elem)
-            if not content_updated:
-                image_info = self.registry.query_registry_for_image(
-                    commit_item['path'])
+            blob = self.gh_repository.create_git_blob(commit_item["contents"],
+                                                      "utf-8")
+            tree_elements.append(InputGitTreeElement(path=commit_item["path"],
+                                                     mode="100644",
+                                                     type="blob",
+                                                     sha=blob.sha))
+
+        base_tree = self.gh_repository.get_git_tree(sha="main")
+        new_tree = self.gh_repository.create_git_tree(tree=tree_elements,
+                                                      base_tree=base_tree)
+
+        if base_tree.sha != new_tree.sha:
+            content_updated = True
+        elif base_tree.sha == new_tree.sha:
+            image_info = self.registry.query_registry_for_image(
+                commit_list[0]['path'])
             if not image_info:
                 content_updated = True
 
-        base_tree = self.gh_repository.get_git_tree(sha='main')
-
-        new_tree = self.gh_repository.create_git_tree(tree=git_tree,
-                                                      base_tree=self.
-                                                      gh_repository.
-                                                      get_git_tree(
-                                                          sha='main'
-                                                      ))
-        if base_tree.sha != new_tree.sha:
-            git_commit = self.gh_repository.create_git_commit(
-                message="Added: " + commit_list[0]['path'],
-                tree=self.gh_repository.get_git_tree(sha=new_tree.sha),
-                parents=[self.gh_repository.get_git_commit(
-                    self.gh_repository.get_branch('main').commit.sha)],
-            )
-
-            # Push that commit to the main branch by editing the reference
-            main_branch_ref = (self.gh_repository.get_git_ref
-                               (ref='heads/main'))
-            main_branch_ref.edit(sha=git_commit.sha)
+        if content_updated:
+            # Create a commit
+            parent_commit = self.gh_repository.get_git_commit(
+                self.gh_repository.get_branch("main").commit.sha)
+            commit_message = commit_list[0]['path']
+            new_commit = (self.gh_repository.
+                          create_git_commit(message=commit_message,
+                                            tree=new_tree,
+                                            parents=[parent_commit]))
+            # Update the reference to point to the new commit
+            main_ref = self.gh_repository.get_git_ref("heads/main")
+            main_ref.edit(sha=new_commit.sha)
             content_updated = True
 
         if os.getenv('DEBUG') and os.getenv('DEBUG').lower() == 'true':

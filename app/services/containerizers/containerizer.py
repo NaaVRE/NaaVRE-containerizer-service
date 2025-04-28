@@ -1,6 +1,7 @@
+from abc import abstractmethod
+
 import cachetools.func
 import requests
-from abc import abstractmethod
 from jinja2 import Environment, PackageLoader
 
 from app.models.workflow_cell import Cell

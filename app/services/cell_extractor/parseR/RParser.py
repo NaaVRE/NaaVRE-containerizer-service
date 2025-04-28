@@ -1,7 +1,8 @@
 # Generated from R.g4 by ANTLR 4.13.1
 # encoding: utf-8
-import antlr4
 import sys
+
+import antlr4
 from antlr4 import ParserRuleContext
 from antlr4.BufferedTokenStream import TokenStream
 from antlr4.Parser import Parser
