@@ -1,15 +1,14 @@
+import cachetools.func
 import json
+import jwt
 import logging
 import os
-from typing import Annotated
-from urllib.parse import urlparse
-
-import cachetools.func
-import jwt
 import requests
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from typing import Annotated
+from urllib.parse import urlparse
 
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload

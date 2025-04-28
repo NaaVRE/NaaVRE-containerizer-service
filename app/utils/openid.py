@@ -1,11 +1,10 @@
-import logging
-import os
-import ssl
-from typing import Union
-
 import cachetools.func
 import jwt
+import logging
+import os
 import requests
+import ssl
+from typing import Union
 
 logger = logging.getLogger()
 

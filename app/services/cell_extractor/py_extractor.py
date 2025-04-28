@@ -2,11 +2,10 @@ import ast
 import logging
 import re
 from functools import lru_cache
-from typing import Literal
-
 from pyflakes import reporter as pyflakes_reporter, api as pyflakes_api
 from pytype import config as pytype_config
 from pytype.tools.annotate_ast import annotate_ast
+from typing import Literal
 
 from .extractor import Extractor
 from .py_conf_assignment_transformer import PyConfAssignmentTransformer

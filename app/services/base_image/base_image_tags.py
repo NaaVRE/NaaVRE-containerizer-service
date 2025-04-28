@@ -1,6 +1,5 @@
-import logging
-
 import cachetools.func
+import logging
 import requests
 
 logger = logging.getLogger('base_image_tags')

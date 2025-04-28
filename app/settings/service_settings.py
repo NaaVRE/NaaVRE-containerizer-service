@@ -1,6 +1,5 @@
-from typing import List
-
 from pydantic_settings import BaseSettings
+from typing import List
 
 from app.models.vl_config import VLConfig
 

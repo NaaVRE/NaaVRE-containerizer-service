@@ -1,8 +1,8 @@
 import json
 import os
-from time import sleep
 import requests
 from fastapi.testclient import TestClient
+from time import sleep
 
 from app.main import app
 

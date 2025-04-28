@@ -1,7 +1,6 @@
 # Generated from R.g4 by ANTLR 4.13.1
-import sys
-
 import antlr4.Lexer as Lexer
+import sys
 from antlr4.PredictionContext import PredictionContextCache
 from antlr4.atn.ATNDeserializer import ATNDeserializer
 from antlr4.atn.LexerATNSimulator import LexerATNSimulator

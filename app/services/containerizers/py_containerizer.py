@@ -1,10 +1,9 @@
+import distro
 import importlib
 import json
+import nbformat as nbf
 import sys
 from abc import ABC
-
-import distro
-import nbformat as nbf
 
 from app.models.workflow_cell import Cell
 from app.services.containerizers.containerizer import Containerizer
