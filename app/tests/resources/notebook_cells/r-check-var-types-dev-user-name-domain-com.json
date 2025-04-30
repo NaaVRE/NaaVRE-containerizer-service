@@ -146,12 +146,12 @@
         "type": "str"
       },
       {
-        "default_value": 1,
+        "default_value": "1",
         "name": "param_int",
         "type": "int"
       },
       {
-        "default_value": 1.1,
+        "default_value": "1.1",
         "name": "param_float",
         "type": "float"
       },
