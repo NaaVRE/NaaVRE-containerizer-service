@@ -51,7 +51,7 @@ checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre
 ### Generate JWT
 
 To test the service, you need to generate a test JWT token. To do this, you can 
-go to https://jwt.io/ and set the folling payload:
+go to https://jwt.io/ and set the following payload:
 
 
 ```json
