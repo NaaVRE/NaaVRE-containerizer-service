@@ -6,6 +6,6 @@ on:
 jobs:
   add-to-projects-overview:
     uses: NaaVRE/.github/.github/workflows/add-issue-to-projects-overview.yaml@main
-    secrets: 
+    secrets:
       personal_access_token: ${{ secrets.ADD_TO_PROJECT_PAT }}
       

@@ -3,13 +3,13 @@ kind: Pod
 metadata:
   name: "{{ include "naavre-containerizer-service.fullname" . }}-test-connection"
   labels:
-    {{- include "naavre-containerizer-service.labels" . | nindent 4}}
+    { { - include "naavre-containerizer-service.labels" . | nindent 4 } }
   annotations:
     "helm.sh/hook": test
 spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "naavre-containerizer-service.fullname" . }}:{{ .Values.service.port }}']
+      command: [ 'wget' ]
+      args: [ '{{ include "naavre-containerizer-service.fullname" . }}:{{ .Values.service.port }}' ]
   restartPolicy: Never

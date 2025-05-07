@@ -1,8 +1,8 @@
 import json
 import os
-import requests
 from urllib.parse import quote
 
+import requests
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -75,8 +75,8 @@ def test_extract_cell():
             assert expected_cell_dependency in returned_cell_dependencies
 
         tags = get_latest_container_tags_from_ghcr_url(
-                                expected_cell.base_container_image['build'],
-                                os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
+            expected_cell.base_container_image['build'],
+            os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
         expected_cell.base_container_image['build'] = \
             (expected_cell.base_container_image['build'].rsplit(":", 1)[0] +

@@ -45,21 +45,18 @@ helm -n naavre-containerizer-service upgrade --install --create-namespace naavre
 `values.yaml` should contain ingress, OAuth2, and other configuration (
 checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre-containerizer-service/values-example.yaml)).
 
-
 ## Configuration
 
 ### Generate JWT
 
-To test the service, you need to generate a test JWT token. To do this, you can 
+To test the service, you need to generate a test JWT token. To do this, you can
 go to https://jwt.io/ and set the following payload:
-
 
 ```json
 {
 
 }
 ```
-
 
 ```shell
 
