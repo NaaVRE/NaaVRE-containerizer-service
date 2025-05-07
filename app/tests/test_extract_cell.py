@@ -5,7 +5,7 @@ from urllib.parse import quote
 
 from fastapi.testclient import TestClient
 
-from app.main import app, load_configuration
+from app.main import app
 from app.models.workflow_cell import Cell
 
 if os.path.exists('resources'):
@@ -13,6 +13,7 @@ if os.path.exists('resources'):
 elif os.path.exists('app/tests/resources/'):
     base_path = 'app/tests/resources/'
 client = TestClient(app)
+
 
 def test_extract_cell():
     cells_json_path = os.path.join(base_path, 'notebook_cells')
@@ -77,25 +78,27 @@ def test_extract_cell():
                                 expected_cell.base_container_image['build'],
                                 os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
-        # In the expected_cell.base_container_image replace all tags with tags[0]
         expected_cell.base_container_image['build'] = \
             (expected_cell.base_container_image['build'].rsplit(":", 1)[0] +
              f":{tags[0]}")
         expected_cell.base_container_image['runtime'] = \
-        (expected_cell.base_container_image['runtime'].rsplit(":", 1)[0] +
-         f":{tags[0]}")
+            (expected_cell.base_container_image['runtime'].rsplit(":", 1)[0] +
+             f":{tags[0]}")
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)
         # In R we add libraries and remove comments
         # assert returned_cell.original_source == expected_cell.original_source
 
+
 def get_latest_container_tags_from_ghcr_url(ghcr_url, token):
     """
-    Given a GHCR image URL, fetch the tags of the latest version of the container package.
+    Given a GHCR image URL, fetch the tags of the latest version of the
+    container package.
 
     Args:
-        ghcr_url (str): e.g. 'ghcr.io/qcdis/naavre/naavre-cell-build-python:latest'
+        ghcr_url (str): e.g.
+            'ghcr.io/qcdis/naavre/naavre-cell-build-python:latest'
         token (str): GitHub token with 'read:packages' permission
 
     Returns:
@@ -114,7 +117,8 @@ def get_latest_container_tags_from_ghcr_url(ghcr_url, token):
 
         # Prepare API request
         encoded_package = quote(package_name, safe='')
-        url = f"https://api.github.com/orgs/{org}/packages/container/{encoded_package}/versions"
+        url = (f"https://api.github.com/orgs/{org}/packages/container/"
+               f"{encoded_package}/versions")
 
         headers = {
             "Authorization": f"Bearer {token}",
