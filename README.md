@@ -48,6 +48,22 @@ checkout [./helm/naavre-containerizer-service/values-example.yaml](./helm/naavre
 
 ## Configuration
 
+### Generate JWT
+
+To test the service, you need to generate a test JWT token. To do this, you can 
+go to https://jwt.io/ and set the folling payload:
+
+
+```json
+{
+
+}
+```
+
+
+```shell
+
+
 ### Test on GitHub
 
 The secrets.CONFIG_FILE should have quotes escaped:
