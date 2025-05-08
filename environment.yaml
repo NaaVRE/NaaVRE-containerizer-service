@@ -9,6 +9,7 @@ dependencies:
   - r-purrr=1.0.2
   - r-renv=1.0.5
   - pre-commit=3.4.0
+  - flake8
   - pip
   - pip:
       - -r requirements.txt

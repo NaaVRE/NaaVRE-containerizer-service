@@ -64,7 +64,8 @@ class GithubService(GitRepository, ABC):
         for commit_item in commit_list:
             blob = self.gh_repository.create_git_blob(commit_item["contents"],
                                                       "utf-8")
-            tree_elements.append(InputGitTreeElement(path=commit_item["path"],
+            commit_path = commit_item["path"] + '/' + commit_item['file_name']
+            tree_elements.append(InputGitTreeElement(path=commit_path,
                                                      mode="100644",
                                                      type="blob",
                                                      sha=blob.sha))
