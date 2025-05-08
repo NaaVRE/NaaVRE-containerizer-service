@@ -101,6 +101,10 @@ def get_base_image_tags(
 
 def _get_containerizer(containerize_payload: ContainerizerPayload):
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
+    if vl_conf is None:
+        raise ValueError('virtual lab: ' +
+                         containerize_payload.virtual_lab +
+                         ' not found in config')
     if (containerize_payload.cell.kernel.lower() == 'python' or
             containerize_payload.cell.kernel == 'ipython'):
         return PyContainerizer(containerize_payload.cell,
