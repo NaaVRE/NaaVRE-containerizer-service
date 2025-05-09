@@ -12,7 +12,7 @@ client = TestClient(app)
 
 
 def test_get_base_image_tags():
-    labs = ['virtual_lab_1']
+    labs = ['openlab']
     for lab in labs:
         base_image_tags_response = client.get(
             '/base-image-tags?virtual_lab=' + lab,

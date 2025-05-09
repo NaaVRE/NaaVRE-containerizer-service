@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{include "naavre-containerizer-service.fullname" .}}
   labels:
-    {{- include "naavre-containerizer-service.labels" . | nindent 4}}
+    { { - include "naavre-containerizer-service.labels" . | nindent 4 } }
 
 data:
   configuration.json: |

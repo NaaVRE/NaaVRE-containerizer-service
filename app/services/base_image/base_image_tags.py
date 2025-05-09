@@ -26,6 +26,7 @@ class BaseImageTags:
             msg = (f'Error loading base image tags from '
                    f'{base_image_tags_url}\n{e}')
             logger.debug(msg)
+            raise Exception(msg) from e
 
     def get_base_image_tags(self):
         return self.base_image_tags

@@ -2,16 +2,13 @@ import datetime
 import hashlib
 import json
 import logging
-import os
 import uuid
 from abc import ABC
 from time import sleep
 from retry import retry
-
 import requests
-
 from github import Github
-from github.GithubException import UnknownObjectException, GithubException
+from github import InputGitTreeElement
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -60,37 +57,43 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    @retry(GithubException, tries=3, delay=1, backoff=2)
-    def commit(self, local_content=None, path=None, file_name=None):
-        try:
-            remote_hash = self.gh_repository.get_contents(
-                path=path + '/' + file_name).sha
-        except UnknownObjectException:
-            remote_hash = None
-        local_hash = get_content_hash(local_content)
-        if remote_hash is None:
-            self.gh_repository.create_file(
-                path=path + '/' + file_name,
-                message=path + ' creation',
-                content=local_content,
-            )
+    # @retry(GithubException, tries=3, delay=1, backoff=2)
+    def commit(self, commit_list=None):
+        content_updated = False
+        tree_elements = []
+        for commit_item in commit_list:
+            blob = self.gh_repository.create_git_blob(commit_item["contents"],
+                                                      "utf-8")
+            commit_path = commit_item["path"] + '/' + commit_item['file_name']
+            tree_elements.append(InputGitTreeElement(path=commit_path,
+                                                     mode="100644",
+                                                     type="blob",
+                                                     sha=blob.sha))
+
+        base_tree = self.gh_repository.get_git_tree(sha="main")
+        new_tree = self.gh_repository.create_git_tree(tree=tree_elements,
+                                                      base_tree=base_tree)
+
+        if base_tree.sha != new_tree.sha:
             content_updated = True
-        elif remote_hash != local_hash:
-            self.gh_repository.update_file(
-                path=path + '/' + file_name,
-                message=path + ' update',
-                content=local_content,
-                sha=remote_hash,
-            )
-            content_updated = True
-        else:
-            content_updated = False
-        if os.getenv('DEBUG') and os.getenv('DEBUG').lower() == 'true':
-            content_updated = True
-        image_info = None
-        if not content_updated:
-            image_info = self.registry.query_registry_for_image(path)
-        if not image_info:
+        elif base_tree.sha == new_tree.sha:
+            image_info = self.registry.query_registry_for_image(
+                commit_list[0]['path'])
+            if not image_info:
+                content_updated = True
+
+        if content_updated:
+            # Create a commit
+            parent_commit = self.gh_repository.get_git_commit(
+                self.gh_repository.get_branch("main").commit.sha)
+            commit_message = commit_list[0]['path']
+            new_commit = (self.gh_repository.
+                          create_git_commit(message=commit_message,
+                                            tree=new_tree,
+                                            parents=[parent_commit]))
+            # Update the reference to point to the new commit
+            main_ref = self.gh_repository.get_git_ref("heads/main")
+            main_ref.edit(sha=new_commit.sha)
             content_updated = True
         return content_updated
 
@@ -210,4 +213,4 @@ class GithubService(GitRepository, ABC):
                 if job['name'] == job_name:
                     job['head_sha'] = run['head_sha']
                     return job
-        raise JobNotFoundError
+        raise JobNotFoundError('Job not found: ' + job_name)
