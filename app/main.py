@@ -169,6 +169,12 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload)
     cell = extractor.get_cell()
+    if os.getenv('DEBUG', 'false').lower() == 'true':
+        test_resource = extractor_payload.model_dump()
+        test_resource['cell'] = cell.model_dump()
+        with open('/tmp/' + cell.title + '.json', 'w') as f:
+            json.dump(test_resource, f, indent=4)
+        f.close()
     return cell
 
 
