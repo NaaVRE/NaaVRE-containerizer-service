@@ -213,4 +213,4 @@ class GithubService(GitRepository, ABC):
                 if job['name'] == job_name:
                     job['head_sha'] = run['head_sha']
                     return job
-        raise JobNotFoundError
+        raise JobNotFoundError('Job not found: ' + job_name)
