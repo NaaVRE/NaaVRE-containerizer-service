@@ -114,6 +114,14 @@
       {
         "name": "var_float",
         "type": "float"
+      },
+      {
+        "name": "var_list_int",
+        "type": "list"
+      },
+      {
+        "name": "var_list_str",
+        "type": "list"
       }
     ],
     "kernel": "IRkernel",
