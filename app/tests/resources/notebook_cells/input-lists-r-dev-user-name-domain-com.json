@@ -146,7 +146,12 @@
     }
   },
   "cell": {
-    "confs": [],
+    "confs": [
+      {
+        "name": "conf_data_folder",
+        "assignation": "conf_data_folder <- file.path('/tmp', 'data')"
+      }
+    ],
     "dependencies": [],
     "inputs": [],
     "kernel": "IRkernel",

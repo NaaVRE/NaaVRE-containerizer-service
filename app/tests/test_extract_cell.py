@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.models.workflow_cell import Cell
-
+from nbformat import v4, write
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -16,18 +16,37 @@ elif os.path.exists('app/tests/resources/'):
 client = TestClient(app)
 
 
+def save_as_jupyter_notebook(notebook_cell, notebook_file):
+    # Extract the notebook content
+    notebook_data = notebook_cell['data']['notebook']
+    # Convert to Jupyter notebook format
+    notebook = v4.new_notebook()
+    notebook.cells = [
+        v4.new_code_cell(cell['source']) for cell in notebook_data['cells']
+    ]
+    # Save as a Jupyter notebook file
+    output_path = '/tmp/' + notebook_file.replace('.json', '.ipynb')
+    with open(output_path, 'w') as f:
+        write(notebook, f)
+    print(f"Jupyter notebook saved to {output_path}")
+
+
 def test_extract_cell():
     cells_json_path = os.path.join(base_path, 'notebook_cells')
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
+
         notebook_path = os.path.join(cells_json_path, notebook_file)
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)
             notebook_cell = json.load(f)
         f.close()
 
+        save_as_jupyter_notebook(notebook_cell, notebook_file)
+
         extractor_json_payload = notebook_cell.copy()
         del extractor_json_payload['cell']
+
         expected_cell_dict = notebook_cell['cell']
         cell_extractor_response = client.post(
             '/extract_cell/',

@@ -71,14 +71,6 @@
     }
   },
   "cell": {
-    "all_inputs": [
-      "var_string",
-      "var_string_with_comment",
-      "var_int",
-      "var_float",
-      "var_list_int",
-      "var_list_str"
-    ],
     "confs": [
       {
         "name": "conf_string",
