@@ -7,10 +7,10 @@ from abc import ABC
 from time import sleep
 
 import github
-from retry import retry
 import requests
 from github import Github
 from github import InputGitTreeElement
+from retry import retry
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
