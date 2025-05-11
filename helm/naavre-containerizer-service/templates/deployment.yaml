@@ -3,79 +3,79 @@ kind: Deployment
 metadata:
   name: {{include "naavre-containerizer-service.fullname" .}}
   labels:
-    {{- include "naavre-containerizer-service.labels" . | nindent 4}}
+    { { - include "naavre-containerizer-service.labels" . | nindent 4 } }
 spec:
-  {{- if not .Values.autoscaling.enabled}}
+  { { - if not .Values.autoscaling.enabled } }
   replicas: {{.Values.replicaCount}}
-  {{- end}}
+  { { - end } }
   selector:
     matchLabels:
-      {{- include "naavre-containerizer-service.selectorLabels" . | nindent 6}}
+      { { - include "naavre-containerizer-service.selectorLabels" . | nindent 6 } }
   template:
     metadata:
-      {{- with .Values.podAnnotations}}
+      { { - with .Values.podAnnotations } }
       annotations:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
       labels:
-        {{- include "naavre-containerizer-service.labels" . | nindent 8}}
-          {{- with .Values.podLabels}}
-          {{- toYaml . | nindent 8}}
-          {{- end}}
+        { { - include "naavre-containerizer-service.labels" . | nindent 8 } }
+          { { - with .Values.podLabels } }
+          { { - toYaml . | nindent 8 } }
+          { { - end } }
     spec:
-      {{- with .Values.imagePullSecrets}}
+      { { - with .Values.imagePullSecrets } }
       imagePullSecrets:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
       serviceAccountName: {{include "naavre-containerizer-service.serviceAccountName" .}}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8}}
+        { { - toYaml .Values.podSecurityContext | nindent 8 } }
       containers:
         - name: {{.Chart.Name}}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12}}
+            { { - toYaml .Values.securityContext | nindent 12 } }
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{.Values.image.pullPolicy}}
           env:
             - name: ROOT_PATH
               value: "{{ .Values.conf.rootPath }}"
-            {{- range $k, $v := .Values.env}}
+            { { - range $k, $v := .Values.env } }
             - name: {{$k | quote}}
               value: {{$v | quote}}
-            {{- end}}
+            { { - end } }
           ports:
             - name: http
               containerPort: {{.Values.service.port}}
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12}}
+            { { - toYaml .Values.livenessProbe | nindent 12 } }
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12}}
+            { { - toYaml .Values.readinessProbe | nindent 12 } }
           resources:
-            {{- toYaml .Values.resources | nindent 12}}
+            { { - toYaml .Values.resources | nindent 12 } }
           volumeMounts:
             - name: config-volume
               mountPath: /configuration.json
               subPath: configuration.json
-            {{- with .Values.volumeMounts}}
-            {{- toYaml . | nindent 12}}
-            {{- end}}
+            { { - with .Values.volumeMounts } }
+            { { - toYaml . | nindent 12 } }
+            { { - end } }
       volumes:
         - name: config-volume
           configMap:
             name: {{include "naavre-containerizer-service.fullname" .}}
-        {{- with .Values.volumes}}
-        {{- toYaml . | nindent 8}}
-        {{- end}}
-      {{- with .Values.nodeSelector}}
+        { { - with .Values.volumes } }
+        { { - toYaml . | nindent 8 } }
+        { { - end } }
+      { { - with .Values.nodeSelector } }
       nodeSelector:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.affinity}}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.affinity } }
       affinity:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.tolerations}}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.tolerations } }
       tolerations:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
