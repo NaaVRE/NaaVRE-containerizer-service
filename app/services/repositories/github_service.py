@@ -85,17 +85,28 @@ class GithubService(GitRepository, ABC):
                 content_updated = True
 
         if content_updated:
-            # Create a commit
+            # Fetch and merge the latest changes from the remote branch
+            self.github.get_repo(
+                self.owner + '/' + self.repository_name).get_branch("main")
             parent_commit = self.gh_repository.get_git_commit(
                 self.gh_repository.get_branch("main").commit.sha)
+
+            # Create a commit
             commit_message = commit_list[0]['path']
             new_commit = (self.gh_repository.
                           create_git_commit(message=commit_message,
                                             tree=new_tree,
                                             parents=[parent_commit]))
+
             # Update the reference to point to the new commit
             main_ref = self.gh_repository.get_git_ref("heads/main")
-            main_ref.edit(sha=new_commit.sha)
+            try:
+                main_ref.edit(sha=new_commit.sha)
+            except github.GithubException as e:
+                if "not a fast-forward" in str(e):
+                    raise Exception(
+                        "Update failed: not a fast-forward. Ensure the branch "
+                        "is up-to-date.")
             content_updated = True
         return content_updated
 
