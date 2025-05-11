@@ -128,6 +128,26 @@
     "outputs": [],
     "params": [
       {
+        "default_value": 1.1,
+        "name": "param_float",
+        "type": "float"
+      },
+      {
+        "default_value": 1,
+        "name": "param_int",
+        "type": "int"
+      },
+      {
+        "default_value": "[1, 2, 3]",
+        "name": "param_list_int",
+        "type": "list"
+      },
+      {
+        "default_value": "['list_str', 'space in elem', '3']",
+        "name": "param_list_str",
+        "type": "list"
+      },
+      {
         "default_value": "param_string value",
         "name": "param_string",
         "type": "str"
@@ -136,16 +156,6 @@
         "default_value": "param_string value",
         "name": "param_string_with_comment",
         "type": "str"
-      },
-      {
-        "default_value": 1,
-        "name": "param_int",
-        "type": "int"
-      },
-      {
-        "default_value": 1.1,
-        "name": "param_float",
-        "type": "float"
       }
     ],
     "secrets": [],
