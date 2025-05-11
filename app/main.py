@@ -101,6 +101,10 @@ def get_base_image_tags(
 
 def _get_containerizer(containerize_payload: ContainerizerPayload):
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
+    if vl_conf is None:
+        raise ValueError('virtual lab: ' +
+                         containerize_payload.virtual_lab +
+                         ' not found in config')
     if (containerize_payload.cell.kernel.lower() == 'python' or
             containerize_payload.cell.kernel == 'ipython'):
         return PyContainerizer(containerize_payload.cell,
@@ -165,6 +169,13 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload)
     cell = extractor.get_cell()
+    if os.getenv('DEBUG', 'false').lower() == 'true':
+        test_resource = extractor_payload.model_dump()
+        test_resource['cell'] = cell.model_dump()
+        with open('/tmp/' + cell.title + '.json', 'w') as f:
+            json.dump(test_resource, f, indent=4)
+        f.close()
+        print(test_resource)
     return cell
 
 
@@ -174,25 +185,21 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     conteinerizer = _get_containerizer(containerize_payload)
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
     gh = _get_github_service(vl_conf)
+    commit_list = []
     cell_contents = conteinerizer.build_script()
-    cell_updated = gh.commit(local_content=cell_contents,
-                             path=containerize_payload.cell.title,
-                             file_name='task' + conteinerizer.file_extension)
-    notebook_updated = False
-    if conteinerizer.visualization_cell:
-        notebook_contents = conteinerizer.extract_notebook()
-        notebook_updated = gh.commit(local_content=notebook_contents,
-                                     path=containerize_payload.cell.title,
-                                     file_name='task.ipynb')
-
+    commit_list.append({'contents': cell_contents,
+                        'path': containerize_payload.cell.title,
+                        'file_name': 'task' + conteinerizer.file_extension})
     environment_contents = conteinerizer.build_environment()
-    environment_updated = gh.commit(local_content=environment_contents,
-                                    path=containerize_payload.cell.title,
-                                    file_name='environment.yaml')
+    commit_list.append({'contents': environment_contents,
+                        'path': containerize_payload.cell.title,
+                        'file_name': 'environment.yaml'})
     docker_template = conteinerizer.build_docker()
-    dockerfile_updated = gh.commit(local_content=docker_template,
-                                   path=containerize_payload.cell.title,
-                                   file_name='Dockerfile')
+    commit_list.append({'contents': docker_template,
+                        'path': containerize_payload.cell.title,
+                        'file_name': 'Dockerfile'})
+
+    files_updated = gh.commit(commit_list)
 
     image_version = get_content_hash(cell_contents)[:7]
     container_image = (gh.registry.registry_url + '/' +
@@ -203,16 +210,13 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                                       'workflow_url': None,
                                       'source_url': None}
 
-    if (cell_updated or environment_updated or dockerfile_updated or
-            notebook_updated):
+    if files_updated:
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
             image_version=image_version)
     containerize_payload.cell.container_image = container_image
     return {'workflow_id': containerization_workflow_resp['workflow_id'],
-            'dispatched_github_workflow': (
-                    cell_updated or environment_updated or dockerfile_updated
-                    or notebook_updated),
+            'dispatched_github_workflow': files_updated,
             'container_image': container_image,
             'workflow_url': containerization_workflow_resp['workflow_url'],
             'source_url': containerization_workflow_resp['source_url']}
