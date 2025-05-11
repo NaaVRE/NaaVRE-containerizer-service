@@ -74,6 +74,8 @@ def test_extract_cell():
         for expected_cell_dependency in expected_cell_dependencies:
             assert expected_cell_dependency in returned_cell_dependencies
 
+        assert os.getenv('REGISTRY_TOKEN_FOR_TESTS') is not None, \
+            "REGISTRY_TOKEN_FOR_TESTS is not set. "
         tags = get_latest_container_tags_from_ghcr_url(
             expected_cell.base_container_image['build'],
             os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
