@@ -155,7 +155,12 @@
     }
   },
   "cell": {
-    "confs": [],
+    "confs": [
+  {
+    "assignation": "conf_data_folder<-'/tmp/data'",
+    "name": "conf_data_folder"
+  }
+],
     "dependencies": [],
     "inputs": [
       {
