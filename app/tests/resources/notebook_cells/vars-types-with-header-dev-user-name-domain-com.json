@@ -87,7 +87,28 @@
     "dependencies": [],
     "inputs": [],
     "kernel": "ipython",
-    "outputs": [],
+    "outputs": [
+  {
+    "name": "var_float",
+    "type": "float"
+  },
+  {
+    "name": "var_list_int",
+    "type": "list"
+  },
+  {
+    "name": "var_list_str",
+    "type": "list"
+  },
+  {
+    "name": "var_string",
+    "type": "str"
+  },
+  {
+    "name": "var_string_with_comment",
+    "type": "str"
+  }
+],
     "params": [],
     "secrets": [],
     "title": "vars-types-with-header-test-user-2",
