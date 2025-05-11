@@ -78,6 +78,11 @@ def test_extract_cell():
             expected_cell.base_container_image['build'],
             os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
+        # Check if the tags are not None. If None print the name of the image
+        assert tags is not None, \
+            (f"Failed to fetch tags for "
+             f"{expected_cell.base_container_image['build']}")
+
         expected_cell.base_container_image['build'] = \
             (expected_cell.base_container_image['build'].rsplit(":", 1)[0] +
              f":{tags[0]}")
