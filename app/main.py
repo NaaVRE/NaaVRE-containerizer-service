@@ -175,6 +175,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
         with open('/tmp/' + cell.title + '.json', 'w') as f:
             json.dump(test_resource, f, indent=4)
         f.close()
+        print(test_resource)
     return cell
 
 
