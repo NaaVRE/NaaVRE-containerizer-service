@@ -28,14 +28,12 @@ def save_as_jupyter_notebook(notebook_cell, notebook_file):
     output_path = '/tmp/' + notebook_file.replace('.json', '.ipynb')
     with open(output_path, 'w') as f:
         write(notebook, f)
-    print(f"Jupyter notebook saved to {output_path}")
 
 
 def test_extract_cell():
     cells_json_path = os.path.join(base_path, 'notebook_cells')
     notebooks_files = os.listdir(cells_json_path)
     for notebook_file in notebooks_files:
-
         notebook_path = os.path.join(cells_json_path, notebook_file)
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_file)

@@ -114,14 +114,6 @@
       {
         "name": "var_float",
         "type": "float"
-      },
-      {
-        "name": "var_list_int",
-        "type": "list"
-      },
-      {
-        "name": "var_list_str",
-        "type": "list"
       }
     ],
     "kernel": "IRkernel",
@@ -146,16 +138,6 @@
         "default_value": 1.1,
         "name": "param_float",
         "type": "float"
-      },
-      {
-        "default_value": "[1, 2, 3]",
-        "name": "param_list_int",
-        "type": "list"
-      },
-      {
-        "default_value": "[\"list_str\", \"space in elem\", \"3\"]",
-        "name": "param_list_str",
-        "type": "list"
       }
     ],
     "secrets": [],
