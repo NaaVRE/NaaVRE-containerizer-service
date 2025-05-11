@@ -5,6 +5,8 @@ import logging
 import uuid
 from abc import ABC
 from time import sleep
+
+import github
 from retry import retry
 import requests
 from github import Github
@@ -57,7 +59,7 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    # @retry(GithubException, tries=3, delay=1, backoff=2)
+    @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
     def commit(self, commit_list=None):
         content_updated = False
         tree_elements = []
