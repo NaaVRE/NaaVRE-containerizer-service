@@ -85,6 +85,7 @@ jobs:
     secrets:
       configuration: ${{ secrets.CONFIG_FILE }}
       auth_token: ${{ secrets.AUTH_TOKEN }}
+      registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
 
   call-build-container:
     needs: [ call-pytest ]

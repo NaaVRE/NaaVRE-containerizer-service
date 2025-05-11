@@ -30,6 +30,8 @@ on:
         required: true
       auth_token:
         required: true
+      registry_token_for_tests:
+        required: true
 
 env:
   DEBUG: ${{ inputs.debug }}
@@ -39,6 +41,7 @@ env:
   ROOT_PATH: ${{ inputs.root_path }}
   AUTH_TOKEN: ${{ secrets.auth_token }}
   CONFIG_FILE_URL: /tmp/configuration.json
+  REGISTRY_TOKEN_FOR_TESTS: ${{ secrets.registry_token_for_tests }}
 
 jobs:
   test:
