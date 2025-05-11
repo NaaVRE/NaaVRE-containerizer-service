@@ -18,6 +18,7 @@ class Extractor(abc.ABC):
     cell_confs: list
     cell_dependencies: list
     kernel: str
+    reserved_prefixes = ['param_', 'secret_', 'conf_']
 
     def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         self.cell_source = (
@@ -76,6 +77,17 @@ class Extractor(abc.ABC):
         # Remove \n from the start and end of the string
         original_source = original_source.strip("\n")
         return original_source
+
+    def not_reserved(self, var_name: str) -> bool:
+        """
+        Check if the variable name is not reserved
+        :param var_name: variable name
+        :return: True if the variable name is not reserved, False otherwise
+        """
+        for prefix in self.reserved_prefixes:
+            if var_name.startswith(prefix):
+                return False
+        return True
 
     @abc.abstractmethod
     def get_cell_inputs(self) -> list[dict]:

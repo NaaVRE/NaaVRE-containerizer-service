@@ -128,25 +128,25 @@ class PyExtractor(Extractor):
     def get_cell_outputs(self) -> list[dict]:
         cell_variables = self.__extract_variables(self.cell_source)
         cell_outputs = []
-        for name, properties in cell_variables.items():
-            if (name not in self.__extract_cell_undefined(self.cell_source) and
-                    name not in self.notebook_imports and
-                    name in self.undefined and
-                    name not in self.notebook_configurations and
-                    name not in self.notebook_params and
-                    name not in self.notebook_secrets):
-                cell_outputs.append({'name': name, 'type': properties['type']})
+        for var_name, properties in cell_variables.items():
+            if (var_name not in self.__extract_cell_undefined(self.cell_source)
+                    and var_name not in self.notebook_imports
+                    and var_name in self.undefined
+                    and self.not_reserved(var_name)):
+                cell_outputs.append({'name': var_name,
+                                     'type': properties['type']})
         return cell_outputs
 
     def get_cell_inputs(self) -> list[dict]:
         cell_undefined = self.__extract_cell_undefined(self.cell_source)
         cell_inputs = []
-        for und, properties in cell_undefined.items():
-            if (und not in self.notebook_imports and
-                    und not in self.notebook_configurations and
-                    und not in self.notebook_params and
-                    und not in self.notebook_secrets):
-                cell_inputs.append({'name': und, 'type': properties['type']})
+        for var_name, properties in cell_undefined.items():
+            if var_name in self.reserved_prefixes:
+                continue
+            if (var_name not in self.notebook_imports and
+                    self.not_reserved(var_name)):
+                cell_inputs.append({'name': var_name,
+                                    'type': properties['type']})
         return cell_inputs
 
     def get_cell_dependencies(self, confs):

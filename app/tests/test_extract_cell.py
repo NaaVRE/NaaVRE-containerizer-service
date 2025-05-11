@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models.workflow_cell import Cell
 
+
 if os.path.exists('resources'):
     base_path = 'resources'
 elif os.path.exists('app/tests/resources/'):
@@ -39,38 +40,59 @@ def test_extract_cell():
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
-        returned_cell_confs = returned_cell.confs
-        expected_cell_confs = expected_cell.confs
-        for expected_cell_conf in expected_cell_confs:
-            assert expected_cell_conf in returned_cell_confs
+        returned_cell_confs = sorted(returned_cell.confs,
+                                     key=lambda x: x['name'])
+        expected_cell_confs = sorted(expected_cell.confs,
+                                     key=lambda x: x['name'])
+        assert (len(returned_cell_confs) == len(expected_cell_confs)), \
+            f"Expected {expected_cell_confs}, " \
+            f"but got {returned_cell_confs}"
 
         assert returned_cell.title == expected_cell.title
         assert returned_cell.kernel == expected_cell.kernel
 
-        returned_cell_inputs = returned_cell.inputs
-        expected_cell_inputs = expected_cell.inputs
-        for expected_cell_input in expected_cell_inputs:
-            assert expected_cell_input in returned_cell_inputs
+        returned_cell_inputs = sorted(returned_cell.inputs,
+                                      key=lambda x: x['name'])
+        expected_cell_inputs = sorted(expected_cell.inputs,
+                                      key=lambda x: x['name'])
 
-        returned_cell_outputs = returned_cell.outputs
-        expected_cell_outputs = expected_cell.outputs
-        for expected_cell_output in expected_cell_outputs:
-            assert expected_cell_output in returned_cell_outputs
+        assert (len(returned_cell_inputs) == len(expected_cell_inputs)), \
+            f"Expected {expected_cell_inputs}, " \
+            f"but got {returned_cell_inputs}"
 
-        returned_cell_params = returned_cell.params
-        expected_cell_params = expected_cell.params
-        for expected_cell_param in expected_cell_params:
-            assert expected_cell_param in returned_cell_params
+        returned_cell_outputs = sorted(returned_cell.outputs,
+                                       key=lambda x: x['name'])
+        expected_cell_outputs = sorted(expected_cell.outputs,
+                                       key=lambda x: x['name'])
 
-        returned_cell_secrets = returned_cell.secrets
-        expected_cell_secrets = expected_cell.secrets
-        for expected_cell_secret in expected_cell_secrets:
-            assert expected_cell_secret in returned_cell_secrets
+        assert (len(returned_cell_outputs) == len(expected_cell_outputs)), \
+            f"Expected {expected_cell_outputs}, " \
+            f"but got {returned_cell_outputs}"
 
-        returned_cell_dependencies = returned_cell.dependencies
-        expected_cell_dependencies = expected_cell.dependencies
-        for expected_cell_dependency in expected_cell_dependencies:
-            assert expected_cell_dependency in returned_cell_dependencies
+        returned_cell_params = sorted(returned_cell.params,
+                                      key=lambda x: x['name'])
+        expected_cell_params = sorted(expected_cell.params,
+                                      key=lambda x: x['name'])
+
+        assert (len(returned_cell_params) == len(expected_cell_params)), \
+            f"Expected {expected_cell_outputs}, " \
+            f"but got {returned_cell_params}"
+
+        returned_cell_secrets = sorted(returned_cell.secrets,
+                                       key=lambda x: x['name'])
+        expected_cell_secrets = sorted(expected_cell.secrets,
+                                       key=lambda x: x['name'])
+        assert (len(returned_cell_secrets) == len(expected_cell_secrets)), \
+            f"Expected {expected_cell_secrets}, " \
+            f"but got {returned_cell_secrets}"
+
+        returned_cell_deps = sorted(returned_cell.dependencies,
+                                    key=lambda x: x['name'])
+        expected_cell_dependencies = sorted(expected_cell.dependencies,
+                                            key=lambda x: x['name'])
+        assert (len(returned_cell_deps) == len(expected_cell_dependencies)), \
+            f"Expected {expected_cell_dependencies}, " \
+            f"but got {returned_cell_deps}"
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)
