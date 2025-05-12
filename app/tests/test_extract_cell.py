@@ -79,6 +79,11 @@ def test_extract_cell():
             f"Expected {expected_cell_inputs}, " \
             f"but got {returned_cell_inputs}"
 
+        for returned, expected in zip(returned_cell_inputs,
+                                      expected_cell_inputs):
+            assert returned['name'] == expected['name']
+            assert returned['type'] == expected['type']
+
         returned_cell_outputs = sorted(returned_cell.outputs,
                                        key=lambda x: x['name'])
         expected_cell_outputs = sorted(expected_cell.outputs,
@@ -87,6 +92,11 @@ def test_extract_cell():
         assert (len(returned_cell_outputs) == len(expected_cell_outputs)), \
             f"Expected {expected_cell_outputs}, " \
             f"but got {returned_cell_outputs}"
+
+        for returned, expected in zip(returned_cell_outputs,
+                                      expected_cell_outputs):
+            assert returned['name'] == expected['name']
+            assert returned['type'] == expected['type']
 
         returned_cell_params = sorted(returned_cell.params,
                                       key=lambda x: x['name'])
@@ -97,6 +107,11 @@ def test_extract_cell():
             f"Expected {expected_cell_outputs}, " \
             f"but got {returned_cell_params}"
 
+        for returned, expected in zip(returned_cell_params,
+                                      expected_cell_params):
+            assert returned['name'] == expected['name']
+            assert returned['type'] == expected['type']
+
         returned_cell_secrets = sorted(returned_cell.secrets,
                                        key=lambda x: x['name'])
         expected_cell_secrets = sorted(expected_cell.secrets,
@@ -105,6 +120,11 @@ def test_extract_cell():
             f"Expected {expected_cell_secrets}, " \
             f"but got {returned_cell_secrets}"
 
+        for returned, expected in zip(returned_cell_secrets,
+                                      expected_cell_secrets):
+            assert returned['name'] == expected['name']
+            assert returned['type'] == expected['type']
+
         returned_cell_deps = sorted(returned_cell.dependencies,
                                     key=lambda x: x['name'])
         expected_cell_dependencies = sorted(expected_cell.dependencies,
@@ -112,6 +132,12 @@ def test_extract_cell():
         assert (len(returned_cell_deps) == len(expected_cell_dependencies)), \
             f"Expected {expected_cell_dependencies}, " \
             f"but got {returned_cell_deps}"
+
+        for returned, expected in zip(returned_cell_deps,
+                                      expected_cell_dependencies):
+            assert returned['name'] == expected['name']
+            assert returned['asname'] == expected['asname']
+            assert returned['module'] == expected['module']
 
         assert os.getenv('REGISTRY_TOKEN_FOR_TESTS') is not None, \
             "REGISTRY_TOKEN_FOR_TESTS is not set. "
