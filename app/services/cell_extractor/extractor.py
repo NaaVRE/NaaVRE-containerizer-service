@@ -1,5 +1,7 @@
 import abc
+import json
 import re
+from typing import Union
 
 from slugify import slugify
 
@@ -40,9 +42,16 @@ class Extractor(abc.ABC):
         title += '-' + slugify(self.user_name)
         title = title.lower()
         base_image_tags = BaseImageTags(self.base_image_tags_url)
+        cell_params = [
+            {
+                k: json.dumps(v) if not isinstance(v, Union[str | None]) else v
+                for k, v in param.items()
+            }
+            for param in self.cell_params
+        ]
         cell_dict = {
             'title': title,
-            'params': self.cell_params,
+            'params': cell_params,
             'secrets': self.cell_secrets,
             'inputs': self.cell_inputs,
             'outputs': self.cell_outputs,
