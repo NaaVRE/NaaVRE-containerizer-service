@@ -71,14 +71,6 @@
     }
   },
   "cell": {
-    "all_inputs": [
-      "var_string",
-      "var_string_with_comment",
-      "var_int",
-      "var_float",
-      "var_list_int",
-      "var_list_str"
-    ],
     "confs": [
       {
         "name": "conf_string",
@@ -136,6 +128,26 @@
     "outputs": [],
     "params": [
       {
+        "default_value": 1.1,
+        "name": "param_float",
+        "type": "float"
+      },
+      {
+        "default_value": 1,
+        "name": "param_int",
+        "type": "int"
+      },
+      {
+        "default_value": "[1, 2, 3]",
+        "name": "param_list_int",
+        "type": "list"
+      },
+      {
+        "default_value": "['list_str', 'space in elem', '3']",
+        "name": "param_list_str",
+        "type": "list"
+      },
+      {
         "default_value": "param_string value",
         "name": "param_string",
         "type": "str"
@@ -144,26 +156,6 @@
         "default_value": "param_string value",
         "name": "param_string_with_comment",
         "type": "str"
-      },
-      {
-        "default_value": "1",
-        "name": "param_int",
-        "type": "int"
-      },
-      {
-        "default_value": "1.1",
-        "name": "param_float",
-        "type": "float"
-      },
-      {
-        "default_value": "[1, 2, 3]",
-        "name": "param_list_int",
-        "type": "list"
-      },
-      {
-        "default_value": "[\"list_str\", \"space in elem\", \"3\"]",
-        "name": "param_list_str",
-        "type": "list"
       }
     ],
     "secrets": [],

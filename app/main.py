@@ -139,6 +139,30 @@ def _get_extractor(extractor_payload: ExtractorPayload):
     cell_index = extractor_payload.data.cell_index
     kernel = extractor_payload.data.kernel
     vl_settings = settings.get_vl_config(extractor_payload.virtual_lab)
+    if vl_settings is None:
+        raise HTTPException(status_code=400,
+                            detail='vl_settings for: ' +
+                            extractor_payload.virtual_lab + ' not found')
+    if vl_settings.base_image_tags_url is None:
+        raise HTTPException(status_code=400,
+                            detail='base_image_tags_url for: ' +
+                            extractor_payload.virtual_lab + ' not found')
+    if vl_settings.module_mapping_url is None:
+        raise HTTPException(status_code=400,
+                            detail='module_mapping_url for: ' +
+                            extractor_payload.virtual_lab + ' not found')
+    if vl_settings.cell_github_url is None:
+        raise HTTPException(status_code=400,
+                            detail='cell_github_url for: ' +
+                            extractor_payload.virtual_lab + ' not found')
+    if vl_settings.cell_github_token is None:
+        raise HTTPException(status_code=400,
+                            detail='cell_github_token for: ' +
+                            extractor_payload.virtual_lab + ' not found')
+    if vl_settings.module_mapping_url is None:
+        raise HTTPException(status_code=400,
+                            detail='module_mapping_url for: ' +
+                            extractor_payload.virtual_lab + ' not found')
     if notebook.cells[cell_index].cell_type != 'code':
         # dummy extractor for non-code cells (e.g. markdown)
         extractor = DummyExtractor(extractor_payload.data,
@@ -175,7 +199,6 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
         with open('/tmp/' + cell.title + '.json', 'w') as f:
             json.dump(test_resource, f, indent=4)
         f.close()
-        print(test_resource)
     return cell
 
 

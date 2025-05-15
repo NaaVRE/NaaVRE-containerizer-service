@@ -192,7 +192,6 @@ class RExtractor(Extractor):
             tree = parse_text(s)
             visitor = ExtractConfigs()
             output = visitor.visit(tree)
-
             for o in output:
                 configurations[o] = output[o]
 
@@ -228,24 +227,19 @@ class RExtractor(Extractor):
         cell_names = self.__extract_cell_names(self.cell_source)
         cell_undef = self.__extract_cell_undefined(self.cell_source)
         cell_outputs = []
-        for name, properties in cell_names.items():
-            if (name not in cell_undef and
-                    name not in self.imports and
-                    name in self.undefined and
-                    name not in self.notebook_configurations and
-                    name not in self.notebook_params and
-                    name not in self.notebook_secrets):
+        for var_name, properties in cell_names.items():
+            if (var_name not in cell_undef and
+                    var_name not in self.imports and
+                    var_name in self.undefined and
+                    self.not_reserved(var_name)):
                 cell_outputs.append(properties)
         return cell_outputs
 
     def get_cell_inputs(self) -> list[dict]:
         cell_undefined = self.__extract_cell_undefined(self.cell_source)
         cell_inputs = []
-        for und, properties in cell_undefined.items():
-            if (und not in self.imports and
-                    und not in self.notebook_configurations and
-                    und not in self.notebook_params and
-                    und not in self.notebook_secrets):
+        for var_name, properties in cell_undefined.items():
+            if var_name not in self.imports and self.not_reserved(var_name):
                 cell_inputs.append(properties)
         return cell_inputs
 
@@ -304,15 +298,12 @@ class RExtractor(Extractor):
         return cell_secret
 
     def get_cell_confs(self) -> list[dict]:
-        conf = {}
         cell_confs = []
-        cell_unds = self.__extract_cell_undefined(self.cell_source)
-        conf_unds = [und for und in cell_unds if
-                     und in self.notebook_configurations]
-        for u in conf_unds:
-            if u not in conf:
-                conf[u] = self.notebook_configurations[u]
-                cell_confs.append({'name': u, 'assignation': conf[u]})
+        for conf in self.notebook_configurations:
+            cell_confs.append({
+                'name': conf,
+                'assignation': self.notebook_configurations[conf]
+            })
         return cell_confs
 
     def __resolve_configurations(self, configurations) -> dict:
