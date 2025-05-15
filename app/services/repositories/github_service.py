@@ -59,32 +59,33 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
-    def commit(self, commit_list=None):
+    # @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
+    def commit(self, commit_list=None, force=False):
         content_updated = False
         tree_elements = []
         for commit_item in commit_list:
-            blob = self.gh_repository.create_git_blob(commit_item["contents"],
-                                                      "utf-8")
             commit_path = commit_item["path"] + '/' + commit_item['file_name']
-            tree_elements.append(InputGitTreeElement(path=commit_path,
-                                                     mode="100644",
-                                                     type="blob",
-                                                     sha=blob.sha))
-
-        base_tree = self.gh_repository.get_git_tree(sha="main")
-        new_tree = self.gh_repository.create_git_tree(tree=tree_elements,
-                                                      base_tree=base_tree)
-
-        if base_tree.sha != new_tree.sha:
-            content_updated = True
-        elif base_tree.sha == new_tree.sha:
+            local_hash = get_content_hash(commit_item["contents"])
+            remote_hash = self.gh_repository.get_contents(commit_path).sha
+            if local_hash != remote_hash or force:
+                content_updated = True
+                blob = self.gh_repository.create_git_blob(
+                            commit_item["contents"],
+                            "utf-8")
+                tree_elements.append(InputGitTreeElement(path=commit_path,
+                                                         mode="100644",
+                                                         type="blob",
+                                                         sha=blob.sha))
+        if not content_updated:
             image_info = self.registry.query_registry_for_image(
                 commit_list[0]['path'])
             if not image_info:
                 content_updated = True
 
-        if content_updated:
+        if content_updated or force:
+            base_tree = self.gh_repository.get_git_tree(sha="main")
+            new_tree = self.gh_repository.create_git_tree(tree=tree_elements,
+                                                          base_tree=base_tree)
             # Fetch and merge the latest changes from the remote branch
             self.github.get_repo(
                 self.owner + '/' + self.repository_name).get_branch("main")
@@ -107,7 +108,6 @@ class GithubService(GitRepository, ABC):
                     raise Exception(
                         "Update failed: not a fast-forward. Ensure the branch "
                         "is up-to-date.")
-            content_updated = True
         return content_updated
 
     def dispatch_containerization_workflow(self, title=None,
