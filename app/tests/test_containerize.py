@@ -43,6 +43,7 @@ def download_files_from_github(repo_url, download_path):
 
 
 def test_containerize():
+    os.environ['DEBUG'] = 'True'
     cells_json_path = os.path.join(base_path, 'notebook_cells')
     cells_files = os.listdir(cells_json_path)
     for cell_file in cells_files:
