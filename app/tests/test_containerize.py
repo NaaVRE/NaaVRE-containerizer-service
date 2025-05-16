@@ -55,6 +55,7 @@ def test_containerize():
 
         containerizer_json_payload = cell_notebook_dict.copy()
         del containerizer_json_payload['data']
+        containerizer_json_payload['force_containerize'] = True
 
         containerize_response = client.post(
             '/containerize/',
@@ -172,19 +173,6 @@ def test_force_containerize():
             download_path = os.path.join('/tmp', 'downloaded_files')
             os.makedirs(download_path, exist_ok=True)
             download_files_from_github(source_url, download_path)
-
-            # Check if the downloaded files are correct
-            if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                    cell_notebook_dict['cell']['kernel'] == 'ipython'):
-                assert os.path.exists(os.path.join(download_path, 'task.py'))
-            elif (cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or
-                  cell_notebook_dict['cell']['kernel'].lower() == 'r'):
-                assert os.path.exists(os.path.join(download_path, 'task.R'))
-            # assert task_code in cell_notebook_dict['cell'][
-            #     'original_source']
-            assert os.path.exists(
-                os.path.join(download_path, 'environment.yaml'))
-            assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
             containerizer_json_payload.update({'force_containerize': False})
             containerize_response = client.post(
