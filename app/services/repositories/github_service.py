@@ -216,23 +216,26 @@ class GithubService(GitRepository, ABC):
                 'Error getting jobs for workflow run: ' + jobs.text)
 
     def find_job_by_name(self, job_name=None, wf_creation_utc=None):
+        sleep(5)
         runs = self.get_github_workflow_runs(
             t_utc=wf_creation_utc)
         logger.debug('Got runs: ' + str(len(runs)))
         job = self.get_github_workflow_job(job_name=job_name,
                                            runs=runs['workflow_runs'])
+        if job:
+            return job
         counter = 0
         while not job:
-            logger.debug('No job found, waiting for 2 seconds')
-            sleep(3)
+            counter += 1
+            logger.debug('No job found, waiting for 10 seconds')
+            sleep(10)
             runs = self.get_github_workflow_runs()
             logger.debug('Got runs: ' + str(len(runs)))
             job = self.get_github_workflow_job(job_name=job_name,
                                                runs=runs['workflow_runs'])
             if job:
                 return job
-            counter += 1
-            if counter > 10 and not job:
+            elif counter > 10:
                 break
         raise JobNotFoundError('Job not found: ' + job_name)
 
