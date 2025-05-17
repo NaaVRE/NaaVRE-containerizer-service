@@ -236,8 +236,8 @@ class GithubService(GitRepository, ABC):
                 break
         raise JobNotFoundError('Job not found: ' + job_name)
 
-    def get_github_workflow_job(self, job_name, runs):
-        for run in runs['workflow_runs']:
+    def get_github_workflow_job(self, job_name=None, runs=None):
+        for run in runs:
             jobs_url = run['jobs_url']
             self.wait_for_github_api_resources()
             jobs = self.get_github_workflow_jobs(jobs_url)
