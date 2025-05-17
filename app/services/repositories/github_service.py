@@ -59,7 +59,7 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    # @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
+    @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
     def commit(self, commit_list=None, force=False):
         content_updated = False
         tree_elements = []
