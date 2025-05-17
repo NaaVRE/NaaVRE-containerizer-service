@@ -40,7 +40,9 @@ class JobNotFoundError(Exception):
 class GithubService(GitRepository, ABC):
 
     def __init__(self, vl_conf: VLConfig):
-        self.github = Github(vl_conf.cell_github_token)
+        self.github = Github(auth=github.Auth.Token(
+                                            token=vl_conf.cell_github_token))
+
         cell_github_url = vl_conf.cell_github_url
         self.token = vl_conf.cell_github_token
         self.owner = cell_github_url.split(GITHUB_PREFIX)[1].split('/')[0]
