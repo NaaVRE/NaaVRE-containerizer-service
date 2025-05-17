@@ -188,9 +188,9 @@ class GithubService(GitRepository, ABC):
         workflow_runs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                              self.repository_name + '/actions/runs')
         if t_utc:
-            t_start = (t_utc - datetime.timedelta(minutes=1)).strftime(
+            t_start = (t_utc - datetime.timedelta(minutes=2)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
-            t_stop = (t_utc + datetime.timedelta(minutes=1)).strftime(
+            t_stop = (t_utc + datetime.timedelta(minutes=2)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
             workflow_runs_url += f"?created={t_start}..{t_stop}"
         headers = {'Accept': 'application/vnd.github.v3+json'}
@@ -215,11 +215,28 @@ class GithubService(GitRepository, ABC):
             raise Exception(
                 'Error getting jobs for workflow run: ' + jobs.text)
 
-    @retry(JobNotFoundError, tries=6, delay=1, backoff=2)
     def find_job_by_name(self, job_name=None, wf_creation_utc=None):
         runs = self.get_github_workflow_runs(
             t_utc=wf_creation_utc)
         logger.debug('Got runs: ' + str(len(runs)))
+        job = self.get_github_workflow_job(job_name=job_name,
+                                           runs=runs['workflow_runs'])
+        counter = 0
+        while not job:
+            logger.debug('No job found, waiting for 2 seconds')
+            sleep(3)
+            runs = self.get_github_workflow_runs()
+            logger.debug('Got runs: ' + str(len(runs)))
+            job = self.get_github_workflow_job(job_name=job_name,
+                                               runs=runs['workflow_runs'])
+            if job:
+                return job
+            counter += 1
+            if counter > 10 and not job:
+                break
+        raise JobNotFoundError('Job not found: ' + job_name)
+
+    def get_github_workflow_job(self, job_name, runs):
         for run in runs['workflow_runs']:
             jobs_url = run['jobs_url']
             self.wait_for_github_api_resources()
@@ -228,4 +245,4 @@ class GithubService(GitRepository, ABC):
                 if job['name'] == job_name:
                     job['head_sha'] = run['head_sha']
                     return job
-        raise JobNotFoundError('Job not found: ' + job_name)
+        return None
