@@ -43,6 +43,7 @@ def download_files_from_github(repo_url, download_path):
 
 
 def test_containerize():
+    os.environ['DEBUG'] = 'True'
     cells_json_path = os.path.join(base_path, 'notebook_cells')
     cells_files = os.listdir(cells_json_path)
     for cell_file in cells_files:
@@ -54,7 +55,7 @@ def test_containerize():
 
         containerizer_json_payload = cell_notebook_dict.copy()
         del containerizer_json_payload['data']
-
+        containerizer_json_payload['force_containerize'] = True
         containerize_response = client.post(
             '/containerize/',
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
@@ -105,3 +106,13 @@ def test_containerize():
         #     'original_source']
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
+
+        containerizer_json_payload.update({'force_containerize': False})
+        containerize_response = client.post(
+            '/containerize/',
+            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            json=containerizer_json_payload,
+        )
+        assert containerize_response.status_code == 200
+        assert containerize_response.json()[
+                   'dispatched_github_workflow'] is False

@@ -221,8 +221,8 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     commit_list.append({'contents': docker_template,
                         'path': containerize_payload.cell.title,
                         'file_name': 'Dockerfile'})
-
-    files_updated = gh.commit(commit_list)
+    files_updated = gh.commit(commit_list=commit_list,
+                              force=containerize_payload.force_containerize)
 
     image_version = get_content_hash(cell_contents)[:7]
     container_image = (gh.registry.registry_url + '/' +
@@ -233,7 +233,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                                       'workflow_url': None,
                                       'source_url': None}
 
-    if files_updated:
+    if files_updated or containerize_payload.force_containerize:
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
             image_version=image_version)
