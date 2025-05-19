@@ -68,8 +68,12 @@ class GithubService(GitRepository, ABC):
         for commit_item in commit_list:
             commit_path = commit_item["path"] + '/' + commit_item['file_name']
             local_hash = get_content_hash(commit_item["contents"])
-            remote_hash = self.gh_repository.get_contents(commit_path).sha
-            if local_hash != remote_hash or force:
+            remote_hash = None
+            try:
+                remote_hash = self.gh_repository.get_contents(commit_path).sha
+            except github.GithubException:
+                force = True
+            if remote_hash and local_hash != remote_hash or force:
                 content_updated = True
                 blob = self.gh_repository.create_git_blob(
                             commit_item["contents"],
