@@ -262,8 +262,25 @@ class GithubService(GitRepository, ABC):
         return None
 
     def is_context_available(self, path=None):
+        found_docker = False
+        found_env = False
+        found_task = False
         try:
-            self.gh_repository.get_contents(path)
+            contents = self.gh_repository.get_contents(path)
+            for content in contents:
+                if content.name == 'Dockerfile':
+                    found_docker = True
+                if content.name == 'environment.yaml':
+                    found_env = True
+                if content.name == 'task.py' or content.name == 'task.R':
+                    found_task = True
+            if found_docker and found_env and found_task:
+                return True
+            else:
+                logger.debug('found_docker: ' + str(found_docker) + ' ' +
+                             'found_env: ' + str(found_env) + ' ' +
+                             'found_task: ' + str(found_task))
+                return False
         except github.GithubException:
+            logger.debug('GithubException: ' + path)
             return False
-        return True
