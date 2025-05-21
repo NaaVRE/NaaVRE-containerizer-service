@@ -118,6 +118,13 @@ class GithubService(GitRepository, ABC):
 
     def dispatch_containerization_workflow(self, title=None,
                                            image_version=None):
+        count = 0
+        while not self.is_context_available(title):
+            logger.debug('Waiting for context to be available')
+            sleep(5)
+            count += 1
+            if count > 10:
+                raise Exception('Context in ' + title + ' is not available')
         wf_id = str(uuid.uuid4())
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         resp = requests.post(
@@ -228,9 +235,9 @@ class GithubService(GitRepository, ABC):
                                            runs=runs['workflow_runs'])
         if job:
             return job
-        counter = 0
+        count = 0
         while not job:
-            counter += 1
+            count += 1
             logger.debug('No job found, waiting for 10 seconds')
             sleep(10)
             runs = self.get_github_workflow_runs()
@@ -239,7 +246,7 @@ class GithubService(GitRepository, ABC):
                                                runs=runs['workflow_runs'])
             if job:
                 return job
-            elif counter > 10:
+            elif count > 10:
                 break
         raise JobNotFoundError('Job not found: ' + job_name)
 
@@ -253,3 +260,10 @@ class GithubService(GitRepository, ABC):
                     job['head_sha'] = run['head_sha']
                     return job
         return None
+
+    def is_context_available(self, path=None):
+        try:
+            self.gh_repository.get_contents(path)
+        except github.GithubException:
+            return False
+        return True
