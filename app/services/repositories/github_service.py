@@ -68,8 +68,12 @@ class GithubService(GitRepository, ABC):
         for commit_item in commit_list:
             commit_path = commit_item["path"] + '/' + commit_item['file_name']
             local_hash = get_content_hash(commit_item["contents"])
-            remote_hash = self.gh_repository.get_contents(commit_path).sha
-            if local_hash != remote_hash or force:
+            remote_hash = None
+            try:
+                remote_hash = self.gh_repository.get_contents(commit_path).sha
+            except github.GithubException:
+                force = True
+            if remote_hash and local_hash != remote_hash or force:
                 content_updated = True
                 blob = self.gh_repository.create_git_blob(
                             commit_item["contents"],
@@ -114,6 +118,13 @@ class GithubService(GitRepository, ABC):
 
     def dispatch_containerization_workflow(self, title=None,
                                            image_version=None):
+        count = 0
+        while not self.is_context_available(title):
+            logger.debug('Waiting for context to be available')
+            sleep(5)
+            count += 1
+            if count > 10:
+                raise Exception('Context in ' + title + ' is not available')
         wf_id = str(uuid.uuid4())
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         resp = requests.post(
@@ -224,9 +235,9 @@ class GithubService(GitRepository, ABC):
                                            runs=runs['workflow_runs'])
         if job:
             return job
-        counter = 0
+        count = 0
         while not job:
-            counter += 1
+            count += 1
             logger.debug('No job found, waiting for 10 seconds')
             sleep(10)
             runs = self.get_github_workflow_runs()
@@ -235,7 +246,7 @@ class GithubService(GitRepository, ABC):
                                                runs=runs['workflow_runs'])
             if job:
                 return job
-            elif counter > 10:
+            elif count > 10:
                 break
         raise JobNotFoundError('Job not found: ' + job_name)
 
@@ -249,3 +260,27 @@ class GithubService(GitRepository, ABC):
                     job['head_sha'] = run['head_sha']
                     return job
         return None
+
+    def is_context_available(self, path=None):
+        found_docker = False
+        found_env = False
+        found_task = False
+        try:
+            contents = self.gh_repository.get_contents(path)
+            for content in contents:
+                if content.name == 'Dockerfile':
+                    found_docker = True
+                if content.name == 'environment.yaml':
+                    found_env = True
+                if content.name == 'task.py' or content.name == 'task.R':
+                    found_task = True
+            if found_docker and found_env and found_task:
+                return True
+            else:
+                logger.debug('found_docker: ' + str(found_docker) + ' ' +
+                             'found_env: ' + str(found_env) + ' ' +
+                             'found_task: ' + str(found_task))
+                return False
+        except github.GithubException:
+            logger.debug('GithubException: ' + path)
+            return False

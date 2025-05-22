@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from time import sleep
 
 import requests
@@ -116,3 +117,57 @@ def test_containerize():
         assert containerize_response.status_code == 200
         assert containerize_response.json()[
                    'dispatched_github_workflow'] is False
+
+        uid = str(uuid.uuid4())
+        containerizer_json_payload['cell']['title'] = 'test_containerize'+uid
+        containerizer_json_payload['force_containerize'] = True
+        containerize_response = client.post(
+            '/containerize/',
+            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            json=containerizer_json_payload,
+        )
+        assert containerize_response.status_code == 200
+
+        workflow_id = containerize_response.json()['workflow_id']
+        source_url = containerize_response.json()['source_url']
+        assert cell_notebook_dict['cell']['title'] in source_url
+        containerization_status_response = client.get(
+            '/status/' +
+            containerizer_json_payload['virtual_lab'] + '/' +
+            workflow_id,
+            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+        )
+        assert containerization_status_response.status_code == 200
+        count = 0
+        sleep_time = 10
+        while (containerization_status_response.json()['status'] != 'completed'
+               and count <= 50):
+            sleep(sleep_time)
+            containerization_status_response = client.get(
+                '/status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
+                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            )
+            assert containerization_status_response.status_code == 200
+            count += 1
+            sleep_time += 10
+        assert containerization_status_response.json()['status'] == 'completed'
+        assert containerization_status_response.json()[
+                   'conclusion'] == 'success'
+        # Download files from source_url
+        download_path = os.path.join('/tmp', 'downloaded_files')
+        os.makedirs(download_path, exist_ok=True)
+        download_files_from_github(source_url, download_path)
+
+        # Check if the downloaded files are correct
+        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
+                cell_notebook_dict['cell']['kernel'] == 'ipython'):
+            assert os.path.exists(os.path.join(download_path, 'task.py'))
+        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
+                cell_notebook_dict['cell']['kernel'].lower() == 'r':
+            assert os.path.exists(os.path.join(download_path, 'task.R'))
+        # assert task_code in cell_notebook_dict['cell'][
+        #     'original_source']
+        assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
+        assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
