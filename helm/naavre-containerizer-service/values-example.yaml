@@ -13,7 +13,7 @@ ingress:
 conf:
   rootPath: /my-root-path
   virtual_labs_configuration:
-    rawJson: |
+    rawJson: |    
       {
         "vl_configurations": [
           {
