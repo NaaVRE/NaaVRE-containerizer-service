@@ -158,6 +158,10 @@ class PyExtractor(Extractor):
         for name in names:
             if name in self.notebook_imports:
                 dependencies.append(self.notebook_imports.get(name))
+            for v in self.notebook_imports.values():
+                if v.get('asname') == name:
+                    dependencies.append(v)
+                    break
         return dependencies
 
     @staticmethod

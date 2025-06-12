@@ -14,7 +14,7 @@
             "trusted": true
           },
           "outputs": [],
-          "source": "# Cell with dependency specification\n# ---\n# NaaVRE:\n#  cell:\n#   params:\n#    - param_dataverse_api_key:\n#       type: String\n#       default_value: ''\n#   outputs:\n#    - event_file: String\n#   dependencies:\n#    - name: dplyr\n# ...\nprint(\"doesn't work\")\n"
+          "source": "# Cell with dependency specification\n# ---\n# NaaVRE:\n#  cell:\n#   params:\n#    - param_dataverse_api_key:\n#       type: String\n#       default_value: ''\n#   outputs:\n#    - event_file: String\n#   dependencies:\n#    - name: pandas\n# ...\nprint(\"doesn't work\")\n"
         }
       ],
       "metadata": {
@@ -64,7 +64,7 @@
     "confs": [],
     "dependencies": [
       {
-        "name": "dplyr",
+        "name": "pandas",
         "asname": null,
         "module": ""
       }
