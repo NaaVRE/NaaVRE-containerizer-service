@@ -91,8 +91,8 @@ def test_containerize():
         assert containerization_status_response.status_code == 200
         count = 0
         sleep_time = 10
-        while (containerization_status_response.json()['status'] != 'completed'
-               and count <= 30):
+        while (containerization_status_response.json()['job']['status'] !=
+               'completed' and count <= 30):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/status/' +
