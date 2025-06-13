@@ -220,9 +220,9 @@ class GithubService(GitRepository, ABC):
         headers = {'Accept': 'application/vnd.github.v3+json'}
         if self.token:
             headers['Authorization'] = 'Bearer ' + self.token
-        jobs = requests.get(url=jobs_url, verify=False,
+        jobs = requests.get(url=jobs_url, verify=True,
                             headers=headers)
-        if jobs.status_code == 200:
+        if jobs.status_code == 200 and jobs:
             return json.loads(jobs.text)
         else:
             return None

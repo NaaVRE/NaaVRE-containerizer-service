@@ -90,7 +90,7 @@ def test_containerize():
             print(f"Failed for workflow_id: {workflow_id}")
         assert containerization_status_response.status_code == 200
         count = 0
-        sleep_time = 10
+        sleep_time = 5
         while (containerization_status_response.json()['job']['status'] !=
                'completed' and count <= 30):
             sleep(sleep_time)
