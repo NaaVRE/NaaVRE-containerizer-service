@@ -58,6 +58,10 @@ class HeaderExtractor(Extractor):
              ),
             re.MULTILINE)
         self.schema = self._load_schema()
+        for cell in notebook_data.notebook.cells:
+            if isinstance(cell.source, list):
+                # Convert list of strings to a single string
+                cell.source = ''.join(cell.source)
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.cell_header = self._extract_header()
@@ -71,16 +75,6 @@ class HeaderExtractor(Extractor):
         with open(filename) as f:
             schema = json.load(f)
         return schema
-
-    def is_complete(self):
-        return (
-                self.cell_inputs
-                and self.cell_outputs
-                and self.cell_params
-                and self.cell_secrets
-                and self.cell_confs
-                and self.cell_dependencies
-        )
 
     def _extract_header(self) -> Union[dict, None]:
         # get yaml document from cell comments
