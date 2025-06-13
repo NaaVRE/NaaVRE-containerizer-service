@@ -244,8 +244,8 @@ class GithubService(GitRepository, ABC):
         count = 0
         while not job:
             count += 1
-            logger.debug('Job: ' + job_name + ' not found, waiting 10 seconds')
-            sleep(10)
+            logger.debug('Job: ' + job_name + ' not found, waiting 5 seconds')
+            sleep(5)
             runs = self.get_github_workflow_runs()
             logger.debug('Got runs: ' + str(len(runs)))
             job = self.get_github_workflow_job(job_name=job_name,
