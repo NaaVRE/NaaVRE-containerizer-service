@@ -198,6 +198,9 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
     extractor_payload.data.set_user_name(access_token['preferred_username'])
     extractor = _get_extractor(extractor_payload)
+    if isinstance(extractor, DummyExtractor):
+        raise HTTPException(status_code=422,
+                            detail='Cell is not a code cell, cannot extract')
     cell = extractor.get_cell()
     if os.getenv('DEBUG', 'false').lower() == 'true':
         test_resource = extractor_payload.model_dump()
@@ -230,8 +233,10 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     commit_resp = gh.commit(commit_list=commit_list,
                             force=containerize_payload.force_containerize)
     commit_sha = commit_resp['commit_sha']
-    source_url = (gh.repository_url.replace('.git', '') + '/tree/' +
-                  commit_sha + '/' + containerize_payload.cell.title)
+    source_url = None
+    if commit_sha:
+        source_url = (gh.repository_url.replace('.git', '') + '/tree/' +
+                      commit_sha + '/' + containerize_payload.cell.title)
 
     image_version = get_content_hash(cell_contents)[:7]
     container_image = (gh.registry.registry_url + '/' +

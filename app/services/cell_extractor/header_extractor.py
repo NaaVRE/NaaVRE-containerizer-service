@@ -72,16 +72,6 @@ class HeaderExtractor(Extractor):
             schema = json.load(f)
         return schema
 
-    def is_complete(self):
-        return (
-                self.cell_inputs
-                and self.cell_outputs
-                and self.cell_params
-                and self.cell_secrets
-                and self.cell_confs
-                and self.cell_dependencies
-        )
-
     def _extract_header(self) -> Union[dict, None]:
         # get yaml document from cell comments
         m = self.re_yaml_doc_in_comment.match(self.cell_source)

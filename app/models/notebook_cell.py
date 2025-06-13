@@ -13,4 +13,4 @@ class NotebookCell(BaseModel):
     id: str
     metadata: dict | None = None
     outputs: list | None = None
-    source: str
+    source: str | list[str]
