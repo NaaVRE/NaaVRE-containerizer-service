@@ -73,11 +73,26 @@ def test_containerize():
             workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
+        count = 0
+        while containerization_status_response.status_code != 200 and \
+                count <= 5:
+            print(f"Retrying status check for workflow_id: {workflow_id}")
+            sleep(2)
+            containerization_status_response = client.get(
+                '/status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
+                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            )
+            count += 1
+
+        if containerization_status_response.status_code != 200:
+            print(f"Failed for workflow_id: {workflow_id}")
         assert containerization_status_response.status_code == 200
         count = 0
-        sleep_time = 10
-        while (containerization_status_response.json()['status'] != 'completed'
-               and count <= 30):
+        sleep_time = 2
+        while (containerization_status_response.json()['job']['status'] !=
+               'completed' and count <= 30):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/status/' +
@@ -87,9 +102,10 @@ def test_containerize():
             )
             assert containerization_status_response.status_code == 200
             count += 1
-            sleep_time += 5
-        assert containerization_status_response.json()['status'] == 'completed'
-        assert containerization_status_response.json()[
+            sleep_time += 1
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
+        assert containerization_status_response.json()['job'][
                    'conclusion'] == 'success'
         # Download files from source_url
         download_path = os.path.join('/tmp', 'downloaded_files')
@@ -137,11 +153,23 @@ def test_containerize():
             workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
+        while containerization_status_response.status_code != 200 and \
+                count <= 10:
+            print(f"Retrying status check for workflow_id: {workflow_id}")
+            sleep(5)
+            containerization_status_response = client.get(
+                '/status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
+                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            )
+            count += 1
+
         assert containerization_status_response.status_code == 200
         count = 0
-        sleep_time = 10
-        while (containerization_status_response.json()['status'] != 'completed'
-               and count <= 50):
+        sleep_time = 2
+        while (containerization_status_response.json()['job']['status'] !=
+               'completed' and count <= 50):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/status/' +
@@ -151,9 +179,10 @@ def test_containerize():
             )
             assert containerization_status_response.status_code == 200
             count += 1
-            sleep_time += 10
-        assert containerization_status_response.json()['status'] == 'completed'
-        assert containerization_status_response.json()[
+            sleep_time += 5
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
+        assert containerization_status_response.json()['job'][
                    'conclusion'] == 'success'
         # Download files from source_url
         download_path = os.path.join('/tmp', 'downloaded_files')
