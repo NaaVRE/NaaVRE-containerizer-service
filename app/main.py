@@ -201,7 +201,12 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
     if isinstance(extractor, DummyExtractor):
         raise HTTPException(status_code=422,
                             detail='Cell is not a code cell, cannot extract')
-    cell = extractor.get_cell()
+    try:
+        cell = extractor.get_cell()
+    except ValueError as e:
+        raise HTTPException(status_code=422,
+                            detail='Error extracting cell: ' + str(e))
+
     if os.getenv('DEBUG', 'false').lower() == 'true':
         test_resource = extractor_payload.model_dump()
         test_resource['cell'] = cell.model_dump()

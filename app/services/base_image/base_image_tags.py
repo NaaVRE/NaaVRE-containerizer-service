@@ -30,3 +30,12 @@ class BaseImageTags:
 
     def get_base_image_tags(self):
         return self.base_image_tags
+
+    def get_base_image_tag(self, base_image_name):
+        if base_image_name not in self.base_image_tags:
+            raise ValueError(
+                f"Base image name '{base_image_name}' not found in "
+                f"base image tags. "
+                "Please check the base image name or the base image tags URL."
+            )
+        return self.base_image_tags[base_image_name]

@@ -58,6 +58,10 @@ class HeaderExtractor(Extractor):
              ),
             re.MULTILINE)
         self.schema = self._load_schema()
+        for cell in notebook_data.notebook.cells:
+            if isinstance(cell.source, list):
+                # Convert list of strings to a single string
+                cell.source = ''.join(cell.source)
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.cell_header = self._extract_header()

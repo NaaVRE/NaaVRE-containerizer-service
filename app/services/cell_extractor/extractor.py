@@ -62,7 +62,7 @@ class Extractor(abc.ABC):
             'confs': self.cell_confs,
             'dependencies': self.cell_dependencies,
             'base_container_image':
-                base_image_tags.base_image_tags[self.base_image_name],
+                base_image_tags.get_base_image_tag(self.base_image_name),
             'kernel': self.kernel,
             'original_source': self.clean_code()
         }
