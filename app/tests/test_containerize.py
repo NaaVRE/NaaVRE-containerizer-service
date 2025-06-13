@@ -153,6 +153,18 @@ def test_containerize():
             workflow_id,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
+        while containerization_status_response.status_code != 200 and \
+                count <= 5:
+            print(f"Retrying status check for workflow_id: {workflow_id}")
+            sleep(2)
+            containerization_status_response = client.get(
+                '/status/' +
+                containerizer_json_payload['virtual_lab'] + '/' +
+                workflow_id,
+                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            )
+            count += 1
+
         assert containerization_status_response.status_code == 200
         count = 0
         sleep_time = 10
