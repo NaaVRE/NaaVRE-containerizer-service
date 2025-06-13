@@ -159,8 +159,7 @@ class GithubService(GitRepository, ABC):
     def get_job(self,
                 wf_id=None,
                 wf_creation_utc=None,
-                job_id=None,
-                cell_title=None
+                job_id=None
                 ):
         f""" Find Github workflow job
 
@@ -228,34 +227,15 @@ class GithubService(GitRepository, ABC):
         if jobs.status_code == 200:
             return json.loads(jobs.text)
         else:
-            raise Exception(
-                'Error getting jobs for workflow run: ' + jobs.text)
+            return None
 
     def find_job_by_name(self, job_name=None, wf_creation_utc=None):
         logger.debug('Finding job by name: ' + job_name)
-        sleep(5)
         runs = self.get_github_workflow_runs(
             t_utc=wf_creation_utc)
         logger.debug('Got runs: ' + str(len(runs)))
-        job = self.get_github_workflow_job(job_name=job_name,
-                                           runs=runs['workflow_runs'])
-        if job:
-            return job
-        count = 0
-        while not job:
-            count += 1
-            logger.debug('Job: ' + job_name + ' not found, waiting 5 seconds')
-            sleep(5)
-            runs = self.get_github_workflow_runs()
-            logger.debug('Got runs: ' + str(len(runs)))
-            job = self.get_github_workflow_job(job_name=job_name,
-                                               runs=runs['workflow_runs'])
-            if job:
-                logger.debug('find_job_by_name: Found job: ' + str(job))
-                return job
-            elif count > 10:
-                break
-        raise JobNotFoundError('Job not found: ' + job_name)
+        return self.get_github_workflow_job(job_name=job_name,
+                                            runs=runs['workflow_runs'])
 
     def get_github_workflow_job(self, job_name=None, runs=None):
         for run in runs:

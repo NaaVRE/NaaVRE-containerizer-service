@@ -28,6 +28,7 @@ from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
+from cachetools import TTLCache
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
@@ -80,6 +81,9 @@ if os.getenv('DEBUG', 'false').lower() == 'true':
     logging.basicConfig(level=logging.DEBUG)
 else:
     logging.basicConfig(level=logging.INFO)
+
+# Create a cache with a time-to-live of 10 minutes and a maximum size of 1000
+cache = TTLCache(maxsize=1000, ttl=10 * 60)
 
 
 def valid_access_token(credentials: Annotated[
@@ -262,11 +266,16 @@ def get_status(
         virtual_lab: str):
     vl_conf = settings.get_vl_config(virtual_lab)
     gh = _get_github_service(vl_conf)
-    job = gh.get_job(wf_id=workflow_id, cell_title=None)
+    job_id = cache.get(workflow_id)
+    job = gh.get_job(wf_id=workflow_id, job_id=job_id)
     if job is None:
         raise HTTPException(status_code=404,
                             detail='containerization job not found')
-    return job
+    cache[workflow_id] = job['id']
+
+    return {'job': job,
+            'workflow_url': workflow_id
+            }
 
 
 if __name__ == '__main__':
