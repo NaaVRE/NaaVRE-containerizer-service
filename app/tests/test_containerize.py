@@ -168,8 +168,8 @@ def test_containerize():
         assert containerization_status_response.status_code == 200
         count = 0
         sleep_time = 5
-        while (containerization_status_response.json()['status'] != 'completed'
-               and count <= 50):
+        while (containerization_status_response.json()['job']['status'] !=
+               'completed' and count <= 50):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/status/' +
@@ -180,7 +180,8 @@ def test_containerize():
             assert containerization_status_response.status_code == 200
             count += 1
             sleep_time += 5
-        assert containerization_status_response.json()['status'] == 'completed'
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
         assert containerization_status_response.json()[
                    'conclusion'] == 'success'
         # Download files from source_url
