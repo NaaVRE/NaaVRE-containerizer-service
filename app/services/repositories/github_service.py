@@ -10,7 +10,6 @@ import github
 import requests
 from github import Github
 from github import InputGitTreeElement
-from retry import retry
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -61,12 +60,15 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
-    @retry(github.GithubException, tries=2, delay=0.1, backoff=0.5)
     def commit(self, commit_list=None, force=False):
         logger.debug('Committing commit_list: ' + str(commit_list) +
                      ' force: ' + str(force))
         content_updated = False
         tree_elements = []
+        image_info = self.registry.query_registry_for_image(
+            commit_list[0]['path'])
+        if not image_info:
+            force = True
         for commit_item in commit_list:
             commit_path = commit_item["path"] + '/' + commit_item['file_name']
             local_hash = get_content_hash(commit_item["contents"])
@@ -84,11 +86,6 @@ class GithubService(GitRepository, ABC):
                                                          mode="100644",
                                                          type="blob",
                                                          sha=blob.sha))
-        if not content_updated:
-            image_info = self.registry.query_registry_for_image(
-                commit_list[0]['path'])
-            if not image_info:
-                content_updated = True
         commit_sha = None
         if content_updated or force:
             base_tree = self.gh_repository.get_git_tree(sha="main")
