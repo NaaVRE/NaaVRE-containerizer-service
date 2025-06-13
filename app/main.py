@@ -75,6 +75,7 @@ settings = Settings(config=conf)
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'))
 
+
 if os.getenv('DEBUG', 'false').lower() == 'true':
     logging.basicConfig(level=logging.DEBUG)
 else:
@@ -130,6 +131,7 @@ def _get_github_service(vl_conf: VLConfig):
     token = vl_conf.cell_github_token
     if token is None:
         raise ValueError('cell_github_token is not set')
+    logging.debug('Using repository URL: %s', repository_url)
     return GithubService(vl_conf)
 
 
@@ -221,38 +223,46 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     commit_list.append({'contents': docker_template,
                         'path': containerize_payload.cell.title,
                         'file_name': 'Dockerfile'})
-    files_updated = gh.commit(commit_list=commit_list,
-                              force=containerize_payload.force_containerize)
+    commit_resp = gh.commit(commit_list=commit_list,
+                            force=containerize_payload.force_containerize)
+    commit_sha = commit_resp['commit_sha']
+    source_url = (gh.repository_url.replace('.git', '') + '/tree/' +
+                  commit_sha + '/' + containerize_payload.cell.title)
 
     image_version = get_content_hash(cell_contents)[:7]
     container_image = (gh.registry.registry_url + '/' +
                        containerize_payload.cell.title + ':' + image_version)
     containerization_workflow_resp = {'workflow_id': None,
                                       'dispatched_github_workflow': False,
-                                      'container_image': container_image,
-                                      'workflow_url': None,
-                                      'source_url': None}
+                                      'container_image': container_image}
 
-    if files_updated or containerize_payload.force_containerize:
+    force_containerize = containerize_payload.force_containerize
+    if commit_resp['content_updated'] or force_containerize:
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
             image_version=image_version)
+
+        logging.debug('Dispatched containerization workflow for: %s',
+                      containerize_payload.cell.title)
+    logging.debug('Setting container image: %s', container_image)
     containerize_payload.cell.container_image = container_image
+    logging.debug('Containerization workflow response: %s',
+                  containerization_workflow_resp)
+
     return {'workflow_id': containerization_workflow_resp['workflow_id'],
-            'dispatched_github_workflow': files_updated,
+            'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
-            'workflow_url': containerization_workflow_resp['workflow_url'],
-            'source_url': containerization_workflow_resp['source_url']}
+            'source_url': source_url}
 
 
-@app.get('/status/{virtual_lab}/{workflow_id}')
+@app.get('/status/{virtual_lab}/{workflow_id}/')
 def get_status(
         access_token: Annotated[dict, Depends(valid_access_token)],
         workflow_id: str,
         virtual_lab: str):
     vl_conf = settings.get_vl_config(virtual_lab)
     gh = _get_github_service(vl_conf)
-    job = gh.get_job(wf_id=workflow_id)
+    job = gh.get_job(wf_id=workflow_id, cell_title=None)
     if job is None:
         raise HTTPException(status_code=404,
                             detail='containerization job not found')
@@ -260,4 +270,4 @@ def get_status(
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=8000, log_level='trace')
