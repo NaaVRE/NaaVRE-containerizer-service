@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -277,7 +278,11 @@ def get_status(
     vl_conf = settings.get_vl_config(virtual_lab)
     gh = _get_github_service(vl_conf)
     job_id = cache.get(workflow_id)
-    job = gh.get_job(wf_id=workflow_id, job_id=job_id)
+    wf_creation_utc = (datetime.datetime.now(tz=datetime.timezone.utc) -
+                       datetime.timedelta(hours=24))
+    job = gh.get_job(wf_id=workflow_id,
+                     job_id=job_id,
+                     wf_creation_utc=wf_creation_utc)
     if job is None:
         raise HTTPException(status_code=404,
                             detail='containerization job not found')

@@ -205,7 +205,8 @@ class GithubService(GitRepository, ABC):
         if t_utc:
             t_start = (t_utc - datetime.timedelta(minutes=2)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
-            t_stop = (t_utc + datetime.timedelta(minutes=2)).strftime(
+            # Get t_stop as now
+            t_stop = datetime.datetime.now(datetime.UTC).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
             workflow_runs_url += f"?created={t_start}..{t_stop}"
         headers = {'Accept': 'application/vnd.github.v3+json'}
