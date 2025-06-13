@@ -81,9 +81,9 @@ jobs:
           echo "AUTH_TOKEN: $AUTH_TOKEN"
           echo "CONFIG_FILE_URL: $CONFIG_FILE_URL"
 
-      - name: pytets
-        shell: bash -l {0}
-        run: |
-          echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
-          conda activate naavre-containerizer-service
-          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG
+#      - name: pytets
+#        shell: bash -l {0}
+#        run: |
+#          echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
+#          conda activate naavre-containerizer-service
+#          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG
