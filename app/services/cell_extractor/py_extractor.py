@@ -213,6 +213,7 @@ class PyExtractor(Extractor):
         else:
             tree = ast.parse(cell_source)
         for module in ast.walk(tree):
+            var_type = None
             if isinstance(module, (ast.Name,)):
                 var_name = module.id
                 if infer_types:
@@ -222,7 +223,6 @@ class PyExtractor(Extractor):
                     except AttributeError:
                         logger.debug(
                             '__extract_variables failed. var_name: %s', )
-                        var_type = None
                 else:
                     var_type = self.notebook_variables[var_name]['type']
                 names[module.id] = {
