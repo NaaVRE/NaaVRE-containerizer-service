@@ -182,7 +182,7 @@ def test_containerize():
             sleep_time += 5
         assert (containerization_status_response.json()['job']['status'] ==
                 'completed')
-        assert containerization_status_response.json()[
+        assert containerization_status_response.json()['job'][
                    'conclusion'] == 'success'
         # Download files from source_url
         download_path = os.path.join('/tmp', 'downloaded_files')
