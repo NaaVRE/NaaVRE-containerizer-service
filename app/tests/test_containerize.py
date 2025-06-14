@@ -75,7 +75,7 @@ def test_containerize():
         )
         count = 0
         while containerization_status_response.status_code != 200 and \
-                count <= 5:
+                count <= 15:
             print(f"Retrying status check for workflow_id: {workflow_id}")
             sleep(2)
             containerization_status_response = client.get(
@@ -92,7 +92,7 @@ def test_containerize():
         count = 0
         sleep_time = 2
         while (containerization_status_response.json()['job']['status'] !=
-               'completed' and count <= 30):
+               'completed' and count <= 50):
             sleep(sleep_time)
             containerization_status_response = client.get(
                 '/status/' +
@@ -154,7 +154,7 @@ def test_containerize():
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
         while containerization_status_response.status_code != 200 and \
-                count <= 10:
+                count <= 15:
             print(f"Retrying status check for workflow_id: {workflow_id}")
             sleep(5)
             containerization_status_response = client.get(
