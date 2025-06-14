@@ -144,7 +144,6 @@ class GithubService(GitRepository, ABC):
             headers={'Accept': 'application/vnd.github.v3+json',
                      'Authorization': 'token ' + self.token}
         )
-        # Get the SHA of the latest commit in the repository
         if (git_resp.status_code != 201 and git_resp.status_code != 200 and
                 git_resp.status_code != 204):
             raise Exception('Error dispatching workflow: ' + git_resp.text)
@@ -200,7 +199,7 @@ class GithubService(GitRepository, ABC):
         workflow_runs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                              self.repository_name + '/actions/runs')
         if t_utc:
-            t_start = (t_utc - datetime.timedelta(minutes=2)).strftime(
+            t_start = (t_utc - datetime.timedelta(minutes=10)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
             # Get t_stop as now
             t_stop = datetime.datetime.now(datetime.UTC).strftime(

@@ -30,6 +30,8 @@ from app.services.repositories.github_service import (GithubService,
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
 from cachetools import TTLCache
+from threading import Thread
+import time
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
@@ -83,8 +85,7 @@ if os.getenv('DEBUG', 'false').lower() == 'true':
 else:
     logging.basicConfig(level=logging.INFO)
 
-# Create a cache with a time-to-live of 10 minutes and a maximum size of 1000
-cache = TTLCache(maxsize=1000, ttl=10 * 60)
+containerization_job_cache = TTLCache(maxsize=1000, ttl=86400)
 
 
 def valid_access_token(credentials: Annotated[
@@ -194,6 +195,25 @@ def _get_extractor(extractor_payload: ExtractorPayload):
     return extractor
 
 
+def _query_github_job_id(workflow_id, gh_service, wf_creation_utc):
+    """
+    Function to run in a background thread that polls for the job ID.
+    """
+    max_retries = 10
+    delay = 5  # seconds
+    job = gh_service.get_job(wf_id=workflow_id,
+                             wf_creation_utc=wf_creation_utc)
+    while job is None and max_retries > 0:
+        logging.debug('Job not found, retrying in %d seconds...',
+                      delay)
+        time.sleep(delay)
+        job = gh_service.get_job(wf_id=workflow_id,
+                                 wf_creation_utc=wf_creation_utc)
+        max_retries -= 1
+    if job:
+        containerization_job_cache[workflow_id] = job['id']
+
+
 @app.post('/extract_cell')
 def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                  extractor_payload: ExtractorPayload):
@@ -256,6 +276,17 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
             image_version=image_version)
+        wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
+        workflow_id = containerization_workflow_resp.get('workflow_id')
+        if workflow_id:
+            thread = Thread(
+                target=_query_github_job_id,
+                args=(workflow_id,
+                      gh,
+                      wf_creation_utc),
+                daemon=True
+            )
+            thread.start()
 
         logging.debug('Dispatched containerization workflow for: %s',
                       containerize_payload.cell.title)
@@ -263,7 +294,6 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     containerize_payload.cell.container_image = container_image
     logging.debug('Containerization workflow response: %s',
                   containerization_workflow_resp)
-
     return {'workflow_id': containerization_workflow_resp['workflow_id'],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
@@ -277,7 +307,7 @@ def get_status(
         virtual_lab: str):
     vl_conf = settings.get_vl_config(virtual_lab)
     gh = _get_github_service(vl_conf)
-    job_id = cache.get(workflow_id)
+    job_id = containerization_job_cache.get(workflow_id)
     wf_creation_utc = (datetime.datetime.now(tz=datetime.timezone.utc) -
                        datetime.timedelta(hours=24))
     job = gh.get_job(wf_id=workflow_id,
@@ -286,7 +316,7 @@ def get_status(
     if job is None:
         raise HTTPException(status_code=404,
                             detail='containerization job not found')
-    cache[workflow_id] = job['id']
+    containerization_job_cache[workflow_id] = job['id']
 
     return {'job': job,
             'workflow_url': workflow_id
