@@ -43,6 +43,50 @@ def download_files_from_github(repo_url, download_path):
                         response.status_code, "Response:", response.text)
 
 
+def wait_for_containerization(workflow_id=None,
+                              virtual_lab=None,
+                              wait_for_completion=True):
+    containerization_status_response = client.get(
+        '/status/' +
+        virtual_lab + '/' +
+        workflow_id,
+        headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+    )
+    sleep_time = 3
+    count = 0
+
+    while containerization_status_response.status_code != 200 and \
+            count <= 50:
+        print(f"Retrying status check for workflow_id: {workflow_id}")
+        sleep(sleep_time)
+        containerization_status_response = client.get(
+            '/status/' +
+            virtual_lab + '/' +
+            workflow_id,
+            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+        )
+        count += 1
+        sleep_time += 1
+    if wait_for_completion:
+        while (containerization_status_response.json()['job']['status'] !=
+               'completed' and count <= 50):
+            sleep(sleep_time)
+            containerization_status_response = client.get(
+                '/status/' +
+                virtual_lab + '/' +
+                workflow_id,
+                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            )
+            assert containerization_status_response.status_code == 200
+            count += 1
+            sleep_time += 1
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
+        assert containerization_status_response.json()['job'][
+                   'conclusion'] == 'success'
+    return containerization_status_response
+
+
 def test_containerize():
     os.environ['DEBUG'] = 'True'
     cells_json_path = os.path.join(base_path, 'notebook_cells')
@@ -67,42 +111,18 @@ def test_containerize():
         workflow_id = containerize_response.json()['workflow_id']
         source_url = containerize_response.json()['source_url']
         assert cell_notebook_dict['cell']['title'] in source_url
-        containerization_status_response = client.get(
-            '/status/' +
-            containerizer_json_payload['virtual_lab'] + '/' +
-            workflow_id,
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-        )
-        count = 0
-        while containerization_status_response.status_code != 200 and \
-                count <= 15:
-            print(f"Retrying status check for workflow_id: {workflow_id}")
-            sleep(2)
-            containerization_status_response = client.get(
-                '/status/' +
-                containerizer_json_payload['virtual_lab'] + '/' +
-                workflow_id,
-                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            )
-            count += 1
+        containerization_status_response = wait_for_containerization(
+            workflow_id=workflow_id,
+            virtual_lab=containerizer_json_payload['virtual_lab'],
+            wait_for_completion=False)
 
         if containerization_status_response.status_code != 200:
             print(f"Failed for workflow_id: {workflow_id}")
         assert containerization_status_response.status_code == 200
-        count = 0
-        sleep_time = 2
-        while (containerization_status_response.json()['job']['status'] !=
-               'completed' and count <= 50):
-            sleep(sleep_time)
-            containerization_status_response = client.get(
-                '/status/' +
-                containerizer_json_payload['virtual_lab'] + '/' +
-                workflow_id,
-                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            )
-            assert containerization_status_response.status_code == 200
-            count += 1
-            sleep_time += 1
+        containerization_status_response = wait_for_containerization(
+            workflow_id=workflow_id,
+            virtual_lab=containerizer_json_payload['virtual_lab'],
+            wait_for_completion=True)
         assert (containerization_status_response.json()['job']['status'] ==
                 'completed')
         assert containerization_status_response.json()['job'][
@@ -147,39 +167,11 @@ def test_containerize():
         workflow_id = containerize_response.json()['workflow_id']
         source_url = containerize_response.json()['source_url']
         assert cell_notebook_dict['cell']['title'] in source_url
-        containerization_status_response = client.get(
-            '/status/' +
-            containerizer_json_payload['virtual_lab'] + '/' +
-            workflow_id,
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-        )
-        while containerization_status_response.status_code != 200 and \
-                count <= 15:
-            print(f"Retrying status check for workflow_id: {workflow_id}")
-            sleep(5)
-            containerization_status_response = client.get(
-                '/status/' +
-                containerizer_json_payload['virtual_lab'] + '/' +
-                workflow_id,
-                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            )
-            count += 1
-
+        containerization_status_response = wait_for_containerization(
+            workflow_id=workflow_id,
+            virtual_lab=containerizer_json_payload['virtual_lab'],
+            wait_for_completion=True)
         assert containerization_status_response.status_code == 200
-        count = 0
-        sleep_time = 2
-        while (containerization_status_response.json()['job']['status'] !=
-               'completed' and count <= 50):
-            sleep(sleep_time)
-            containerization_status_response = client.get(
-                '/status/' +
-                containerizer_json_payload['virtual_lab'] + '/' +
-                workflow_id,
-                headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            )
-            assert containerization_status_response.status_code == 200
-            count += 1
-            sleep_time += 5
         assert (containerization_status_response.json()['job']['status'] ==
                 'completed')
         assert containerization_status_response.json()['job'][
