@@ -85,7 +85,7 @@ if os.getenv('DEBUG', 'false').lower() == 'true':
 else:
     logging.basicConfig(level=logging.INFO)
 
-containerization_job_cache = TTLCache(maxsize=1000, ttl=30 * 60)
+containerization_job_cache = TTLCache(maxsize=1000, ttl=86400)
 
 
 def valid_access_token(credentials: Annotated[
