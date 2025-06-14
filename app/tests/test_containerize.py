@@ -52,9 +52,8 @@ def wait_for_containerization(workflow_id=None,
         workflow_id,
         headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
     )
-    sleep_time = 3
+    sleep_time = 4
     count = 0
-
     while containerization_status_response.status_code != 200 and \
             count <= 50:
         print(f"Retrying status check for workflow_id: {workflow_id}")
@@ -66,8 +65,10 @@ def wait_for_containerization(workflow_id=None,
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
         )
         count += 1
-        sleep_time += 1
+        sleep_time += 2
     if wait_for_completion:
+        sleep_time = 4
+        count = 0
         while (containerization_status_response.json()['job']['status'] !=
                'completed' and count <= 50):
             sleep(sleep_time)
