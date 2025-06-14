@@ -199,7 +199,7 @@ class GithubService(GitRepository, ABC):
         workflow_runs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
                              self.repository_name + '/actions/runs')
         if t_utc:
-            t_start = (t_utc - datetime.timedelta(minutes=5)).strftime(
+            t_start = (t_utc - datetime.timedelta(minutes=10)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ")
             # Get t_stop as now
             t_stop = datetime.datetime.now(datetime.UTC).strftime(
