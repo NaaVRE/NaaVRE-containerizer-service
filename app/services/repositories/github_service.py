@@ -144,7 +144,6 @@ class GithubService(GitRepository, ABC):
             headers={'Accept': 'application/vnd.github.v3+json',
                      'Authorization': 'token ' + self.token}
         )
-        # Get the SHA of the latest commit in the repository
         if (git_resp.status_code != 201 and git_resp.status_code != 200 and
                 git_resp.status_code != 204):
             raise Exception('Error dispatching workflow: ' + git_resp.text)
