@@ -298,12 +298,15 @@ class RExtractor(Extractor):
         return cell_secret
 
     def get_cell_confs(self) -> list[dict]:
+        conf = {}
         cell_confs = []
-        for conf in self.notebook_configurations:
-            cell_confs.append({
-                'name': conf,
-                'assignation': self.notebook_configurations[conf]
-            })
+        cell_unds = self.__extract_cell_undefined(self.cell_source)
+        conf_unds = [und for und in cell_unds if
+                     und in self.notebook_configurations]
+        for u in conf_unds:
+            if u not in conf:
+                conf[u] = self.notebook_configurations[u]
+                cell_confs.append({'name': u, 'assignation': conf[u]})
         return cell_confs
 
     def __resolve_configurations(self, configurations) -> dict:
