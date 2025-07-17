@@ -14,7 +14,7 @@ library(jsonlite)
 print('option_list')
 option_list = list(
 
-{% for in_var in cell.inputs|sort(attribute='name')  %}
+{% for in_var in (cell.inputs + cell.params) |sort(attribute='name')  %}
 {% if in_var['type'] == list or in_var['type'] == 'list' %}
 {% set type = 'character' %}
 {% elif in_var['type'] == str or in_var['type'] == 'str' %}
