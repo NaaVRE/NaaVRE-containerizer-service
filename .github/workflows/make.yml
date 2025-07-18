@@ -62,7 +62,8 @@ jobs:
         id: split-output
         run: |
           cat test_list.json
-          MATRIX=$(jq -c . test_list.json)
+          # Merge test parameters, to run them sequentially within a runner
+          MATRIX=$(jq -c '. | map(.module + "::" + .test) | unique' test_list.json)
           echo $MATRIX
           echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
@@ -72,7 +73,6 @@ jobs:
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
