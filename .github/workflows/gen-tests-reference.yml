@@ -1,4 +1,4 @@
-name: make
+name: Generate tests reference results
 on:
   workflow_dispatch:
 
