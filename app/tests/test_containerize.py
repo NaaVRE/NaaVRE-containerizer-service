@@ -1,14 +1,14 @@
 import json
 import logging
 import os
-import pytest
 import uuid
 from time import sleep
 
 import requests
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.main import app, _get_containerizer
+from app.models.containerizer_payload import ContainerizerPayload
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -16,8 +16,6 @@ elif os.path.exists('app/tests/resources/'):
     base_path = 'app/tests/resources/'
 else:
     raise RuntimeError('cannot find test resources')
-notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
-cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
 
 client = TestClient(app)
 
@@ -97,8 +95,43 @@ def wait_for_containerization(workflow_id=None,
     return containerization_status_response
 
 
-@pytest.mark.parametrize('cell_dir', cells_dirs)
-def test_containerize(cell_dir):
+def gen_tests_reference():
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            cell = json.load(f)
+
+        payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+        with open(payload_path) as f:
+            containerize_payload = json.load(f)
+
+        containerize_payload['cell'] = cell
+        containerize_payload = ContainerizerPayload(**containerize_payload)
+
+        containerizer = _get_containerizer(containerize_payload)
+        cell_dir = os.path.join(cell_dir, 'containerized_cell_source')
+        os.makedirs(cell_dir)
+
+        task_source = containerizer.build_script()
+        task_filename = os.path.join(
+            cell_dir, 'task' + containerizer.file_extension)
+        with open(task_filename, 'w') as f:
+            f.write(task_source)
+
+        environment_source = containerizer.build_environment()
+        environment_filename = os.path.join(cell_dir, 'environment.yaml')
+        with open(environment_filename, 'w') as f:
+            f.write(environment_source)
+
+        dockerfile_source = containerizer.build_docker()
+        dockerfile_filename = os.path.join(cell_dir, 'Dockerfile')
+        with open(dockerfile_filename, 'w') as f:
+            f.write(dockerfile_source)
+
+
+def test_containerize_github(cell_dir):
     os.environ['DEBUG'] = 'True'
     cell_path = os.path.join(cell_dir, 'cell.json')
     with open(cell_path) as f:

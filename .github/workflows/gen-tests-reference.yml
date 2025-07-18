@@ -1,0 +1,102 @@
+name: make
+on:
+  workflow_dispatch:
+
+
+jobs:
+  configure-workflow:
+    name: Configure workflow
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      runner: ${{ steps.choose-runner.outputs.runner }}
+    steps:
+      - id: choose-runner
+        uses: QCDIS/choose-action-runner@v2
+        with:
+          preferred-runner: ${{ vars.PREFERRED_ACTIONS_RUNNER }}
+          fallback-runner: ubuntu-latest
+          github-token: ${{ secrets.RUNNER_ACCESS_TOKEN }}
+
+  lint:
+    uses: ./.github/workflows/lint.yml
+    needs: [ configure-workflow ]
+    with:
+      runs-on: ubuntu-latest
+
+  call-collect-tests:
+    uses: ./.github/workflows/collect-tests.yml
+    with:
+      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
+      pytest_extra_options: '--containerize-github-all'
+
+  split-tests:
+    needs: [ call-collect-tests ]
+    runs-on: ubuntu-latest
+    outputs:
+      test_list: ${{ steps.split-output.outputs.test_list }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download pytest output artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test_list
+          path: ./
+
+      - name: Generate matrix from pytest_output
+        id: split-output
+        run: |
+          cat test_list.json
+          MATRIX=$(jq -c . test_list.json)
+          echo $MATRIX
+          echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
+
+  call-pytest:
+    uses: ./.github/workflows/run-tests.yml
+    needs: [ configure-workflow,split-tests ]
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
+    with:
+      runs-on: ${{ needs.configure-workflow.outputs.runner }}
+      debug: ${{ vars.DEBUG }}
+      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
+      verify_ssl: ${{ vars.VERIFY_SSL }}
+      disable_auth: ${{ vars.DISABLE_AUTH }}
+      root_path: ${{ vars.ROOT_PATH }}
+      test: ${{ matrix.test }}
+    secrets:
+      configuration: ${{ secrets.CONFIG_FILE }}
+      auth_token: ${{ secrets.AUTH_TOKEN }}
+      registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
+
+  gen-tests-reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          miniforge-version: latest
+
+          python-version: 3.11
+          path: ${{ env.CONDA }}/envs
+          environment-file: environment.yaml
+          activate-environment: naavre-containerizer-service
+          use-mamba: true
+
+      - name: Generate tests reference
+        run: |
+          python -c "from app.tests.test_containerize import gen_tests_reference; gen_tests_reference()"
+
+      - name: Create commit
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          file_pattern: 'app/tests/resources/notebook_cells/*/containerized_cell_source/*'
+          commit_message: 'Update containerized cells reference sources for tests'
