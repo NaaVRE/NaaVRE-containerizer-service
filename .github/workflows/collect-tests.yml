@@ -48,8 +48,8 @@ jobs:
         run: |
           conda activate naavre-containerizer-service
           pip install pytest
-          pytest --collect-only -q ${{ inputs.pytest_extra_options }}
-          pytest --collect-only -q ${{ inputs.pytest_extra_options }} | grep 'tests/' | jq -R . | jq -s . > test_list.json
+          pytest --collect-only -q app/tests ${{ inputs.pytest_extra_options }}
+          pytest --collect-only -q app/tests ${{ inputs.pytest_extra_options }} | grep 'tests/' | jq -R . | jq -s . > test_list.json
           cat test_list.json
 
       - name: Upload pytest output as artifact
