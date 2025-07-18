@@ -93,6 +93,7 @@ jobs:
 
       - name: Generate tests reference
         run: |
+          conda activate naavre-containerizer-service
           python -c "from app.tests.test_containerize import gen_tests_reference; gen_tests_reference()"
 
       - name: Create commit
