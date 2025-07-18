@@ -71,6 +71,7 @@ jobs:
       disable_auth: ${{ vars.DISABLE_AUTH }}
       root_path: ${{ vars.ROOT_PATH }}
       test: ${{ matrix.test }}
+      pytest_extra_options: '--containerize-github-all'
     secrets:
       configuration: ${{ secrets.CONFIG_FILE }}
       auth_token: ${{ secrets.AUTH_TOKEN }}
