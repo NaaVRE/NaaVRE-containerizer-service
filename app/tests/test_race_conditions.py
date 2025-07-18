@@ -14,30 +14,32 @@ elif os.path.exists('app/tests/resources/'):
 client = TestClient(app)
 
 
-def test_race_conditions():
-    cells_json_path = os.path.join(base_path, 'notebook_cells')
-    cells_files = os.listdir(cells_json_path)
-    # Pick a random cell file. Genara a random number between 0 and
-    # len(cells_files)
-    random_index_1 = random.randint(0, len(cells_files) - 1)
-    cell_file_1 = cells_files[random_index_1]
-    cell_path_1 = os.path.join(cells_json_path, cell_file_1)
-    with open(cell_path_1) as f:
-        print('Testing containerize for cell: ' + cell_file_1)
-        cell_notebook_dict_1 = json.load(f)
-    f.close()
-    containerizer_json_payload_1 = cell_notebook_dict_1.copy()
-    del containerizer_json_payload_1['data']
+def get_random_test_case(cells_dirs):
+    random_index = random.randint(0, len(cells_dirs) - 1)
+    cell_dir = cells_dirs[random_index]
 
-    random_index_2 = random.randint(0, len(cells_files) - 1)
-    cell_file_2 = cells_files[random_index_2]
-    cell_path_2 = os.path.join(cells_json_path, cell_file_2)
-    with open(cell_path_2) as f:
-        print('Testing containerize for cell: ' + cell_file_2)
-        cell_notebook_dict_2 = json.load(f)
-    f.close()
-    containerizer_json_payload_2 = cell_notebook_dict_2.copy()
-    del containerizer_json_payload_2['data']
+    cell_path = os.path.join(cell_dir, 'cell.json')
+    with open(cell_path) as f:
+        print('Testing containerize for cell: ' + cell_path)
+        cell = json.load(f)
+
+    payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+    with open(payload_path) as f:
+        print('                 with payload: ' + payload_path)
+        payload = json.load(f)
+
+    payload['cell'] = cell
+
+    return payload
+
+
+def test_race_conditions():
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+
+    # Pick random cell files
+    containerizer_json_payload_1 = get_random_test_case(cells_dirs)
+    containerizer_json_payload_2 = get_random_test_case(cells_dirs)
 
     # Create a thread to do a POST request to /containerize/ concurrently
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -53,15 +55,7 @@ def test_race_conditions():
     print(results)
 
     # Test it on the same cell
-    random_index_3 = random.randint(0, len(cells_files) - 1)
-    cell_file_3 = cells_files[random_index_3]
-    cell_path_3 = os.path.join(cells_json_path, cell_file_3)
-    with open(cell_path_3) as f:
-        print('Testing containerize for cell: ' + cell_path_3)
-        cell_notebook_dict_3 = json.load(f)
-    f.close()
-    containerizer_json_payload_3 = cell_notebook_dict_3.copy()
-    del containerizer_json_payload_3['data']
+    containerizer_json_payload_3 = get_random_test_case(cells_dirs)
 
     # Create a thread to do a POST request to /containerize/ concurrently
     with ThreadPoolExecutor(max_workers=2) as executor:

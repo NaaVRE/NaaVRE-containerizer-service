@@ -93,18 +93,21 @@ def wait_for_containerization(workflow_id=None,
 
 def test_containerize():
     os.environ['DEBUG'] = 'True'
-    cells_json_path = os.path.join(base_path, 'notebook_cells')
-    cells_files = os.listdir(cells_json_path)
-    for cell_file in cells_files:
-        cell_path = os.path.join(cells_json_path, cell_file)
-        with open(cell_path) as f:
-            print('Testing containerize for cell: ' + cell_file)
-            logging.info('Testing containerize for cell: ' + cell_file)
-            cell_notebook_dict = json.load(f)
-        f.close()
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
 
-        containerizer_json_payload = cell_notebook_dict.copy()
-        del containerizer_json_payload['data']
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            print('Testing containerize for cell: ' + cell_path)
+            cell = json.load(f)
+
+        payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+        with open(payload_path) as f:
+            print('                with payload: ' + payload_path)
+            containerizer_json_payload = json.load(f)
+
+        containerizer_json_payload['cell'] = cell
         containerizer_json_payload['force_containerize'] = True
         containerize_response = client.post(
             '/containerize/',
@@ -126,7 +129,7 @@ def test_containerize():
 
         workflow_id = containerize_response.json()['workflow_id']
         source_url = containerize_response.json()['source_url']
-        assert cell_notebook_dict['cell']['title'] in source_url
+        assert cell['title'] in source_url
         containerization_status_response = wait_for_containerization(
             workflow_id=workflow_id,
             virtual_lab=containerizer_json_payload['virtual_lab'],
@@ -187,14 +190,13 @@ def test_containerize():
         download_files_from_github(source_url, download_path)
 
         # Check if the downloaded files are correct
-        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                cell_notebook_dict['cell']['kernel'] == 'ipython'):
+        if (cell['kernel'].lower() == 'python' or
+                cell['kernel'] == 'ipython'):
             assert os.path.exists(os.path.join(download_path, 'task.py'))
-        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
-                cell_notebook_dict['cell']['kernel'].lower() == 'r':
+        elif cell['kernel'].lower() == 'irkernel' or \
+                cell['kernel'].lower() == 'r':
             assert os.path.exists(os.path.join(download_path, 'task.R'))
-        # assert task_code in cell_notebook_dict['cell'][
-        #     'original_source']
+        # assert task_code in cell['original_source']
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
 
@@ -261,7 +263,7 @@ def test_containerize():
 
         workflow_id = containerize_response.json()['workflow_id']
         source_url = containerize_response.json()['source_url']
-        assert cell_notebook_dict['cell']['title'] in source_url
+        assert cell['title'] in source_url
         containerization_status_response = wait_for_containerization(
             workflow_id=workflow_id,
             virtual_lab=containerizer_json_payload['virtual_lab'],
@@ -317,13 +319,12 @@ def test_containerize():
         download_files_from_github(source_url, download_path)
 
         # Check if the downloaded files are correct
-        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                cell_notebook_dict['cell']['kernel'] == 'ipython'):
+        if (cell['kernel'].lower() == 'python' or
+                cell['kernel'] == 'ipython'):
             assert os.path.exists(os.path.join(download_path, 'task.py'))
-        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
-                cell_notebook_dict['cell']['kernel'].lower() == 'r':
+        elif cell['kernel'].lower() == 'irkernel' or \
+                cell['kernel'].lower() == 'r':
             assert os.path.exists(os.path.join(download_path, 'task.R'))
-        # assert task_code in cell_notebook_dict['cell'][
-        #     'original_source']
+        # assert task_code in cell['original_source']
         assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
         assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
