@@ -95,6 +95,7 @@ jobs:
           use-mamba: true
 
       - name: Generate tests reference
+        shell: bash -l {0}
         run: |
           conda activate naavre-containerizer-service
           python -c "from app.tests.test_containerize import gen_tests_reference; gen_tests_reference()"
