@@ -5,6 +5,7 @@ import uuid
 from time import sleep
 
 import requests
+import yaml
 from fastapi.testclient import TestClient
 
 from app.main import app, _get_containerizer
@@ -111,24 +112,99 @@ def gen_tests_reference():
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
         containerizer = _get_containerizer(containerize_payload)
-        cell_dir = os.path.join(cell_dir, 'containerized_cell_source')
-        os.makedirs(cell_dir)
+        cell_source_dir = os.path.join(cell_dir, 'containerized_cell_source')
+        os.makedirs(cell_source_dir)
 
         task_source = containerizer.build_script()
         task_filename = os.path.join(
-            cell_dir, 'task' + containerizer.file_extension)
+            cell_source_dir, 'task' + containerizer.file_extension)
         with open(task_filename, 'w') as f:
             f.write(task_source)
 
         environment_source = containerizer.build_environment()
-        environment_filename = os.path.join(cell_dir, 'environment.yaml')
+        environment_filename = os.path.join(
+            cell_source_dir, 'environment.yaml')
         with open(environment_filename, 'w') as f:
             f.write(environment_source)
 
         dockerfile_source = containerizer.build_docker()
-        dockerfile_filename = os.path.join(cell_dir, 'Dockerfile')
+        dockerfile_filename = os.path.join(cell_source_dir, 'Dockerfile')
         with open(dockerfile_filename, 'w') as f:
             f.write(dockerfile_source)
+
+
+class RefContainerizer:
+    def __init__(self, cell_dir):
+        self.source_dir = os.path.join(cell_dir, 'containerized_cell_source')
+
+    def build_script(self, file_extension):
+        filename = os.path.join(self.source_dir, 'task' + file_extension)
+        with open(filename) as f:
+            source = f.read()
+        return source
+
+    def build_docker(self):
+        filename = os.path.join(self.source_dir, 'Dockerfile')
+        with open(filename) as f:
+            source = f.read()
+        return source
+
+    def build_environment(self):
+        filename = os.path.join(self.source_dir, 'environment.yaml')
+        with open(filename) as f:
+            source = f.read()
+        return source
+
+
+def test_containerize_render():
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
+        print("Testing containerization for cell", cell_dir)
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            cell = json.load(f)
+
+        payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+        with open(payload_path) as f:
+            containerize_payload = json.load(f)
+
+        containerize_payload['cell'] = cell
+        containerize_payload = ContainerizerPayload(**containerize_payload)
+
+        containerizer = _get_containerizer(containerize_payload)
+
+        # Helper to load saved references for containerized cell source
+        ref_containerized = RefContainerizer(cell_dir)
+
+        # Compare uild script (task.py or task.R)
+        script = containerizer.build_script()
+        ref_script = ref_containerized.build_script(
+            containerizer.file_extension
+            )
+        assert script == ref_script
+
+        # Dockerfile
+        dockerfile = containerizer.build_docker()
+        ref_dockerfile = ref_containerized.build_docker()
+        assert dockerfile == ref_dockerfile
+
+        # Compare environment source (environment.yaml) to reference.
+        # Because the order in which dependencies are listed might change, we
+        # sort them before comparing.
+        environment = yaml.safe_load(containerizer.build_environment())
+        ref_environment = yaml.safe_load(ref_containerized.build_environment())
+        is_string = lambda x: isinstance(x, str)
+        dependencies = sorted(filter(is_string, environment['dependencies']))
+        ref_dependencies = sorted(filter(is_string, ref_environment['dependencies']))
+        assert dependencies == ref_dependencies
+        is_dict = lambda x: isinstance(x, dict)
+        pip_dependencies = list(filter(is_dict, environment['dependencies']))
+        ref_pip_dependencies = list(filter(is_dict, ref_environment['dependencies']))
+        assert pip_dependencies == ref_pip_dependencies
+        del environment['dependencies']
+        del ref_environment['dependencies']
+        assert environment == ref_environment
 
 
 def test_containerize_github(cell_dir):
