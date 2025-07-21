@@ -194,13 +194,19 @@ def test_containerize_render():
         # sort them before comparing.
         environment = yaml.safe_load(containerizer.build_environment())
         ref_environment = yaml.safe_load(ref_containerized.build_environment())
-        is_string = lambda x: isinstance(x, str)
-        dependencies = sorted(filter(is_string, environment['dependencies']))
-        ref_dependencies = sorted(filter(is_string, ref_environment['dependencies']))
+        dependencies = sorted(filter(
+            lambda x: isinstance(x, str),
+            environment['dependencies']))
+        ref_dependencies = sorted(filter(
+            lambda x: isinstance(x, str),
+            ref_environment['dependencies']))
         assert dependencies == ref_dependencies
-        is_dict = lambda x: isinstance(x, dict)
-        pip_dependencies = list(filter(is_dict, environment['dependencies']))
-        ref_pip_dependencies = list(filter(is_dict, ref_environment['dependencies']))
+        pip_dependencies = list(filter(
+            lambda x: isinstance(x, dict),
+            environment['dependencies']))
+        ref_pip_dependencies = list(filter(
+            lambda x: isinstance(x, dict),
+            ref_environment['dependencies']))
         assert pip_dependencies == ref_pip_dependencies
         del environment['dependencies']
         del ref_environment['dependencies']
