@@ -17,6 +17,8 @@ client = TestClient(app)
 
 logging.basicConfig(level=logging.DEBUG)
 
+auth_token = os.getenv('AUTH_TOKEN')
+
 
 def download_files_from_github(repo_url, download_path):
     repo_owner = repo_url.split('/')[3]
@@ -108,7 +110,7 @@ def test_containerize():
         containerizer_json_payload['force_containerize'] = True
         containerize_response = client.post(
             '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=containerizer_json_payload,
         )
         try:
@@ -201,7 +203,7 @@ def test_containerize():
         containerizer_json_payload.update({'force_containerize': False})
         containerize_response = client.post(
             '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=containerizer_json_payload,
         )
         try:
@@ -240,7 +242,7 @@ def test_containerize():
         containerizer_json_payload['force_containerize'] = True
         containerize_response = client.post(
             '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=containerizer_json_payload,
         )
 
