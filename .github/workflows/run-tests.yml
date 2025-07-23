@@ -88,7 +88,6 @@ jobs:
           ./setup-tests.sh -f ../values-deploy-naavre-containerizer-service-minikube-github.yaml
 
       - run: |
-            pip install -r requirements.txt
             pip install pytest
 
       - name: pytets
