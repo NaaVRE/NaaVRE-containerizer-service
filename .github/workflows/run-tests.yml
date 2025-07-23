@@ -86,6 +86,7 @@ jobs:
           wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/36-move-setup-testssh-for-testing-in-minikube-here/scripts/setup-tests.sh
           chmod +x setup-tests.sh
           ./setup-tests.sh -f ../values-deploy-naavre-containerizer-service-minikube-github.yaml
+          cat minkube_configuration.json
 
       - run: |
             pip install pytest
