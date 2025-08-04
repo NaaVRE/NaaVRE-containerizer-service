@@ -87,8 +87,8 @@ print("-------------------------------------------------------------------------
 {% endfor %}
 id <- gsub('"', '', opt$id)
 
-{% for c in confs %}
-{{ c }}
+{% for c in cell.confs %}
+{{ c.assignation }}
 {% endfor %}
 
 print("Running the cell")

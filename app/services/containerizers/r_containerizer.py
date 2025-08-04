@@ -30,7 +30,6 @@ class RContainerizer(Containerizer, ABC):
     def build_script(self):
         template_script = self.template_env.get_template(self.template_script)
         deps = self.cell.dependencies
-        conf = self.cell.confs
 
         r_dependencies = []
         for dep in deps:
@@ -41,6 +40,4 @@ class RContainerizer(Containerizer, ABC):
             r_dependencies.append(install_packages)
             library = 'library(' + dep['name'] + ')'
             r_dependencies.append(library)
-        return template_script.render(cell=self.cell,
-                                      deps=r_dependencies,
-                                      confs=conf)
+        return template_script.render(cell=self.cell, deps=r_dependencies)
