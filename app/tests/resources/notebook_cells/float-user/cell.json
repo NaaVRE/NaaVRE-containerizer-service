@@ -1,0 +1,20 @@
+{
+  "confs": [],
+  "dependencies": [],
+  "inputs": [],
+  "kernel": "ipython",
+  "outputs": [
+    {
+      "name": "c",
+      "type": "float"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "title": "float-test-user-2",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+  },
+  "original_source": "c = 2.4"
+}

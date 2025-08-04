@@ -1,0 +1,32 @@
+{
+  "confs": [],
+  "container_source": "",
+  "dependencies": [],
+  "inputs": [
+    {
+      "name": "foo",
+      "type": "str"
+    }
+  ],
+  "kernel": "ipython",
+  "outputs": [],
+  "params": [
+    {
+      "name": "param_abc",
+      "type": "str",
+      "default_value": "abc"
+    }
+  ],
+  "secrets": [
+    {
+      "name": "secret_xyz",
+      "type": "str"
+    }
+  ],
+  "title": "secret-reader-test-user-2",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+  },
+  "original_source": "print(param_abc, secret_xyz, foo)"
+}
