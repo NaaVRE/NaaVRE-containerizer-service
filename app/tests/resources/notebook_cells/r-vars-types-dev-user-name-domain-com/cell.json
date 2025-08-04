@@ -1,0 +1,40 @@
+{
+  "confs": [],
+  "dependencies": [],
+  "inputs": [],
+  "kernel": "IRkernel",
+  "outputs": [
+    {
+      "name": "var_string_with_comment",
+      "type": "str"
+    },
+    {
+      "name": "var_string",
+      "type": "str"
+    },
+    {
+      "name": "var_int",
+      "type": "int"
+    },
+    {
+      "name": "var_float",
+      "type": "float"
+    },
+    {
+      "name": "var_list_int",
+      "type": "list"
+    },
+    {
+      "name": "var_list_str",
+      "type": "list"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "title": "r-vars-types-test-user-2",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
+  },
+  "original_source": "var_string <- 'var_string value'\nvar_string_with_comment <- 'var_string value'  # comment\nvar_int <- 1\nvar_float <- 1.1\nvar_list_int <- list(1, 2, 3)\nvar_list_str <- list(\"list_str\", \"space in elem\", \"3\")\nprint(class(var_list_int))"
+}

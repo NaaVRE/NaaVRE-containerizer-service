@@ -25,6 +25,9 @@ on:
       test:
         required: true
         type: string
+      pytest_extra_options:
+        default: ""
+        type: string
     secrets:
       configuration:
         required: true
@@ -86,4 +89,4 @@ jobs:
         run: |
           echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
           conda activate naavre-containerizer-service
-          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG -vv --tb=long
+          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}
