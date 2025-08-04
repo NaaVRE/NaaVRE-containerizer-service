@@ -16,36 +16,42 @@ elif os.path.exists('app/tests/resources/'):
 client = TestClient(app)
 
 
-def save_as_jupyter_notebook(notebook_cell, notebook_file):
-    # Extract the notebook content
-    notebook_data = notebook_cell['data']['notebook']
+def save_as_jupyter_notebook(notebook_data, notebook_filename):
     # Convert to Jupyter notebook format
     notebook = v4.new_notebook()
     notebook.cells = [
         v4.new_code_cell(cell['source']) for cell in notebook_data['cells']
     ]
     # Save as a Jupyter notebook file
-    output_path = '/tmp/' + notebook_file.replace('.json', '.ipynb')
+    output_path = '/tmp/' + notebook_filename
     with open(output_path, 'w') as f:
         write(notebook, f)
 
 
 def test_extract_cell():
-    cells_json_path = os.path.join(base_path, 'notebook_cells')
-    notebooks_files = os.listdir(cells_json_path)
-    for notebook_file in notebooks_files:
-        notebook_path = os.path.join(cells_json_path, notebook_file)
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
+        notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
         with open(notebook_path) as f:
-            print('Testing extract for notebook: ' + notebook_file)
-            notebook_cell = json.load(f)
-        f.close()
+            print('Testing extract for notebook: ' + notebook_path)
+            notebook = json.load(f)
 
-        save_as_jupyter_notebook(notebook_cell, notebook_file)
+        payload_path = os.path.join(cell_dir, 'payload_extract_cell.json')
+        with open(payload_path) as f:
+            print('                with payload: ' + payload_path)
+            extractor_json_payload = json.load(f)
 
-        extractor_json_payload = notebook_cell.copy()
-        del extractor_json_payload['cell']
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            print('              expecting cell: ' + cell_path)
+            expected_cell_dict = json.load(f)
 
-        expected_cell_dict = notebook_cell['cell']
+        cell_name = os.path.basename(cell_dir)
+        save_as_jupyter_notebook(notebook, f'{cell_name}.ipynb')
+
+        extractor_json_payload['data']['notebook'] = notebook
+
         cell_extractor_response = client.post(
             '/extract_cell/',
             headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},

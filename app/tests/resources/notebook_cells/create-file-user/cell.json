@@ -1,0 +1,46 @@
+{
+  "confs": [
+    {
+      "name": "conf_data_folder",
+      "assignation": "conf_data_folder = os.path.join('/tmp', 'data')"
+    }
+  ],
+  "dependencies": [
+    {
+      "asname": null,
+      "module": "os.path",
+      "name": "isfile"
+    },
+    {
+      "asname": null,
+      "module": "os.path",
+      "name": "join"
+    },
+    {
+      "asname": null,
+      "module": "os",
+      "name": "listdir"
+    },
+    {
+      "asname": null,
+      "module": "",
+      "name": "os"
+    }
+  ],
+  "inputs": [],
+  "kernel": "ipython",
+  "outputs": [
+    {
+      "name": "file_path",
+      "type": "str"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "title": "create-file-test-user-2",
+  "original_source": "L = [\"a\\n\", \"b\\n\", \"c\\n\"]\nfile_path =  os.path.join(conf_data_folder,'hello.txt')\nfp = open(file_path, 'w')\nfp.writelines(L)\nfp.close()\n\nonlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+  }
+}
