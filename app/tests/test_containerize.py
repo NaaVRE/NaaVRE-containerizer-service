@@ -5,14 +5,19 @@ import uuid
 from time import sleep
 
 import requests
+import yaml
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.main import app, _get_containerizer
+from app.models.containerizer_payload import ContainerizerPayload
 
 if os.path.exists('resources'):
     base_path = 'resources'
 elif os.path.exists('app/tests/resources/'):
     base_path = 'app/tests/resources/'
+else:
+    raise RuntimeError('cannot find test resources')
+
 client = TestClient(app)
 
 logging.basicConfig(level=logging.DEBUG)
@@ -91,239 +96,353 @@ def wait_for_containerization(workflow_id=None,
     return containerization_status_response
 
 
-def test_containerize():
-    os.environ['DEBUG'] = 'True'
-    cells_json_path = os.path.join(base_path, 'notebook_cells')
-    cells_files = os.listdir(cells_json_path)
-    for cell_file in cells_files:
-        cell_path = os.path.join(cells_json_path, cell_file)
+def gen_tests_reference():
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
+        cell_path = os.path.join(cell_dir, 'cell.json')
         with open(cell_path) as f:
-            print('Testing containerize for cell: ' + cell_file)
-            logging.info('Testing containerize for cell: ' + cell_file)
-            cell_notebook_dict = json.load(f)
-        f.close()
+            cell = json.load(f)
 
-        containerizer_json_payload = cell_notebook_dict.copy()
-        del containerizer_json_payload['data']
-        containerizer_json_payload['force_containerize'] = True
-        containerize_response = client.post(
-            '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            json=containerizer_json_payload,
-        )
-        try:
-            assert containerize_response.status_code == 200
-        except AssertionError:
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            raise
+        payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+        with open(payload_path) as f:
+            containerize_payload = json.load(f)
 
-        workflow_id = containerize_response.json()['workflow_id']
-        source_url = containerize_response.json()['source_url']
-        assert cell_notebook_dict['cell']['title'] in source_url
-        containerization_status_response = wait_for_containerization(
-            workflow_id=workflow_id,
-            virtual_lab=containerizer_json_payload['virtual_lab'],
-            wait_for_completion=False)
-        try:
-            assert containerization_status_response.status_code == 200
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
-        containerization_status_response = wait_for_containerization(
-            workflow_id=workflow_id,
-            virtual_lab=containerizer_json_payload['virtual_lab'],
-            wait_for_completion=True)
+        containerize_payload['cell'] = cell
+        containerize_payload = ContainerizerPayload(**containerize_payload)
 
-        try:
-            assert (containerization_status_response.json()['job']['status'] ==
-                    'completed')
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
+        containerizer = _get_containerizer(containerize_payload)
+        cell_source_dir = os.path.join(cell_dir, 'containerized_cell_source')
+        os.makedirs(cell_source_dir)
 
-        try:
-            assert containerization_status_response.json()['job'][
-                       'conclusion'] == 'success'
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
-        # Download files from source_url
-        download_path = os.path.join('/tmp', 'downloaded_files')
-        os.makedirs(download_path, exist_ok=True)
-        download_files_from_github(source_url, download_path)
+        task_source = containerizer.build_script()
+        task_filename = os.path.join(
+            cell_source_dir, 'task' + containerizer.file_extension)
+        with open(task_filename, 'w') as f:
+            f.write(task_source)
 
-        # Check if the downloaded files are correct
-        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                cell_notebook_dict['cell']['kernel'] == 'ipython'):
-            assert os.path.exists(os.path.join(download_path, 'task.py'))
-        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
-                cell_notebook_dict['cell']['kernel'].lower() == 'r':
-            assert os.path.exists(os.path.join(download_path, 'task.R'))
-        # assert task_code in cell_notebook_dict['cell'][
-        #     'original_source']
-        assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
-        assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
+        environment_source = containerizer.build_environment()
+        environment_filename = os.path.join(
+            cell_source_dir, 'environment.yaml')
+        with open(environment_filename, 'w') as f:
+            f.write(environment_source)
 
-        containerizer_json_payload.update({'force_containerize': False})
-        containerize_response = client.post(
-            '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            json=containerizer_json_payload,
-        )
-        try:
-            assert containerize_response.status_code == 200
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            raise
+        dockerfile_source = containerizer.build_docker()
+        dockerfile_filename = os.path.join(cell_source_dir, 'Dockerfile')
+        with open(dockerfile_filename, 'w') as f:
+            f.write(dockerfile_source)
 
-        try:
-            assert containerize_response.json()[
-                       'dispatched_github_workflow'] is False
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            raise
 
-        uid = str(uuid.uuid4())
-        containerizer_json_payload['cell']['title'] = 'test_containerize'+uid
-        containerizer_json_payload['force_containerize'] = True
-        containerize_response = client.post(
-            '/containerize/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
-            json=containerizer_json_payload,
-        )
+class RefContainerizer:
+    def __init__(self, cell_dir):
+        self.source_dir = os.path.join(cell_dir, 'containerized_cell_source')
 
-        try:
-            assert containerize_response.status_code == 200
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerize_response.status_code}")
-            raise
+    def build_script(self, file_extension):
+        filename = os.path.join(self.source_dir, 'task' + file_extension)
+        with open(filename) as f:
+            source = f.read()
+        return source
 
-        workflow_id = containerize_response.json()['workflow_id']
-        source_url = containerize_response.json()['source_url']
-        assert cell_notebook_dict['cell']['title'] in source_url
-        containerization_status_response = wait_for_containerization(
-            workflow_id=workflow_id,
-            virtual_lab=containerizer_json_payload['virtual_lab'],
-            wait_for_completion=True)
+    def build_docker(self):
+        filename = os.path.join(self.source_dir, 'Dockerfile')
+        with open(filename) as f:
+            source = f.read()
+        return source
 
-        try:
-            assert containerization_status_response.status_code == 200
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
-        try:
-            assert (containerization_status_response.json()['job']['status'] ==
-                    'completed')
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
-        try:
-            assert containerization_status_response.json()['job'][
-                       'conclusion'] == 'success'
-        except AssertionError:
-            print(f"Failed for workflow_id: {workflow_id}")
-            logging.info(f"Failed for workflow_id: {workflow_id}")
-            print(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            logging.error(
-                f"Assertion failed at line "
-                f"{__import__('inspect').currentframe().f_lineno - 3}: "
-                f"status_code={containerization_status_response.status_code}")
-            raise
-        # Download files from source_url
-        download_path = os.path.join('/tmp', 'downloaded_files')
-        os.makedirs(download_path, exist_ok=True)
-        download_files_from_github(source_url, download_path)
+    def build_environment(self):
+        filename = os.path.join(self.source_dir, 'environment.yaml')
+        with open(filename) as f:
+            source = f.read()
+        return source
 
-        # Check if the downloaded files are correct
-        if (cell_notebook_dict['cell']['kernel'].lower() == 'python' or
-                cell_notebook_dict['cell']['kernel'] == 'ipython'):
-            assert os.path.exists(os.path.join(download_path, 'task.py'))
-        elif cell_notebook_dict['cell']['kernel'].lower() == 'irkernel' or \
-                cell_notebook_dict['cell']['kernel'].lower() == 'r':
-            assert os.path.exists(os.path.join(download_path, 'task.R'))
-        # assert task_code in cell_notebook_dict['cell'][
-        #     'original_source']
-        assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
-        assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
+
+def test_containerize_render():
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    for cell_dir in cells_dirs:
+        print("Testing containerization for cell", cell_dir)
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            cell = json.load(f)
+
+        payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+        with open(payload_path) as f:
+            containerize_payload = json.load(f)
+
+        containerize_payload['cell'] = cell
+        containerize_payload = ContainerizerPayload(**containerize_payload)
+
+        containerizer = _get_containerizer(containerize_payload)
+
+        # Helper to load saved references for containerized cell source
+        ref_containerized = RefContainerizer(cell_dir)
+
+        # Compare uild script (task.py or task.R)
+        script = containerizer.build_script()
+        ref_script = ref_containerized.build_script(
+            containerizer.file_extension
+            )
+        assert script == ref_script
+
+        # Dockerfile
+        dockerfile = containerizer.build_docker()
+        ref_dockerfile = ref_containerized.build_docker()
+        assert dockerfile == ref_dockerfile
+
+        # Compare environment source (environment.yaml) to reference.
+        # Because the order in which dependencies are listed might change, we
+        # sort them before comparing.
+        environment = yaml.safe_load(containerizer.build_environment())
+        ref_environment = yaml.safe_load(ref_containerized.build_environment())
+        dependencies = sorted(filter(
+            lambda x: isinstance(x, str),
+            environment['dependencies']))
+        ref_dependencies = sorted(filter(
+            lambda x: isinstance(x, str),
+            ref_environment['dependencies']))
+        assert dependencies == ref_dependencies
+        pip_dependencies = list(filter(
+            lambda x: isinstance(x, dict),
+            environment['dependencies']))
+        ref_pip_dependencies = list(filter(
+            lambda x: isinstance(x, dict),
+            ref_environment['dependencies']))
+        assert pip_dependencies == ref_pip_dependencies
+        del environment['dependencies']
+        del ref_environment['dependencies']
+        assert environment == ref_environment
+
+
+def test_containerize_github(cell_dir):
+    os.environ['DEBUG'] = 'True'
+    cell_path = os.path.join(cell_dir, 'cell.json')
+    with open(cell_path) as f:
+        print('Testing containerize for cell: ' + cell_path)
+        cell = json.load(f)
+
+    payload_path = os.path.join(cell_dir, 'payload_containerize.json')
+    with open(payload_path) as f:
+        print('                with payload: ' + payload_path)
+        containerizer_json_payload = json.load(f)
+
+    containerizer_json_payload['cell'] = cell
+    containerizer_json_payload['force_containerize'] = True
+    containerize_response = client.post(
+        '/containerize/',
+        headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+        json=containerizer_json_payload,
+    )
+    try:
+        assert containerize_response.status_code == 200
+    except AssertionError:
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        raise
+
+    workflow_id = containerize_response.json()['workflow_id']
+    source_url = containerize_response.json()['source_url']
+    assert cell['title'] in source_url
+    containerization_status_response = wait_for_containerization(
+        workflow_id=workflow_id,
+        virtual_lab=containerizer_json_payload['virtual_lab'],
+        wait_for_completion=False)
+    try:
+        assert containerization_status_response.status_code == 200
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+    containerization_status_response = wait_for_containerization(
+        workflow_id=workflow_id,
+        virtual_lab=containerizer_json_payload['virtual_lab'],
+        wait_for_completion=True)
+
+    try:
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+
+    try:
+        assert containerization_status_response.json()['job'][
+                   'conclusion'] == 'success'
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+    # Download files from source_url
+    download_path = os.path.join('/tmp', 'downloaded_files')
+    os.makedirs(download_path, exist_ok=True)
+    download_files_from_github(source_url, download_path)
+
+    # Check if the downloaded files are correct
+    if (cell['kernel'].lower() == 'python' or
+            cell['kernel'] == 'ipython'):
+        assert os.path.exists(os.path.join(download_path, 'task.py'))
+    elif cell['kernel'].lower() == 'irkernel' or \
+            cell['kernel'].lower() == 'r':
+        assert os.path.exists(os.path.join(download_path, 'task.R'))
+    # assert task_code in cell['original_source']
+    assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
+    assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
+
+    containerizer_json_payload.update({'force_containerize': False})
+    containerize_response = client.post(
+        '/containerize/',
+        headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+        json=containerizer_json_payload,
+    )
+    try:
+        assert containerize_response.status_code == 200
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        raise
+
+    try:
+        assert containerize_response.json()[
+                   'dispatched_github_workflow'] is False
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        raise
+
+    uid = str(uuid.uuid4())
+    containerizer_json_payload['cell']['title'] = 'test_containerize'+uid
+    containerizer_json_payload['force_containerize'] = True
+    containerize_response = client.post(
+        '/containerize/',
+        headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+        json=containerizer_json_payload,
+    )
+
+    try:
+        assert containerize_response.status_code == 200
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerize_response.status_code}")
+        raise
+
+    workflow_id = containerize_response.json()['workflow_id']
+    source_url = containerize_response.json()['source_url']
+    assert cell['title'] in source_url
+    containerization_status_response = wait_for_containerization(
+        workflow_id=workflow_id,
+        virtual_lab=containerizer_json_payload['virtual_lab'],
+        wait_for_completion=True)
+
+    try:
+        assert containerization_status_response.status_code == 200
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+    try:
+        assert (containerization_status_response.json()['job']['status'] ==
+                'completed')
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+    try:
+        assert containerization_status_response.json()['job'][
+                   'conclusion'] == 'success'
+    except AssertionError:
+        print(f"Failed for workflow_id: {workflow_id}")
+        logging.info(f"Failed for workflow_id: {workflow_id}")
+        print(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        logging.error(
+            f"Assertion failed at line "
+            f"{__import__('inspect').currentframe().f_lineno - 3}: "
+            f"status_code={containerization_status_response.status_code}")
+        raise
+    # Download files from source_url
+    download_path = os.path.join('/tmp', 'downloaded_files')
+    os.makedirs(download_path, exist_ok=True)
+    download_files_from_github(source_url, download_path)
+
+    # Check if the downloaded files are correct
+    if (cell['kernel'].lower() == 'python' or
+            cell['kernel'] == 'ipython'):
+        assert os.path.exists(os.path.join(download_path, 'task.py'))
+    elif cell['kernel'].lower() == 'irkernel' or \
+            cell['kernel'].lower() == 'r':
+        assert os.path.exists(os.path.join(download_path, 'task.R'))
+    # assert task_code in cell['original_source']
+    assert os.path.exists(os.path.join(download_path, 'environment.yaml'))
+    assert os.path.exists(os.path.join(download_path, 'Dockerfile'))
