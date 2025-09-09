@@ -1,0 +1,29 @@
+{
+  "title": "none-in-environment-yaml-gabriel-pelouze-lifewatch-eu",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.22",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.22"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "a",
+      "type": "int"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "module": "",
+      "asname": null,
+      "name": "acolite"
+    }
+  ],
+  "kernel": "ipython",
+  "original_source": "print(acolite)\na = 1",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
