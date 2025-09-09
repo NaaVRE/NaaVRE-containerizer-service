@@ -57,6 +57,8 @@ class PyContainerizer(Containerizer, ABC):
                 pip_deps.add(module_name_mapping['pip'][module_name])
             elif not self.is_standard_module(module_name):
                 conda_deps.add(module_name)
+        conda_deps.discard(None)
+        conda_deps.discard(None)
         return {'conda_dependencies': conda_deps, 'pip_dependencies': pip_deps}
 
     def build_script(self):

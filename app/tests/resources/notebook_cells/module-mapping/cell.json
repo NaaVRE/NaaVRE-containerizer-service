@@ -1,0 +1,29 @@
+{
+  "title": "none-in-environment-yaml-test-user-2",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "a",
+      "type": "int"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "module": "",
+      "asname": null,
+      "name": "acolite"
+    }
+  ],
+  "kernel": "ipython",
+  "original_source": "print(acolite)\na = 1",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

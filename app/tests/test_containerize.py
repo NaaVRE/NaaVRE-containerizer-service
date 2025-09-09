@@ -191,14 +191,14 @@ def test_containerize_render():
 
         # Compare environment source (environment.yaml) to reference.
         # Because the order in which dependencies are listed might change, we
-        # sort them before comparing.
+        # convert them to sets before comparing.
         environment = yaml.safe_load(containerizer.build_environment())
         ref_environment = yaml.safe_load(ref_containerized.build_environment())
         dependencies = sorted(filter(
-            lambda x: isinstance(x, str),
+            lambda x: not isinstance(x, dict),
             environment['dependencies']))
         ref_dependencies = sorted(filter(
-            lambda x: isinstance(x, str),
+            lambda x: not isinstance(x, dict),
             ref_environment['dependencies']))
         assert dependencies == ref_dependencies
         pip_dependencies = list(filter(
