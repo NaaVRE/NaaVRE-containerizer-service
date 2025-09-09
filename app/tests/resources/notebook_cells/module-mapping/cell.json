@@ -1,8 +1,8 @@
 {
-  "title": "none-in-environment-yaml-gabriel-pelouze-lifewatch-eu",
+  "title": "none-in-environment-yaml-test-user-2",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.22",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.22"
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
   },
   "inputs": [],
   "outputs": [
