@@ -72,3 +72,4 @@ You can run the following command to generate the secrets.CONFIG_FILE:
 ```shell
 tr -d '\n' < configuration.json | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
 ```
+
