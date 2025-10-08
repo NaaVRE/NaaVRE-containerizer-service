@@ -201,11 +201,8 @@ class RExtractor(Extractor):
     def __extract_prefixed_var(self, sources,
                                prefix:
                                Literal['input', 'output', 'param', 'secret']) \
-            -> list[dict]:
-        extracted_vars = []
-        key_value_name = 'value'
-        if prefix == 'param':
-            key_value_name = 'default_value'
+            -> dict:
+        extracted_vars = dict()
         for s in sources:
             tree = parse_text(s)
             visitor = ExtractPrefixedVar(prefix)
@@ -216,11 +213,11 @@ class RExtractor(Extractor):
                         'name': variable_name,
                         'type': self.notebook_names[variable_name]['type']
                         if variable_name in self.notebook_names else None,
-                        key_value_name: variable_names[variable_name]['value']
+                        'value': variable_names[variable_name]['value']
                     }
                     if prefix == 'secret':
-                        del extracted_var[key_value_name]
-                    extracted_vars.append(extracted_var)
+                        del extracted_var['value']
+                    extracted_vars[variable_name] = extracted_var
         return extracted_vars
 
     def get_cell_outputs(self) -> list[dict]:
@@ -282,28 +279,32 @@ class RExtractor(Extractor):
         for u in param_unds:
             if u not in param:
                 param[u] = self.notebook_params[u]
-                cell_params.append(param)
+                cell_params.append({'name': u, 'type': param[u]['type'],
+                                    'default_value': param[u]['value']})
         return cell_params
 
     def get_cell_secrets(self) -> list[dict]:
         secret = {}
-        cell_secret = []
+        cell_secrets = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
         secret_unds = [und for und in cell_unds if
                        und in self.notebook_secrets]
         for u in secret_unds:
             if u not in secret:
                 secret[u] = self.notebook_secrets[u]
-                cell_secret.append({'name': u, 'type': secret[u]['type']})
-        return cell_secret
+                cell_secrets.append({'name': u, 'type': secret[u]['type']})
+        return cell_secrets
 
     def get_cell_confs(self) -> list[dict]:
+        conf = {}
         cell_confs = []
-        for conf in self.notebook_configurations:
-            cell_confs.append({
-                'name': conf,
-                'assignation': self.notebook_configurations[conf]
-            })
+        cell_unds = self.__extract_cell_undefined(self.cell_source)
+        conf_unds = [und for und in cell_unds if
+                     und in self.notebook_configurations]
+        for u in conf_unds:
+            if u not in conf:
+                conf[u] = self.notebook_configurations[u]
+                cell_confs.append({'name': u, 'assignation': conf[u]})
         return cell_confs
 
     def __resolve_configurations(self, configurations) -> dict:
