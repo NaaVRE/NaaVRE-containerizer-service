@@ -91,7 +91,7 @@ jobs:
         shell: bash -l {0}
         run: |
           echo '${{ inputs.configuration }}' \
-            | jq '.vl_configurations[].cell_github_token |= "${{ secrets.cell_github_token }}"'
+            | jq '.vl_configurations[].cell_github_token |= "${{ secrets.cell_github_token }}"' \
             > "${{ env.CONFIG_FILE_URL }}"
           echo "Configuration file ${{ env.CONFIG_FILE_URL }}"
           cat "${{ env.CONFIG_FILE_URL }}"
