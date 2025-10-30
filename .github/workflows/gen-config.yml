@@ -1,0 +1,21 @@
+name: Gen config
+
+on:
+  workflow_call:
+    inputs:
+      configuration:
+        required: true
+    secrets:
+      cell_github_token:
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: print environment variables
+        run: |
+          echo "${{inputs.configuration}}"
+          echo "${{secrets.cell_github_token}}
