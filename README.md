@@ -55,20 +55,3 @@ Then, add the token you created to the `Authorization` header to your HTTP reque
 ```http
 Authorization: Bearer eyJ0eXAi...
 ```
-
-```shell
-
-
-### Test on GitHub
-
-The secrets.CONFIG_FILE should have quotes escaped:
-
-```commandline
-{   \"vl_configurations\": [     {       \"name\": \"openlab\",       \"base_image_tags_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/base_image_tags_latest.json\",       \"module_mapping_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json\",       \"cell_github_url\": \"https://github.com/QCDIS/NaaVRE-cells-test-3.git\",       \"cell_github_token\": \"TOKEN\",       \"registry_url\": \"ghcr.io/qcdis/naavre-cells-test-3\"     },     {       \"name\": \"virtual_lab_2\",       \"base_image_tags_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/base_image_tags_latest.json\",       \"module_mapping_url\": \"https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json\",       \"cell_github_url\": \"\",       \"cell_github_token\": \"\",       \"registry_url\": \"https://registry.naavre.com\"     }   ] }
-```
-
-You can run the following command to generate the secrets.CONFIG_FILE:
-
-```shell
-tr -d '\n' < configuration.json | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
-```

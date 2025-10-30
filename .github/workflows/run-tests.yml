@@ -7,6 +7,9 @@ on:
       runs-on:
         default: ubuntu-latest
         type: string
+      configuration:
+        required: true
+        type: string
       debug:
         required: true
         type: string
@@ -29,9 +32,9 @@ on:
         default: ""
         type: string
     secrets:
-      configuration:
-        required: true
       auth_token:
+        required: true
+      cell_github_token:
         required: true
       registry_token_for_tests:
         required: true
@@ -87,6 +90,10 @@ jobs:
       - name: pytets
         shell: bash -l {0}
         run: |
-          echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
+          echo '${{ inputs.configuration }}' \
+            | jq '.vl_configurations[].cell_github_token |= "${{ secrets.cell_github_token }}"'
+            > "${{ env.CONFIG_FILE_URL }}"
+          echo "Configuration file ${{ env.CONFIG_FILE_URL }}"
+          cat "${{ env.CONFIG_FILE_URL }}"
           conda activate naavre-containerizer-service
           pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}
