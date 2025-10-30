@@ -10,6 +10,9 @@ on:
       cell_github_token:
         required: true
 
+env:
+  CONFIG_FILE_URL: /tmp/configuration.json
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,5 +21,7 @@ jobs:
     steps:
       - name: print environment variables
         run: |
-          echo "${{inputs.configuration}}"
-          echo "${{secrets.cell_github_token}}
+          echo '${{inputs.configuration}}' \
+            | jq '.vl_configurations[].cell_github_token |= "${{secrets.cell_github_token}}"'
+            > "${{ env.CONFIG_FILE_URL }}"
+          cat "${{ env.CONFIG_FILE_URL }}"
