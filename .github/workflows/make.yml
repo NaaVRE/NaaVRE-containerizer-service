@@ -14,7 +14,7 @@ jobs:
   gen-config-file:
     uses: ./.github/workflows/gen-config.yml
     with:
-      configuration: ${{ secrets.TMP_CONFIG_FILE }}
+      configuration: ${{ vars.TMP_CONFIG_FILE }}
     secrets:
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
 
