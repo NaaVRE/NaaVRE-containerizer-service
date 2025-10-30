@@ -5,6 +5,7 @@ on:
     inputs:
       configuration:
         required: true
+        type: string
     secrets:
       cell_github_token:
         required: true
