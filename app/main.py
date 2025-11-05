@@ -56,7 +56,7 @@ def load_configuration(source):
 
 config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
                                            'naavrehub/'
-                                           'naavre-workflow-service/'
+                                           'NaaVRE-containerizer-service/'
                                            'main/conf.json')
 
 conf = None
