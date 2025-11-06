@@ -93,8 +93,8 @@ jobs:
           chmod +x setup-tests.sh
           ls -lah 
           pwd
-#          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
-#          cat minkube_configuration.json
+          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
+          cat minkube_configuration.json
 
       - run: |
             pip install pytest
