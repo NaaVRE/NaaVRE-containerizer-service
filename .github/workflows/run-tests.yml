@@ -89,9 +89,9 @@ jobs:
       - name: Run setup-tests.sh
         shell: bash -l {0}
         run: |
-          wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/main/scripts/setup-tests.sh
+          wget //raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/108-error-installation-failed-template-naavretemplateskeycloakyaml/scripts/setup-tests.sh
           chmod +x setup-tests.sh
-          ./setup-tests.sh -f ../values-deploy-naavre-containerizer-service-minikube-github.yaml
+          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
           cat minkube_configuration.json
 
       - run: |
