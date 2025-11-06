@@ -91,10 +91,10 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/108-error-installation-failed-template-naavretemplateskeycloakyaml/scripts/setup-tests.sh
           chmod +x setup-tests.sh
-          ls -lah 
-          pwd
           ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
           cat minkube_configuration.json
+          ls -lah 
+          pwd
 
       - run: |
             pip install pytest
