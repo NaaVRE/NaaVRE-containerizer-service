@@ -86,12 +86,19 @@ jobs:
       - name: Try the cluster
         run: kubectl get pods -A
 
+      - name: Load Secrets from SOPS File
+        uses: byont-ventures/sops@main
+        with:
+          operation: "load-secrets"
+          sops-age-key: ${{ secrets.SOPS_AGE_KEY }}
+          sops-file-path: "path/to/your/secrets.sops.yaml" # e.g., .env.sops or secrets/production.sops.json
+
       - name: Run setup-tests.sh
         shell: bash -l {0}
         run: |
           wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/main/scripts/setup-tests.sh
           chmod +x setup-tests.sh
-          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
+          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github-secrets.yaml
           cat minkube_configuration.json
 
       - run: |
