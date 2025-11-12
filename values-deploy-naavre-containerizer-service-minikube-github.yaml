@@ -28,7 +28,7 @@ global:
       naavreClientSecret: SECRET_KEYCLOAK_NAAVRE_CLIENT_SECRET
       users:
         - username: my-user
-          password: USER_PASSWORD
+          password: my-password
       postgresql:
         password: SECRET_KEYCLOAK_POSTGRESQL_PASSWORD
 
