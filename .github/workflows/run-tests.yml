@@ -91,7 +91,7 @@ jobs:
         with:
           operation: "load-secrets"
           sops-age-key: ${{ secrets.SOPS_AGE_KEY }}
-          sops-file-path: "path/to/your/secrets.sops.yaml" # e.g., .env.sops or secrets/production.sops.json
+          sops-file-path: "values-deploy-naavre-containerizer-service-minikube-github-secrets.yaml"
 
       - name: Run setup-tests.sh
         shell: bash -l {0}

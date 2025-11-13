@@ -39,7 +39,7 @@ and open http://127.0.0.1:8000/docs
 We use Helm for the deployment:
 
 ```shell
-helm -n naavre-containerizer-service upgrade --install --create-namespace naavre-containerizer-service ./helm/naavre-containerizer-service -f values.yaml
+helm -n naavre-containerizer-service upgrade --install --create-namespace naavre-containerizer-service ./helm/naavre-containerizer-service -f values-deploy-naavre-containerizer-service-minikube-github-secrets.yaml
 ```
 
 `values.yaml` should contain ingress, OAuth2, and other configuration (
