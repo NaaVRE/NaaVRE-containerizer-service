@@ -86,12 +86,12 @@ jobs:
       - name: Try the cluster
         run: kubectl get pods -A
 
-      - name: Load Secrets from SOPS File
-        uses: byont-ventures/sops@main
+      # Preferred: assume an IAM role via OIDC (no long-lived keys)
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          operation: "load-secrets"
-          sops-age-key: ${{ secrets.SOPS_AGE_KEY }}
-          sops-file-path: "values-deploy-naavre-containerizer-service-minikube-github-secrets.yaml"
+          role-to-assume: github-actions-role
+          aws-region: eu-west-3
 
       - name: Run setup-tests.sh
         shell: bash -l {0}
