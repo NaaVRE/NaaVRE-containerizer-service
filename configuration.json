@@ -14,7 +14,21 @@
         "service_account": "executor",
         "namespace": "default",
         "workdir_storage_size": "1Gi"
-      }
+      },
+      "extraVolumes": [
+        {
+          "name": "csi-s3-naa-vre-public-bucket",
+          "persistentVolumeClaim": {
+            "claimName": "csi-s3-naa-vre-public-bucket"
+          }
+        },
+        {
+          "name": "naa-vre-user-data",
+          "persistentVolumeClaim": {
+            "claimName": "naa-vre-user-data"
+          }
+        }
+      ]
     },
     {
       "name": "virtual_lab_2",

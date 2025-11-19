@@ -16,6 +16,15 @@ spec:
         resources:
           requests:
             storage: {{ workdir_storage_size }}Gi
+    volumes:
+    - name: public-bucket
+        persistentVolumeClaim:
+            claimName: {{ public_bucket_pvc_name }}
+    {% if private_bucket_pvc_name %}
+    - name: private-bucket
+        persistentVolumeClaim:
+            claimName: {{ private_bucket_pvc_name }}
+    {% endif %}
     arguments:
       parameters:
       {% for p, value in global_params.items() %}
@@ -151,6 +160,12 @@ spec:
         volumeMounts:
         - name: workdir
           mountPath: /tmp/data
+        - name: public-bucket
+            mountPath: /mnt/public-bucket
+        {% if private_bucket_pvc_name %}
+        - name: private-bucket
+            mountPath: /mnt/private-bucket
+        {% endif %}
         env:
         {%  for s in secrets %}
           - name: {{ s }}
