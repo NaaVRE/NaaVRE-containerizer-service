@@ -39,6 +39,8 @@ class JobNotFoundError(Exception):
 class GithubService(GitRepository, ABC):
 
     def __init__(self, vl_conf: VLConfig):
+        if vl_conf.cell_github_token is None:
+            raise ValueError("GitHub token is required for GitHubService")
         self.github = Github(auth=github.Auth.Token(
                                             token=vl_conf.cell_github_token))
 

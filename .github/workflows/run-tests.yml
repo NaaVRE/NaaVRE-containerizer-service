@@ -77,23 +77,36 @@ jobs:
             conda-environment-${{ runner.os }}-
         id: cache-conda
 
-      - name: print environment variables
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@v0.0.19
+        with:
+          addons: ingress,ingress-dns
+
+      - name: Try the cluster
+        run: kubectl get pods -A
+
+      # Preferred: assume an IAM role via OIDC (no long-lived keys)
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: github-actions-role
+          aws-region: eu-west-3
+
+      - name: Run setup-tests.sh
+        shell: bash -l {0}
         run: |
-          echo "DEBUG: $DEBUG"
-          echo "OIDC_CONFIGURATION_URL: $OIDC_CONFIGURATION_URL"
-          echo "DISABLE_AUTH: $DISABLE_AUTH"
-          echo "VERIFY_SSL: $VERIFY_SSL"
-          echo "ROOT_PATH: $ROOT_PATH"
-          echo "AUTH_TOKEN: $AUTH_TOKEN"
-          echo "CONFIG_FILE_URL: $CONFIG_FILE_URL"
+          wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/main/scripts/setup-tests.sh
+          chmod +x setup-tests.sh
+          ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github-secrets.yaml
+          cat minkube_configuration.json
+
+      - run: |
+            pip install pytest
 
       - name: pytets
         shell: bash -l {0}
         run: |
-          echo '${{ inputs.configuration }}' \
-            | jq '.vl_configurations[].cell_github_token |= "${{ secrets.cell_github_token }}"' \
-            > "${{ env.CONFIG_FILE_URL }}"
-          echo "Configuration file ${{ env.CONFIG_FILE_URL }}"
-          cat "${{ env.CONFIG_FILE_URL }}"
+          echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
           conda activate naavre-containerizer-service
           pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}

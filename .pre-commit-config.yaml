@@ -5,10 +5,12 @@ repos:
       - id: ggshield
         language_version: python3
         stages: [ commit ]
+        exclude: values-deploy-naavre-containerizer-service-minikube-github-secret.yaml
   - repo: https://github.com/crate-ci/typos
     rev: v1.26.0
     hooks:
       - id: typos
+        exclude: values-deploy-naavre-containerizer-service-minikube-github-secret.yaml
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
