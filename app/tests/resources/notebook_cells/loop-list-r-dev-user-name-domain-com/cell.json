@@ -11,10 +11,10 @@
   "outputs": [],
   "params": [],
   "secrets": [],
-  "title": "loop-list-r-test-user-2",
+  "title": "loop-list-r-user",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "for (l in list_of_paths) {\n    print(l)\n}"
 }
