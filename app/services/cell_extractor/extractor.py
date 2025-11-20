@@ -26,10 +26,9 @@ class Extractor(abc.ABC):
         for cell in notebook_data.notebook.cells:
             if isinstance(cell.source, list):
                 cell.source = "\n".join(cell.source)
-        nb_cell = notebook_data.notebook.cells[notebook_data.cell_index]
-        if nb_cell.cell_type == 'code' and len(nb_cell.source) > 0 and \
-                nb_cell.source[0] != '!':
-            self.cell_source = nb_cell.source
+
+        self.cell_source = (
+            notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.user_name = notebook_data.user_name
         self.kernel = notebook_data.kernel
         self.cell_inputs = self.get_cell_inputs()

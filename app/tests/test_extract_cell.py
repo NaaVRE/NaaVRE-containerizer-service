@@ -65,6 +65,8 @@ def test_extract_cell():
         cell_dict = cell_extractor_response.json()
 
         returned_cell = Cell.model_validate(cell_dict)
+        json_dict = json.dumps(cell_dict)
+        print(json_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
         returned_cell_confs = sorted(returned_cell.confs,
