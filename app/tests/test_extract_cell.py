@@ -33,8 +33,6 @@ def test_extract_cell():
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
         notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
-        if 'import_as_dependency' not in notebook_path:
-            continue
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
             notebook = json.load(f)
