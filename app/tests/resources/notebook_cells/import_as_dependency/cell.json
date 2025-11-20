@@ -1,0 +1,35 @@
+{
+  "title": "import_as_dependency",
+  "base_container_image": {
+    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
+    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "event_file",
+      "type": "str"
+    }
+  ],
+  "params": [
+    {
+      "name": "param_dataverse_api_key",
+      "type": "str",
+      "default_value": ""
+    }
+  ],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "name": "pandas",
+      "asname": null,
+      "module": ""
+    }
+  ],
+  "kernel": "ipython",
+  "original_source": "print(\"doesn't work\")",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
