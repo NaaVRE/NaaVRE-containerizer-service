@@ -24,6 +24,7 @@
   "original_source": "some_list = range(count, a+1)\n\nmsg = '1'",
   "base_container_image": {
     "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+    "runtime": "
+    "
   }
 }
