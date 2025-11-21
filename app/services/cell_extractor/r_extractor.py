@@ -209,14 +209,23 @@ class RExtractor(Extractor):
             variable_names = visitor.visit(tree)
             for variable_name in variable_names:
                 if variable_name.startswith(prefix + '_'):
+                    variable_type = None
+                    variable_value = None
+                    if variable_name in self.notebook_names:
+                        variable_type = (
+                            self.notebook_names)[variable_name]['type']
+                    if prefix != 'secret':
+                        variable_value = variable_names[variable_name]['value']
                     extracted_var = {
                         'name': variable_name,
-                        'type': self.notebook_names[variable_name]['type']
-                        if variable_name in self.notebook_names else None,
-                        'value': variable_names[variable_name]['value']
+                        'type': variable_type,
+                        'value': variable_value
                     }
-                    if prefix == 'secret':
-                        del extracted_var['value']
+                    if variable_name in extracted_vars:
+                        extracted_var = (
+                            self.__get_best_variable(
+                                extracted_vars[variable_name], extracted_var))
+
                     extracted_vars[variable_name] = extracted_var
         return extracted_vars
 
@@ -328,6 +337,25 @@ class RExtractor(Extractor):
                                        'resolving configuration')
         configurations.update(resolved_configurations)
         return configurations
+
+    def __get_best_variable(self, existing_variable: dict,
+                            candidate_variable: dict) -> dict:
+        # If existing variable has type and value, keep it
+        if (existing_variable['type'] is not None and
+                existing_variable['value'] is not None):
+            return existing_variable
+        # If candidate variable has type and value, use it
+        if (candidate_variable['type'] is not None and
+                candidate_variable['value'] is not None):
+            return candidate_variable
+        # If existing variable has type, keep it
+        if existing_variable['type'] is not None:
+            return existing_variable
+        # If candidate variable has type, use it
+        if candidate_variable['type'] is not None:
+            return candidate_variable
+        # Otherwise, keep existing variable
+        return existing_variable
 
 
 class StreamList:
