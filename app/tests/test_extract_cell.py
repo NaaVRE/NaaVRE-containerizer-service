@@ -120,6 +120,7 @@ def test_extract_cell():
                                       expected_cell_params):
             assert returned['name'] == expected['name']
             assert returned['type'] == expected['type']
+            assert returned['default_value'] == expected['default_value']
 
         returned_cell_secrets = sorted(returned_cell.secrets,
                                        key=lambda x: x['name'])
