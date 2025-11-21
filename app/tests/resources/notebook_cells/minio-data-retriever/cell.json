@@ -1,8 +1,8 @@
 {
   "title": "minio-data-retriever-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-als-tree-ind-cell-build:v0.0.39",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-als-tree-ind-cell-runtime:v0.0.39"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "inputs": [],
   "outputs": [],

@@ -65,8 +65,6 @@ def test_extract_cell():
             print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
-        ddd = json.dumps(cell_dict)
-        print(ddd)
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
