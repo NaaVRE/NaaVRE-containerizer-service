@@ -34,9 +34,9 @@
   ],
   "params": [],
   "secrets": [],
-  "title": "multiplyvector-test-user-2",
+  "title": "multiplyvector-user",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   }
 }

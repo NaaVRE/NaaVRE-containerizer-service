@@ -60,6 +60,14 @@ class PyExtractor(Extractor):
         visitor.visit(tree)
         return visitor
 
+    def __is_in_imports(self, var_name) -> bool:
+        if var_name in self.notebook_imports:
+            return True
+        for v in self.notebook_imports.values():
+            if v.get('asname') == var_name:
+                return True
+        return False
+
     def __extract_configurations(self, sources):
         configurations = {}
         for s in sources:
@@ -130,7 +138,7 @@ class PyExtractor(Extractor):
         cell_outputs = []
         for var_name, properties in cell_variables.items():
             if (var_name not in self.__extract_cell_undefined(self.cell_source)
-                    and var_name not in self.notebook_imports
+                    and not self.__is_in_imports(var_name)
                     and var_name in self.undefined
                     and self.not_reserved(var_name)):
                 cell_outputs.append({'name': var_name,
@@ -143,7 +151,7 @@ class PyExtractor(Extractor):
         for var_name, properties in cell_undefined.items():
             if var_name in self.reserved_prefixes:
                 continue
-            if (var_name not in self.notebook_imports and
+            if (not self.__is_in_imports(var_name) and
                     self.not_reserved(var_name)):
                 cell_inputs.append({'name': var_name,
                                     'type': properties['type']})
