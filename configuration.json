@@ -6,7 +6,7 @@
       "module_mapping_url": "https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json",
       "cell_github_url": "https://github.com/NaaVRE/cells-vl-tests.git",
       "cell_github_token": "TOKEN",
-      "registry_url": "ghcr.io/qcdis/naavre-cells-vl-tests",
+      "registry_url": "ghcr.io/naavre/naavre-cells-vl-tests",
       "wf_engine_config": {
         "name": "argo",
         "api_endpoint": "https://naavre-dev.minikube.test/argowf/",
