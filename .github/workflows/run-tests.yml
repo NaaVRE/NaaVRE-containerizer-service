@@ -86,13 +86,6 @@ jobs:
       - name: Try the cluster
         run: kubectl get pods -A
 
-      # Preferred: assume an IAM role via OIDC (no long-lived keys)
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: github-actions-role
-          aws-region: eu-west-3
-
       - name: Run setup-tests.sh
         shell: bash -l {0}
         run: |
