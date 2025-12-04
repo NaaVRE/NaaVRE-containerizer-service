@@ -1,4 +1,4 @@
-FROM ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest AS build
+FROM ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39 AS build
 COPY --chown=$MAMBA_USER:$MAMBA_USER environment.yaml .
 RUN micromamba install -y -n venv -f environment.yaml
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
