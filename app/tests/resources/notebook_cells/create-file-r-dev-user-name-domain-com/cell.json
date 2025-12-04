@@ -14,7 +14,7 @@
   "title": "create-file-r-test-user-2",
   "original_source": "L <- c(\"a\", \"b\", \"c\")\n\nconf_data_folder <- \"/tmp/data\"\nfile_path <- file.path(conf_data_folder, \"hello.txt\")\n\nwriteLines(L, file_path)\n\nonlyfiles <- list.files(conf_data_folder, full.names = TRUE)\n\nprint(onlyfiles)",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.36",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.36"
   }
 }

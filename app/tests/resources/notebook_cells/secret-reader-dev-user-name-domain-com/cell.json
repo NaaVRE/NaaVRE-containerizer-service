@@ -25,8 +25,8 @@
   ],
   "title": "secret-reader-test-user-2",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.36",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.36"
   },
   "original_source": "print(param_abc, secret_xyz, foo)"
 }

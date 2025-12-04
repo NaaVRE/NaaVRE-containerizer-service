@@ -33,8 +33,8 @@
   "secrets": [],
   "title": "vars-types-test-user-2",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.36",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.36"
   },
   "original_source": "param_string = 'param_string value'\nparam_string_with_comment = 'param_string value'  # comment\nparam_int = 1\nparam_float = 1.1\nparam_list_int = [1, 2, 3]\nparam_list_str = [\"list_str\", \"space in elem\", \"3\"]\n\nconf_string = 'param_string value'\nconf_string_with_comment = 'param_string value'  # comment\nconf_int = 1\nconf_float = 1.1\nconf_list_int = [1, 2, 3]\nconf_list_str = [\"list_str\", \"space in elem\", \"3\"]\n\nvar_string = 'var_string value'\nvar_string_with_comment = 'var_string value'  # comment\nvar_int = 1\nvar_float = 1.1\nvar_list_int = [1, 2, 3]\nvar_list_str = [\"list_str\", \"space in elem\", \"3\"]"
 }
