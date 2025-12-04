@@ -176,7 +176,7 @@ def get_latest_container_tags_from_ghcr_url(ghcr_url, token):
 
     Args:
         ghcr_url (str): e.g.
-            'ghcr.io/qcdis/naavre/naavre-cell-build-python:latest'
+            'ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest'
         token (str): GitHub token with 'read:packages' permission
 
     Returns:

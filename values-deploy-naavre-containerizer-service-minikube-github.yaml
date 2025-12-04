@@ -4,9 +4,9 @@ jupyterhub:
   vlabs:
     openlab:
       image:
-        tag: v0.0.25
+        tag: v0.0.38
       configuration:
-        base_image_tags_url: https://github.com/NaaVRE/flavors/releases/latest/download/base_image_tags.json
+        base_image_tags_url: https://github.com/QCDIS/NaaVRE-flavors/releases/latest/download/base_image_tags.json
         cell_github_url: https://github.com/NaaVRE/cells-vl-tests
         cell_github_token: ghp_XXXXXXXXXXXXXXXX
         registry_url: ghcr.io/naavre/naavre-cells-vl-tests
@@ -27,5 +27,3 @@ jupyterhub:
         - name: naa-vre-user-data
           mountPath: /home/jovyan/Cloud Storage/naa-vre-user-data/
           subPath: '{unescaped_username}'
-naavreContainerizerService:
-  enabled: false

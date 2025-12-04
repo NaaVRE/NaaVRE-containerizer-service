@@ -25,8 +25,8 @@
   ],
   "title": "secret-reader-test-user-2",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "print(param_abc, secret_xyz, foo)"
 }

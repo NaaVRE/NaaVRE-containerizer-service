@@ -1,8 +1,8 @@
 {
-  "title": "cell-with-dependency-specification-test-user-2",
+  "title": "cell-with-dependency-specification-user",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "inputs": [],
   "outputs": [
