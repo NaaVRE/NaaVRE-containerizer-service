@@ -53,10 +53,10 @@
   ],
   "params": [],
   "secrets": [],
-  "title": "s6-geotiff-export-local-test-user-2",
+  "title": "s6-geotiff-export-local-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.36",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.36"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.39"
   },
   "original_source": "S5_done\n\ngeotiff_export_input = {\n    'setup_local_fs': {\n        'input_folder': conf_local_path_targets,\n         'output_folder': conf_local_path_geotiff\n        },\n    'parse_point_cloud': {},\n    'data_split': {'xSub': 1, 'ySub': 1},\n    'create_subregion_geotiffs': {'output_handle': 'geotiff'},\n    'pushremote': conf_remote_path_geotiffs.as_posix(),\n}\n\nwriter = GeotiffWriter(input_dir=conf_feature_name, bands=conf_feature_name, label=conf_feature_name).config(geotiff_export_input).setup_webdav_client(conf_wd_opts)\nwriter.run()\n\nremote_path_geotiffs = str(conf_remote_path_geotiffs)\nS6_done = 'True'"
 }

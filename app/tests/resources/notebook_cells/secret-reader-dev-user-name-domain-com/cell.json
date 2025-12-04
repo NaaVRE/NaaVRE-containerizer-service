@@ -23,10 +23,10 @@
       "type": "str"
     }
   ],
-  "title": "secret-reader-test-user-2",
+  "title": "secret-reader-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.36",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.36"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.39"
   },
   "original_source": "print(param_abc, secret_xyz, foo)"
 }

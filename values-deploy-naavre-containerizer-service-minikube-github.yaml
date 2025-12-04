@@ -6,7 +6,7 @@ jupyterhub:
       image:
         tag: v0.0.38
       configuration:
-        base_image_tags_url: https://github.com/NaaVRE/flavors/releases/download/v0.0.36/base_image_tags.json
+        base_image_tags_url: https://github.com/NaaVRE/flavors/releases/download/v0.0.39/base_image_tags.json
         cell_github_url: https://github.com/NaaVRE/cells-vl-tests
         cell_github_token: ghp_XXXXXXXXXXXXXXXX
         registry_url: ghcr.io/naavre/naavre-cells-vl-tests
