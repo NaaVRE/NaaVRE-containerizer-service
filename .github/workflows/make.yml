@@ -40,8 +40,6 @@ jobs:
 
   call-collect-tests:
     uses: ./.github/workflows/collect-tests.yml
-    with:
-      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
 
   split-tests:
     needs: [ call-collect-tests ]
