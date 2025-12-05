@@ -66,24 +66,9 @@ jobs:
           echo $MATRIX
           echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
-  start-minikube:
-    needs: [configure-workflow]
-    runs-on: ubuntu-latest
-    steps:
-      - name: start minikube
-        id: minikube
-        uses: medyagh/setup-minikube@v0.0.19
-        with:
-          addons: ingress,ingress-dns
-
-      - name: Verify Minikube Status
-        run: |
-          minikube status
-          kubectl get nodes
-
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
-    needs: [ configure-workflow,split-tests,start-minikube ]
+    needs: [ configure-workflow,split-tests ]
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false

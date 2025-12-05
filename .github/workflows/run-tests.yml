@@ -77,14 +77,14 @@ jobs:
             conda-environment-${{ runner.os }}-
         id: cache-conda
 
-#      - name: start minikube
-#        id: minikube
-#        uses: medyagh/setup-minikube@v0.0.19
-#        with:
-#          addons: ingress,ingress-dns
-#
-#      - name: Try the cluster
-#        run: kubectl get pods -A
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@v0.0.19
+        with:
+          addons: ingress,ingress-dns
+
+      - name: Try the cluster
+        run: kubectl get pods -A
 
       - name: Run setup-tests.sh
         shell: bash -l {0}
