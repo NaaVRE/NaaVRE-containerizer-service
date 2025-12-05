@@ -40,6 +40,8 @@ jobs:
 
   call-collect-tests:
     uses: ./.github/workflows/collect-tests.yml
+    with:
+      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
 
   split-tests:
     needs: [ call-collect-tests ]
@@ -56,7 +58,18 @@ jobs:
           name: test_list
           path: ./
 
+
+      - name: Generate matrix from pytest_output
+        id: split-output
+        run: |
+          cat test_list.json
+          # Merge test parameters, to run them sequentially within a runner
+          MATRIX=$(jq -c '. | map(.module + "::" + .test) | unique' test_list.json)
+          echo $MATRIX
+          echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
+
   start-minikube:
+    needs: [configure-workflow]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'schedule' || github.event_name == 'release' }}
     steps:
@@ -70,15 +83,6 @@ jobs:
         run: |
           minikube status
           kubectl get nodes
-
-      - name: Generate matrix from pytest_output
-        id: split-output
-        run: |
-          cat test_list.json
-          # Merge test parameters, to run them sequentially within a runner
-          MATRIX=$(jq -c '. | map(.module + "::" + .test) | unique' test_list.json)
-          echo $MATRIX
-          echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
