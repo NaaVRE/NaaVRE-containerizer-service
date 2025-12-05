@@ -80,5 +80,6 @@ jobs:
       - name: pytest
         shell: bash -l {0}
         run: |
+          echo "AUTH_TOKEN is $AUTH_TOKEN"
           conda activate naavre-containerizer-service
           pytest -s --ignore=docker --ignore=cypress --no-header
