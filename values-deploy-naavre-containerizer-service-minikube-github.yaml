@@ -20,3 +20,10 @@ naavreWorkflowService:
 
 naavrePaasFrontend:
   enabled: false
+
+k8sSecretCreator:
+  enabled: false
+
+argoWorkflows:
+  enabled: false
+
