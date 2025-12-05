@@ -16,11 +16,10 @@ on:
       disable_auth:
         required: true
         type: string
-      cell_github_token:
-        required: true
-        type: string
     secrets:
       registry_token_for_tests:
+        required: true
+      cell_github_token:
         required: true
 
 env:
