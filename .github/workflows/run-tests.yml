@@ -30,6 +30,7 @@ env:
   DISABLE_AUTH: ${{ inputs.disable_auth }}
   VERIFY_SSL: ${{ inputs.verify_ssl }}
   REGISTRY_TOKEN_FOR_TESTS: ${{ secrets.registry_token_for_tests }}
+  CELL_GITHUB_TOKEN: ${{ secrets.cell_github_token }}
 
 jobs:
   test:
@@ -80,6 +81,5 @@ jobs:
       - name: pytest
         shell: bash -l {0}
         run: |
-          echo "AUTH_TOKEN is $AUTH_TOKEN"
           conda activate naavre-containerizer-service
           pytest -s --ignore=docker --ignore=cypress --no-header
