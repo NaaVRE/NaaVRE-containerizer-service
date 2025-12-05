@@ -38,33 +38,33 @@ jobs:
     with:
       runs-on: ubuntu-latest
 
-#  call-collect-tests:
-#    uses: ./.github/workflows/collect-tests.yml
+  call-collect-tests:
+    uses: ./.github/workflows/collect-tests.yml
 
-#  split-tests:
-#    needs: [ call-collect-tests ]
-#    runs-on: ubuntu-latest
-#    outputs:
-#      test_list: ${{ steps.split-output.outputs.test_list }}
-#    steps:
-#      - name: Checkout Code
-#        uses: actions/checkout@v4
-#
-#      - name: Download pytest output artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: test_list
-#          path: ./
-#
-#
-#      - name: Generate matrix from pytest_output
-#        id: split-output
-#        run: |
-#          cat test_list.json
-#          # Merge test parameters, to run them sequentially within a runner
-#          MATRIX=$(jq -c '. | map(.module + "::" + .test) | unique' test_list.json)
-#          echo $MATRIX
-#          echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
+
+  split-tests:
+    needs: [ call-collect-tests ]
+    runs-on: ubuntu-latest
+    outputs:
+      test_list: ${{ steps.split-output.outputs.test_list }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download pytest output artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test_list
+          path: ./
+
+      - name: Generate matrix from pytest_output
+        id: split-output
+        run: |
+          cat test_list.json
+          # Merge test parameters, to run them sequentially within a runner
+          MATRIX=$(jq -c '. | map(.module + "::" + .test) | unique' test_list.json)
+          echo $MATRIX
+          echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
@@ -77,6 +77,8 @@ jobs:
       debug: ${{ vars.DEBUG }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
+      tests: ${{ fromJson(needs.split-tests.outputs.test_list) }}
+
     secrets:
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}

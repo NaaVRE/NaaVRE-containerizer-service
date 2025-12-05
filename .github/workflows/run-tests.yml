@@ -16,6 +16,9 @@ on:
       disable_auth:
         required: true
         type: string
+      test:
+        required: true
+        type: string
     secrets:
       registry_token_for_tests:
         required: true
@@ -78,4 +81,4 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate naavre-containerizer-service
-          pytest -s --ignore=docker --ignore=cypress --no-header --containerize-github-all
+          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header
