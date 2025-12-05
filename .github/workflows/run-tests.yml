@@ -78,4 +78,4 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate naavre-containerizer-service
-          pytest -s --ignore=docker --ignore=cypress --no-header
+          pytest -s --ignore=docker --ignore=cypress --no-header ----containerize-github-all
