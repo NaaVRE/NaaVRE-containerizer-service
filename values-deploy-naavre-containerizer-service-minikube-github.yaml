@@ -18,9 +18,6 @@ naavreContainerizerService:
 naavreWorkflowService:
   enabled: false
 
-naavrePaasFrontend:
-  enabled: false
-
 k8sSecretCreator:
   enabled: false
 
