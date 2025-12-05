@@ -21,6 +21,3 @@ naavreWorkflowService:
 k8sSecretCreator:
   enabled: false
 
-argoWorkflows:
-  enabled: false
-
