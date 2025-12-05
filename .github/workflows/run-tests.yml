@@ -13,9 +13,6 @@ on:
       debug:
         required: true
         type: string
-      oidc_configuration_url:
-        required: true
-        type: string
       verify_ssl:
         required: true
         type: string
@@ -31,9 +28,6 @@ on:
       pytest_extra_options:
         default: ""
         type: string
-    secrets:
-      auth_token:
-        required: true
       cell_github_token:
         required: true
       registry_token_for_tests:
@@ -41,11 +35,9 @@ on:
 
 env:
   DEBUG: ${{ inputs.debug }}
-  OIDC_CONFIGURATION_URL: ${{ inputs.oidc_configuration_url }}
   DISABLE_AUTH: ${{ inputs.disable_auth }}
   VERIFY_SSL: ${{ inputs.verify_ssl }}
   ROOT_PATH: ${{ inputs.root_path }}
-  AUTH_TOKEN: ${{ secrets.auth_token }}
   CONFIG_FILE_URL: /tmp/configuration.json
   REGISTRY_TOKEN_FOR_TESTS: ${{ secrets.registry_token_for_tests }}
 
@@ -101,4 +93,5 @@ jobs:
         run: |
           echo "${{ secrets.configuration }}" > "${{ env.CONFIG_FILE_URL }}"
           conda activate naavre-containerizer-service
-          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --ignore=minkube_configuration.json --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}
+#          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --ignore=minkube_configuration.json --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}
+          pytest -s --ignore=docker --ignore=cypress --no-header
