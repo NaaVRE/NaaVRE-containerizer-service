@@ -31,7 +31,6 @@ env:
   DEBUG: ${{ inputs.debug }}
   DISABLE_AUTH: ${{ inputs.disable_auth }}
   VERIFY_SSL: ${{ inputs.verify_ssl }}
-  ROOT_PATH: ${{ inputs.root_path }}
   REGISTRY_TOKEN_FOR_TESTS: ${{ secrets.registry_token_for_tests }}
 
 jobs:
