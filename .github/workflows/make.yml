@@ -69,7 +69,6 @@ jobs:
   start-minikube:
     needs: [configure-workflow]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'release' }}
     steps:
       - name: start minikube
         id: minikube
