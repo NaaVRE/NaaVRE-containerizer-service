@@ -77,8 +77,7 @@ jobs:
       debug: ${{ vars.DEBUG }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
-      tests: ${{ fromJson(needs.split-tests.outputs.test_list) }}
-
+      test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     secrets:
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
