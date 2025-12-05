@@ -68,7 +68,7 @@ jobs:
 
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
-    needs: [ configure-workflow ]
+    needs: [ configure-workflow, split-tests ]
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false
