@@ -40,7 +40,7 @@
   "title": "create-file-user",
   "original_source": "L = [\"a\\n\", \"b\\n\", \"c\\n\"]\nfile_path =  os.path.join(conf_data_folder,'hello.txt')\nfp = open(file_path, 'w')\nfp.writelines(L)\nfp.close()\n\nonlyfiles = [f for f in listdir(conf_data_folder) if isfile(join(conf_data_folder, f))]\n\nprint(onlyfiles)",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.39"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   }
 }

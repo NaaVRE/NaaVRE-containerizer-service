@@ -33,8 +33,8 @@
   "secrets": [],
   "title": "r-vars-types-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.39"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "var_string <- 'var_string value'\nvar_string_with_comment <- 'var_string value'  # comment\nvar_int <- 1\nvar_float <- 1.1\nvar_list_int <- list(1, 2, 3)\nvar_list_str <- list(\"list_str\", \"space in elem\", \"3\")\nprint(class(var_list_int))"
 }

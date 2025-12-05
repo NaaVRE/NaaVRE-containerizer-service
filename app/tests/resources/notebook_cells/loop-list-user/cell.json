@@ -13,8 +13,8 @@
   "secrets": [],
   "title": "loop-list-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.0.39",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.39"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "for l in list_of_paths:\n    print(l)"
 }
