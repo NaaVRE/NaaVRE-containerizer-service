@@ -40,8 +40,6 @@ jobs:
 
   call-collect-tests:
     uses: ./.github/workflows/collect-tests.yml
-    with:
-      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
 
   split-tests:
     needs: [ call-collect-tests ]
@@ -58,6 +56,21 @@ jobs:
           name: test_list
           path: ./
 
+  start-minikube:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'release' }}
+    steps:
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@v0.0.19
+        with:
+          addons: ingress,ingress-dns
+
+      - name: Verify Minikube Status
+        run: |
+          minikube status
+          kubectl get nodes
+
       - name: Generate matrix from pytest_output
         id: split-output
         run: |
@@ -69,7 +82,7 @@ jobs:
 
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
-    needs: [ configure-workflow,split-tests ]
+    needs: [ configure-workflow,split-tests,start-minikube ]
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false
