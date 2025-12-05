@@ -19,6 +19,7 @@ on:
       cell_github_token:
         required: true
         type: string
+    secrets:
       registry_token_for_tests:
         required: true
         type: string
