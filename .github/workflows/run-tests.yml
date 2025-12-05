@@ -83,4 +83,4 @@ jobs:
       - name: pytest
         shell: bash -l {0}
         run: |
-          pytest -s --ignore=docker --ignore=cypress --no-header -n 2 --maxfail=1
+          pytest -s --ignore=docker --ignore=cypress --no-header -n auto --maxfail=1
