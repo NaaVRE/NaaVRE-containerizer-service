@@ -22,7 +22,6 @@ on:
     secrets:
       registry_token_for_tests:
         required: true
-        type: string
 
 env:
   DEBUG: ${{ inputs.debug }}
