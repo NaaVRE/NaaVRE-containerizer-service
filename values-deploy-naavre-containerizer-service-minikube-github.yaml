@@ -11,3 +11,12 @@ jupyterhub:
         cell_github_token: ghp_XXXXXXXXXXXXXXXX
         registry_url: ghcr.io/naavre/naavre-cells-vl-tests
         module_mapping_url: https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json
+
+naavreContainerizerService:
+  enabled: false
+
+naavreWorkflowService:
+  enabled: false
+
+naavrePaasFrontend:
+  enabled: false
