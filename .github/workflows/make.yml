@@ -72,16 +72,11 @@ jobs:
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false
-#      matrix:
-#        test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
       runs-on: ${{ needs.configure-workflow.outputs.runner }}
-      configuration: ${{ vars.CONFIG_FILE }}
       debug: ${{ vars.DEBUG }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
-      root_path: ${{ vars.ROOT_PATH }}
-#      test: ${{ matrix.test }}
     secrets:
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
