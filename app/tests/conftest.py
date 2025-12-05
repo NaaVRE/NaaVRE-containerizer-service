@@ -35,8 +35,7 @@ def pytest_generate_tests(metafunc):
     if "cell_dir" in metafunc.fixturenames:
         notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
         print(metafunc.config)
-        if ("containerize_github_all" in metafunc.config and
-                metafunc.config.getoption('containerize_github_all')):
+        if (metafunc.config.getoption('containerize_github_all', None)):
             cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if
                           f.is_dir()]
         else:
