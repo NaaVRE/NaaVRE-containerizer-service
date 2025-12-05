@@ -70,7 +70,7 @@ jobs:
       - name: Run setup-tests.sh
         shell: bash -l {0}
         run: |
-#          wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/main/scripts/setup-tests.sh
+          wget https://raw.githubusercontent.com/NaaVRE/NaaVRE-helm/refs/heads/main/scripts/setup-tests.sh
           chmod +x setup-tests-temp.sh
           ./setup-tests-temp.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
 
