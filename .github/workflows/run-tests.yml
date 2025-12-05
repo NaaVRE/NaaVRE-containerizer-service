@@ -76,10 +76,11 @@ jobs:
           ./setup-tests.sh -f values-deploy-naavre-containerizer-service-minikube-github.yaml
 
       - name: Install pytest and xdist
-        run: pip install pytest pytest-xdist
+        run: |
+          conda activate naavre-containerizer-service
+          pip install pytest pytest-xdist
 
       - name: pytest
         shell: bash -l {0}
         run: |
-          conda activate naavre-containerizer-service
-          pytest -s --ignore=docker --ignore=cypress --no-header -n auto --maxfail=1
+          pytest -s --ignore=docker --ignore=cypress --no-header -n 2 --maxfail=1
