@@ -23,7 +23,7 @@ jobs:
         uses: fkirc/skip-duplicate-actions@v5
         with:
           paths_ignore: '["**/README.md"]'  # FIXME
-          do_not_skip: '["workflow_dispatch", "schedule", "release"]'
+          do_not_skip: '["workflow_dispatch", "schedule", "release" ,"push"]'
       - id: choose-runner
         uses: QCDIS/choose-action-runner@v2
         with:
@@ -40,8 +40,7 @@ jobs:
 
   call-collect-tests:
     uses: ./.github/workflows/collect-tests.yml
-    with:
-      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
+
 
   split-tests:
     needs: [ call-collect-tests ]
@@ -69,7 +68,7 @@ jobs:
 
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
-    needs: [ configure-workflow,split-tests ]
+    needs: [ configure-workflow, split-tests ]
     if: ${{ needs.configure-workflow.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: false
@@ -77,15 +76,11 @@ jobs:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
       runs-on: ${{ needs.configure-workflow.outputs.runner }}
-      configuration: ${{ vars.CONFIG_FILE }}
       debug: ${{ vars.DEBUG }}
-      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
-      root_path: ${{ vars.ROOT_PATH }}
       test: ${{ matrix.test }}
     secrets:
-      auth_token: ${{ secrets.AUTH_TOKEN }}
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
 

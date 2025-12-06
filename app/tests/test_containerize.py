@@ -248,7 +248,9 @@ def test_containerize_github(cell_dir):
         raise
 
     workflow_id = containerize_response.json()['workflow_id']
+    assert 'source_url' in containerize_response.json()
     source_url = containerize_response.json()['source_url']
+    assert 'title' in cell
     assert cell['title'] in source_url
     containerization_status_response = wait_for_containerization(
         workflow_id=workflow_id,

@@ -73,8 +73,8 @@ def test_extract_cell():
             f"Expected {expected_cell_confs}, " \
             f"but got {returned_cell_confs}"
 
-        assert returned_cell.title == expected_cell.title
-        assert returned_cell.kernel == expected_cell.kernel
+        assert expected_cell.title == returned_cell.title
+        assert expected_cell.kernel == returned_cell.kernel
 
         returned_cell_inputs = sorted(returned_cell.inputs,
                                       key=lambda x: x['name'])
@@ -147,7 +147,7 @@ def test_extract_cell():
 
         assert os.getenv('REGISTRY_TOKEN_FOR_TESTS') is not None, \
             "REGISTRY_TOKEN_FOR_TESTS is not set. "
-        tags = get_latest_container_tags_from_ghcr_url(
+        tags = get_container_tags_from_ghcr_url(
             expected_cell.base_container_image['build'],
             os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
@@ -169,14 +169,14 @@ def test_extract_cell():
         # assert returned_cell.original_source == expected_cell.original_source
 
 
-def get_latest_container_tags_from_ghcr_url(ghcr_url, token):
+def get_container_tags_from_ghcr_url(ghcr_url, token):
     """
     Given a GHCR image URL, fetch the tags of the latest version of the
     container package.
 
     Args:
         ghcr_url (str): e.g.
-            'ghcr.io/qcdis/naavre/naavre-cell-build-python:latest'
+            'ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest'
         token (str): GitHub token with 'read:packages' permission
 
     Returns:
@@ -210,7 +210,16 @@ def get_latest_container_tags_from_ghcr_url(ghcr_url, token):
         if response.status_code == 200:
             data = response.json()
             if data:
-                return data[0]["metadata"]["container"].get("tags", [])
+                if parts[2].endswith('latest'):
+                    return data[0]["metadata"]["container"].get("tags", [])
+                else:
+                    image_tag = parts[2].split(":")[-1]
+                    for version in data:
+                        tags = version["metadata"]["container"].get("tags", [])
+                        if image_tag in tags:
+                            return tags
+                    print(f"Tag {image_tag} not found in versions.")
+                    return None
             else:
                 print("No versions found.")
                 return None

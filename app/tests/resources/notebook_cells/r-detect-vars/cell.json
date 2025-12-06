@@ -112,10 +112,10 @@
       "type": "str"
     }
   ],
-  "title": "r-detect-vars-print-vars-test-user-2",
+  "title": "r-detect-vars-print-vars-user",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-r:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-r:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "print(paste('conf_string: ', conf_string, ' type: ', class(conf_string)))\nprint(paste('conf_string_with_comment: ', conf_string_with_comment, ' type: ', class(conf_string_with_comment)))\nprint(paste('conf_int: ', conf_int, ' type: ', class(conf_int)))\nprint(paste('conf_float: ', conf_float, ' type: ', class(conf_float)))\nprint(paste('conf_list_int: ', toString(conf_list_int), ' type: ', class(conf_list_int)))\nprint(paste('conf_list_str: ', toString(conf_list_str), ' type: ', class(conf_list_str)))\n\nprint(paste('param_string: ', param_string, ' type: ', class(param_string)))\nprint(paste('param_string_with_comment: ', param_string_with_comment, ' type: ', class(param_string_with_comment)))\nprint(paste('param_int: ', param_int, ' type: ', class(param_int)))\nprint(paste('param_float: ', param_float, ' type: ', class(param_float)))\nprint(paste('param_list_int: ', toString(param_list_int), ' type: ', class(param_list_int)))\nprint(paste('param_list_str: ', toString(param_list_str), ' type: ', class(param_list_str)))\n\nprint(paste('secret_string: ', secret_string, ' type: ', class(secret_string)))\nprint(paste('secret_string_with_comment: ', secret_string_with_comment, ' type: ', class(secret_string_with_comment)))\nprint(paste('secret_int: ', secret_int, ' type: ', class(secret_int)))\nprint(paste('secret_float: ', secret_float, ' type: ', class(secret_float)))\nprint(paste('secret_list_int: ', toString(secret_list_int), ' type: ', class(secret_list_int)))\nprint(paste('secret_list_str: ', toString(secret_list_str), ' type: ', class(secret_list_str)))\n\nprint(paste('var_string: ', var_string, ' type: ', class(var_string)))\nprint(paste('var_string_with_comment: ', var_string_with_comment, ' type: ', class(var_string_with_comment)))\nprint(paste('var_int: ', var_int, ' type: ', class(var_int)))\nprint(paste('var_float: ', var_float, ' type: ', class(var_float)))\nprint(paste('var_list_int: ', toString(var_list_int), ' type: ', class(var_list_int)))\nprint(paste('var_list_str: ', toString(var_list_str), ' type: ', class(var_list_str)))"
 }
