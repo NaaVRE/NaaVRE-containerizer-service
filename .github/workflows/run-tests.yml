@@ -19,6 +19,9 @@ on:
       test:
         required: true
         type: string
+      pytest_extra_options:
+        default: ""
+        type: string
     secrets:
       registry_token_for_tests:
         required: true
@@ -83,4 +86,4 @@ jobs:
         run: |
           conda activate naavre-containerizer-service
           pip install pytest
-          pytest -s --ignore=docker --ignore=cypress --no-header
+          pytest ${{ inputs.test }} -s --ignore=docker --ignore=cypress --no-header --log-cli-level=DEBUG -vv --tb=long ${{ inputs.pytest_extra_options }}
