@@ -4,10 +4,10 @@ from urllib.parse import quote
 
 import requests
 from fastapi.testclient import TestClient
+from nbformat import v4, write
 
 from app.main import app
 from app.models.workflow_cell import Cell
-from nbformat import v4, write
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -100,8 +100,8 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_outputs,
                                       expected_cell_outputs):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
 
         returned_cell_params = sorted(returned_cell.params,
                                       key=lambda x: x['name'])
@@ -114,9 +114,9 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_params,
                                       expected_cell_params):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
-            assert returned['default_value'] == expected['default_value']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
+            assert expected['default_value'] == returned['default_value']
 
         returned_cell_secrets = sorted(returned_cell.secrets,
                                        key=lambda x: x['name'])
