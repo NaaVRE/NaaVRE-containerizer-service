@@ -11,10 +11,10 @@
   ],
   "params": [],
   "secrets": [],
-  "title": "float-test-user-2",
+  "title": "float-user",
   "base_container_image": {
-    "build": "ghcr.io/qcdis/naavre/naavre-cell-build-python:latest",
-    "runtime": "ghcr.io/qcdis/naavre/naavre-cell-runtime-python:latest"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "original_source": "c = 2.4"
 }
