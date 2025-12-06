@@ -32,10 +32,6 @@ def test_extract_cell():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'minio-data-retriever' not in cell_dir:
-            # Skipping minio-data-retriever test for now
-            print(f"Skipping test for {cell_dir}")
-            continue
         notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
