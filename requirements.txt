@@ -3,7 +3,7 @@ PyJWT[crypto]==2.9.0
 requests==2.32.4
 uvicorn==0.30.6
 pydantic==2.9.2
-Jinja2==3.1.4
+Jinja2==3.1.6
 autopep8==2.3.1
 python-slugify==8.0.4
 distro==1.9.0
