@@ -1,6 +1,7 @@
 import json
 import os
 import random
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi.testclient import TestClient
 
@@ -33,44 +34,42 @@ def get_random_test_case(cells_dirs):
 
 
 def test_race_conditions():
-    pass
-    # notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
-    # cells_dirs = [f.path for f in os.scandir(notebook_cells_dir)
-    # if f.is_dir()]
-    #
-    # # Pick random cell files
-    # containerizer_json_payload_1 = get_random_test_case(cells_dirs)
-    # containerizer_json_payload_2 = get_random_test_case(cells_dirs)
-    #
-    # # Create a thread to do a POST request to /containerize/ concurrently
-    # with ThreadPoolExecutor(max_workers=2) as executor:
-    #     futures = [
-    #         executor.submit(make_containerize_request,
-    #                         containerizer_json_payload_1),
-    #         executor.submit(make_containerize_request,
-    #                         containerizer_json_payload_2)
-    #     ]
-    #     results = [f.result() for f in futures]
-    # for result in results:
-    #     assert result is not None
-    # print(results)
-    #
-    # # Test it on the same cell
-    # containerizer_json_payload_3 = get_random_test_case(cells_dirs)
-    #
-    # # Create a thread to do a POST request to /containerize/ concurrently
-    # with ThreadPoolExecutor(max_workers=2) as executor:
-    #     futures = [
-    #         executor.submit(make_containerize_request,
-    #                         containerizer_json_payload_3),
-    #         executor.submit(make_containerize_request,
-    #                         containerizer_json_payload_3)
-    #     ]
-    #     results = [f.result() for f in futures]
-    #
-    # print(results)
-    # for result in results:
-    #     assert result is not None
+    notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
+    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+
+    # Pick random cell files
+    containerizer_json_payload_1 = get_random_test_case(cells_dirs)
+    containerizer_json_payload_2 = get_random_test_case(cells_dirs)
+
+    # Create a thread to do a POST request to /containerize/ concurrently
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [
+            executor.submit(make_containerize_request,
+                            containerizer_json_payload_1),
+            executor.submit(make_containerize_request,
+                            containerizer_json_payload_2)
+        ]
+        results = [f.result() for f in futures]
+    for result in results:
+        assert result is not None
+    print(results)
+
+    # Test it on the same cell
+    containerizer_json_payload_3 = get_random_test_case(cells_dirs)
+
+    # Create a thread to do a POST request to /containerize/ concurrently
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [
+            executor.submit(make_containerize_request,
+                            containerizer_json_payload_3),
+            executor.submit(make_containerize_request,
+                            containerizer_json_payload_3)
+        ]
+        results = [f.result() for f in futures]
+
+    print(results)
+    for result in results:
+        assert result is not None
 
 
 def make_containerize_request(payload):
