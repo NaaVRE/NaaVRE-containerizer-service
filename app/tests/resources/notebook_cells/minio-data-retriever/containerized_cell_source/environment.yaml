@@ -5,5 +5,8 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
+  - r-SecretsProvider
+  - r-aws.s3
+  - r-readxl
   - papermill
   - ipykernel

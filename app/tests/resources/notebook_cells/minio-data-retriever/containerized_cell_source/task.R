@@ -2,24 +2,31 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("SecretsProvider", quietly = TRUE)) {
+	install.packages("SecretsProvider", repos="http://cran.us.r-project.org")
+}
+library(SecretsProvider)
+if (!requireNamespace("aws.s3", quietly = TRUE)) {
+	install.packages("aws.s3", repos="http://cran.us.r-project.org")
+}
+library(aws.s3)
+if (!requireNamespace("readxl", quietly = TRUE)) {
+	install.packages("readxl", repos="http://cran.us.r-project.org")
+}
+library(readxl)
 
 
+secret_minio_access_key = Sys.getenv('secret_minio_access_key')
+secret_minio_secret_key = Sys.getenv('secret_minio_secret_key')
 
 print('option_list')
 option_list = list(
 
-make_option(c("--param_float"), action="store", default=NA, type="numeric", help="my description"),
-make_option(c("--param_int"), action="store", default=NA, type="integer", help="my description"),
-make_option(c("--param_list_int"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--param_list_str"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--param_string"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--param_string_with_comment"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--var_float"), action="store", default=NA, type="numeric", help="my description"),
-make_option(c("--var_int"), action="store", default=NA, type="integer", help="my description"),
-make_option(c("--var_list_int"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--var_list_str"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--var_string"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--var_string_with_comment"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--param_data_filename"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--param_data_sheet"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--param_metadata_sheet"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--param_use_dummy_data"), action="store", default=NA, type="integer", help="my description"),
+make_option(c("--param_user_email"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -55,193 +62,78 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving param_float")
-var = opt$param_float
+print("Retrieving param_data_filename")
+var = opt$param_data_filename
 print(var)
 var_len = length(var)
-print(paste("Variable param_float has length", var_len))
+print(paste("Variable param_data_filename has length", var_len))
 
-param_float = opt$param_float
-print("Retrieving param_int")
-var = opt$param_int
+param_data_filename <- gsub("\"", "", opt$param_data_filename)
+print("Retrieving param_data_sheet")
+var = opt$param_data_sheet
 print(var)
 var_len = length(var)
-print(paste("Variable param_int has length", var_len))
+print(paste("Variable param_data_sheet has length", var_len))
 
-param_int = opt$param_int
-print("Retrieving param_list_int")
-var = opt$param_list_int
+param_data_sheet <- gsub("\"", "", opt$param_data_sheet)
+print("Retrieving param_metadata_sheet")
+var = opt$param_metadata_sheet
 print(var)
 var_len = length(var)
-print(paste("Variable param_list_int has length", var_len))
+print(paste("Variable param_metadata_sheet has length", var_len))
 
-print("------------------------Running var_serialization for param_list_int-----------------------")
-print(opt$param_list_int)
-param_list_int = var_serialization(opt$param_list_int)
-print("---------------------------------------------------------------------------------")
-
-print("Retrieving param_list_str")
-var = opt$param_list_str
+param_metadata_sheet <- gsub("\"", "", opt$param_metadata_sheet)
+print("Retrieving param_use_dummy_data")
+var = opt$param_use_dummy_data
 print(var)
 var_len = length(var)
-print(paste("Variable param_list_str has length", var_len))
+print(paste("Variable param_use_dummy_data has length", var_len))
 
-print("------------------------Running var_serialization for param_list_str-----------------------")
-print(opt$param_list_str)
-param_list_str = var_serialization(opt$param_list_str)
-print("---------------------------------------------------------------------------------")
-
-print("Retrieving param_string")
-var = opt$param_string
+param_use_dummy_data = opt$param_use_dummy_data
+print("Retrieving param_user_email")
+var = opt$param_user_email
 print(var)
 var_len = length(var)
-print(paste("Variable param_string has length", var_len))
+print(paste("Variable param_user_email has length", var_len))
 
-param_string <- gsub("\"", "", opt$param_string)
-print("Retrieving param_string_with_comment")
-var = opt$param_string_with_comment
-print(var)
-var_len = length(var)
-print(paste("Variable param_string_with_comment has length", var_len))
-
-param_string_with_comment <- gsub("\"", "", opt$param_string_with_comment)
-print("Retrieving var_float")
-var = opt$var_float
-print(var)
-var_len = length(var)
-print(paste("Variable var_float has length", var_len))
-
-var_float = opt$var_float
-print("Retrieving var_int")
-var = opt$var_int
-print(var)
-var_len = length(var)
-print(paste("Variable var_int has length", var_len))
-
-var_int = opt$var_int
-print("Retrieving var_list_int")
-var = opt$var_list_int
-print(var)
-var_len = length(var)
-print(paste("Variable var_list_int has length", var_len))
-
-print("------------------------Running var_serialization for var_list_int-----------------------")
-print(opt$var_list_int)
-var_list_int = var_serialization(opt$var_list_int)
-print("---------------------------------------------------------------------------------")
-
-print("Retrieving var_list_str")
-var = opt$var_list_str
-print(var)
-var_len = length(var)
-print(paste("Variable var_list_str has length", var_len))
-
-print("------------------------Running var_serialization for var_list_str-----------------------")
-print(opt$var_list_str)
-var_list_str = var_serialization(opt$var_list_str)
-print("---------------------------------------------------------------------------------")
-
-print("Retrieving var_string")
-var = opt$var_string
-print(var)
-var_len = length(var)
-print(paste("Variable var_string has length", var_len))
-
-var_string <- gsub("\"", "", opt$var_string)
-print("Retrieving var_string_with_comment")
-var = opt$var_string_with_comment
-print(var)
-var_len = length(var)
-print(paste("Variable var_string_with_comment has length", var_len))
-
-var_string_with_comment <- gsub("\"", "", opt$var_string_with_comment)
+param_user_email <- gsub("\"", "", opt$param_user_email)
 id <- gsub('"', '', opt$id)
 
-conf_string = 'param_string value'
-conf_string_with_comment = 'param_string value'
-conf_int = 1
-conf_float = 1.1
-conf_list_int = list(1, 2, 3)
-conf_list_str = list('list_str', 'space in elem', '3')
+conf_minio_user_bucket<-"naa-vre-user-data"
+conf_minio_endpoint<-"scruffy.lab.uvalight.net:9000"
+conf_virtual_lab_biotisan_euromarec<-"vl-biotisan-euromarec"
+conf_minio_public_bucket<-"naa-vre-public"
+conf_minio_region<-"nl-uvalight"
+conf_temporary_data_directory<-"/tmp/data"
 
 print("Running the cell")
-print(paste('conf_string: ', conf_string, ' type: ', class(conf_string)))
-print(paste('conf_string_with_comment: ', conf_string_with_comment, ' type: ', class(conf_string_with_comment)))
-print(paste('conf_int: ', conf_int, ' type: ', class(conf_int)))
-print(paste('conf_float: ', conf_float, ' type: ', class(conf_float)))
-print(paste('conf_list_int: ', toString(conf_list_int), ' type: ', class(conf_list_int)))
-print(paste('conf_list_str: ', toString(conf_list_str), ' type: ', class(conf_list_str)))
+library("readxl")
+library("aws.s3")
 
-print(paste('param_string: ', param_string, ' type: ', class(param_string)))
-print(paste('param_string_with_comment: ', param_string_with_comment, ' type: ', class(param_string_with_comment)))
-print(paste('param_int: ', param_int, ' type: ', class(param_int)))
-print(paste('param_float: ', param_float, ' type: ', class(param_float)))
-print(paste('param_list_int: ', toString(param_list_int), ' type: ', class(param_list_int)))
-print(paste('param_list_str: ', toString(param_list_str), ' type: ', class(param_list_str)))
+Sys.setenv("AWS_S3_ENDPOINT" = conf_minio_endpoint,
+           "AWS_DEFAULT_REGION" = conf_minio_region,
+           "AWS_ACCESS_KEY_ID" = secret_minio_access_key,
+           "AWS_SECRET_ACCESS_KEY" = secret_minio_secret_key)
 
-print(paste('var_string: ', var_string, ' type: ', class(var_string)))
-print(paste('var_string_with_comment: ', var_string_with_comment, ' type: ', class(var_string_with_comment)))
-print(paste('var_int: ', var_int, ' type: ', class(var_int)))
-print(paste('var_float: ', var_float, ' type: ', class(var_float)))
-print(paste('var_list_int: ', toString(var_list_int), ' type: ', class(var_list_int)))
-print(paste('var_list_str: ', toString(var_list_str), ' type: ', class(var_list_str)))
-
-check_type <- function(var, expected_types) {
-  
-  if (!any(sapply(expected_types, function(x) inherits(var, x)))) {
-    stop(paste('Variable is not of the expected types:', paste(expected_types, collapse = ', '),
-               '. It is a', class(var)))
-  }
-  
-  if ('list' %in% expected_types) {
-    if (!is.list(var) && !is.vector(var)) {
-      stop(paste('Variable', var, 'is not iterable.'))
-    }
-  }
+if (param_use_dummy_data) {
+        file_path <- paste(conf_virtual_lab_biotisan_euromarec, param_data_filename, sep="/")
+        print(sprintf("Using dummy data for testing purposes. Set param_use_dummy_data to 0 to use your own data. Downloading data from %s / %s", conf_minio_public_bucket, file_path))
+        aws.s3::save_object(bucket=conf_minio_public_bucket, object=file_path, file=param_data_filename)
+    } else {
+        file_path <- paste(param_user_email, param_data_filename, sep="/")
+        print(sprintf("Downloading data from %s / %s", conf_minio_user_bucket, file_path))
+        aws.s3::save_object(bucket=conf_minio_user_bucket, object=file_path, file=param_data_filename)
 }
 
-check_type(conf_string, c(c("character")))
-check_type(conf_string_with_comment, c("character"))
-check_type(conf_int, "numeric")
-check_type(conf_float, "numeric")
-if (is.numeric(conf_list_int)) {
-  conf_list_int <- list(conf_list_int)
-}
+metadata <- read_excel(param_data_filename, sheet = param_metadata_sheet) #Load metadata sheet
+data <- read_excel(param_data_filename, sheet = param_data_sheet) #Load data sheet
 
-check_type(conf_list_int, c("list"))
-if (is.character(conf_list_str)) {
-  conf_list_str <- list(conf_list_str)
-}
-check_type(conf_list_str, c("list"))
+dir.create(conf_temporary_data_directory, showWarnings = FALSE)
 
-check_type(param_string, c("character"))
-check_type(param_string_with_comment, c("character"))
-check_type(param_int, c("numeric", "integer"))
-check_type(param_float, c("numeric", "float"))
-if (is.numeric(param_list_int)) {
-  param_list_int <- list(param_list_int)
-}
-check_type(param_list_int, c("list"))
-check_type(conf_list_int, c("list"))
-if (is.character(param_list_str)) {
-  param_list_str <- list(param_list_str)
-}
-check_type(param_list_str, c("list"))
-
-check_type(var_string, c("character"))
-check_type(var_string_with_comment, c("character"))
-check_type(var_int, c("numeric", "integer"))
-check_type(var_float, c("numeric", "float"))
-if (is.numeric(var_list_int)) {
-  var_list_int <- list(var_list_int)
-}
-check_type(var_list_int, c("list"))
-
-if (is.character(var_list_str)) {
-  var_list_str <- list(var_list_str)
-}
-check_type(var_list_str, c("list"))
-
-print('All vars are of the correct type')
-
-done <- TRUE
+metadata_as_csv_filename <- "metadata.csv"
+data_as_csv_filename <- "data.csv"
+metadata_from_excel_path <- paste(conf_temporary_data_directory, metadata_as_csv_filename, sep="/")
+data_from_excel_path <- paste(conf_temporary_data_directory, data_as_csv_filename, sep="/")
+print(sprintf("Storing metadata in: %s, and data in %s", metadata_from_excel_path, data_from_excel_path))
+write.csv(metadata, file = metadata_from_excel_path)
+write.csv(data, file =  data_from_excel_path)
