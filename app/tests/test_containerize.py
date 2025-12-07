@@ -162,8 +162,6 @@ def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'import_as_dependency' not in cell_dir:
-            continue
         print("Testing containerization for cell", cell_dir)
         cell_path = os.path.join(cell_dir, 'cell.json')
         with open(cell_path) as f:

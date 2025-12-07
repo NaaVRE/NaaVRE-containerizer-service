@@ -15,7 +15,7 @@
     "name" : "pandas"
   } ],
   "kernel" : "ipython",
-  "original_source" : "mydataset = {\n  'cars': [\"BMW\", \"Volvo\", \"Ford\"],\n  'passings': [3, 7, 2]\n}\n\nmyvar = pd.DataFrame(mydataset)\n\nprint(myvar) ",
+  "original_source" : "mydataset = {\n  'cars': [\"BMW\", \"Volvo\", \"Ford\"],\n  'passings': [3, 7, 2]\n}\n\nmyvar = pd.DataFrame(mydataset)\n\nprint(myvar)",
   "source_url" : null,
   "container_image" : null,
   "description" : null
