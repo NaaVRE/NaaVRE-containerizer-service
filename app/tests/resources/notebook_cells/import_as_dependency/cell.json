@@ -1,0 +1,27 @@
+{
+  "title" : "as-pd-user",
+  "base_container_image" : {
+    "build" : "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime" : "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs" : [ ],
+  "outputs": [
+    {
+      "name": "myvar",
+      "type": null
+    }
+  ],
+  "params" : [ ],
+  "secrets" : [ ],
+  "confs" : [ ],
+  "dependencies" : [ {
+    "module" : "",
+    "asname" : "pd",
+    "name" : "pandas"
+  } ],
+  "kernel" : "ipython",
+  "original_source" : "mydataset = {\n  'cars': [\"BMW\", \"Volvo\", \"Ford\"],\n  'passings': [3, 7, 2]\n}\n\nmyvar = pd.DataFrame(mydataset)\n\nprint(myvar)",
+  "source_url" : null,
+  "container_image" : null,
+  "description" : null
+}

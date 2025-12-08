@@ -1,0 +1,95 @@
+{
+  "title": "minio-data-retriever-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [],
+  "outputs": [],
+  "params": [
+    {
+      "name": "param_data_sheet",
+      "type": "str",
+      "default_value": "BIRDS"
+    },
+    {
+      "name": "param_user_email",
+      "type": "str",
+      "default_value": "[the e-mail address you used to log into NaaVRE]"
+    },
+    {
+      "name": "param_metadata_sheet",
+      "type": "str",
+      "default_value": "METADATA"
+    },
+
+    {
+      "name": "param_data_filename",
+      "type": "str",
+      "default_value": "Template_MBO_Example_raw.xlsx"
+    },
+    {
+      "name": "param_use_dummy_data",
+      "type": "int",
+      "default_value": "1"
+    }
+  ],
+  "secrets": [
+    {
+      "name": "secret_minio_access_key",
+      "type": "str"
+    },
+    {
+      "name": "secret_minio_secret_key",
+      "type": "str"
+    }
+  ],
+  "confs": [
+    {
+      "name": "conf_minio_public_bucket",
+      "assignation": "conf_minio_public_bucket<-\"naa-vre-public\""
+    },
+    {
+      "name": "conf_minio_user_bucket",
+      "assignation": "conf_minio_user_bucket<-\"naa-vre-user-data\""
+    },
+    {
+      "name": "conf_minio_endpoint",
+      "assignation": "conf_minio_endpoint<-\"scruffy.lab.uvalight.net:9000\""
+    },
+    {
+      "name": "conf_minio_region",
+      "assignation": "conf_minio_region<-\"nl-uvalight\""
+    },
+    {
+      "name": "conf_temporary_data_directory",
+      "assignation": "conf_temporary_data_directory<-\"/tmp/data\""
+    },
+    {
+      "name": "conf_virtual_lab_biotisan_euromarec",
+      "assignation": "conf_virtual_lab_biotisan_euromarec<-\"vl-biotisan-euromarec\""
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SecretsProvider",
+      "asname": "",
+      "module": ""
+    },
+    {
+      "name": "aws.s3",
+      "asname": "",
+      "module": ""
+    },
+    {
+      "name": "readxl",
+      "asname": "",
+      "module": ""
+    }
+  ],
+  "kernel": "IRkernel",
+  "original_source": "library(\"readxl\")\nlibrary(\"aws.s3\")\n\nSys.setenv(\"AWS_S3_ENDPOINT\" = conf_minio_endpoint,\n           \"AWS_DEFAULT_REGION\" = conf_minio_region,\n           \"AWS_ACCESS_KEY_ID\" = secret_minio_access_key,\n           \"AWS_SECRET_ACCESS_KEY\" = secret_minio_secret_key)\n\n# Download file from bucket S3\nif (param_use_dummy_data) {\n        file_path <- paste(conf_virtual_lab_biotisan_euromarec, param_data_filename, sep=\"/\")\n        print(sprintf(\"Using dummy data for testing purposes. Set param_use_dummy_data to 0 to use your own data. Downloading data from %s / %s\", conf_minio_public_bucket, file_path))\n        aws.s3::save_object(bucket=conf_minio_public_bucket, object=file_path, file=param_data_filename)\n    } else {\n        file_path <- paste(param_user_email, param_data_filename, sep=\"/\")\n        print(sprintf(\"Downloading data from %s / %s\", conf_minio_user_bucket, file_path))\n        aws.s3::save_object(bucket=conf_minio_user_bucket, object=file_path, file=param_data_filename)\n}\n\n# Load data & metadata\nmetadata <- read_excel(param_data_filename, sheet = param_metadata_sheet) #Load metadata sheet\ndata <- read_excel(param_data_filename, sheet = param_data_sheet) #Load data sheet\n\n# Ensure the temporary data storage directory exists\ndir.create(conf_temporary_data_directory, showWarnings = FALSE)\n\n# Write (meta)data to files\nmetadata_as_csv_filename <- \"metadata.csv\"\ndata_as_csv_filename <- \"data.csv\"\nmetadata_from_excel_path <- paste(conf_temporary_data_directory, metadata_as_csv_filename, sep=\"/\")\ndata_from_excel_path <- paste(conf_temporary_data_directory, data_as_csv_filename, sep=\"/\")\nprint(sprintf(\"Storing metadata in: %s, and data in %s\", metadata_from_excel_path, data_from_excel_path))\nwrite.csv(metadata, file = metadata_from_excel_path)\nwrite.csv(data, file =  data_from_excel_path)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

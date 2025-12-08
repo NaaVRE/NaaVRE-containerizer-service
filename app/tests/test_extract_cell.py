@@ -4,10 +4,10 @@ from urllib.parse import quote
 
 import requests
 from fastapi.testclient import TestClient
+from nbformat import v4, write
 
 from app.main import app
 from app.models.workflow_cell import Cell
-from nbformat import v4, write
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -51,17 +51,16 @@ def test_extract_cell():
         save_as_jupyter_notebook(notebook, f'{cell_name}.ipynb')
 
         extractor_json_payload['data']['notebook'] = notebook
-
+        auth_token = os.getenv('AUTH_TOKEN')
         cell_extractor_response = client.post(
             '/extract_cell/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=extractor_json_payload,
         )
         if cell_extractor_response.status_code != 200:
             print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
-
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
@@ -101,8 +100,8 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_outputs,
                                       expected_cell_outputs):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
 
         returned_cell_params = sorted(returned_cell.params,
                                       key=lambda x: x['name'])
@@ -115,8 +114,9 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_params,
                                       expected_cell_params):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
+            assert expected['default_value'] == returned['default_value']
 
         returned_cell_secrets = sorted(returned_cell.secrets,
                                        key=lambda x: x['name'])
