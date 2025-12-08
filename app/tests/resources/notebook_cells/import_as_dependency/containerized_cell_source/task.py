@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 
 import argparse
 import json
@@ -9,7 +9,6 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--param_dataverse_api_key', action='store', type=str, required=True, dest='param_dataverse_api_key')
 
 args = arg_parser.parse_args()
 print(args)
@@ -17,11 +16,17 @@ print(args)
 id = args.id
 
 
-param_dataverse_api_key = args.param_dataverse_api_key.replace('"','')
 
 
-print("doesn't work")
+mydataset = {
+  'cars': ["BMW", "Volvo", "Ford"],
+  'passings': [3, 7, 2]
+}
 
-file_event_file = open("/tmp/event_file_" + id + ".json", "w")
-file_event_file.write(json.dumps(event_file))
-file_event_file.close()
+myvar = pd.DataFrame(mydataset)
+
+print(myvar)
+
+file_myvar = open("/tmp/myvar_" + id + ".json", "w")
+file_myvar.write(json.dumps(myvar))
+file_myvar.close()

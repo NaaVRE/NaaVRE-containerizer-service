@@ -56,12 +56,12 @@
   "outputs": [],
   "params": [
     {
-      "default_value": 1.1,
+      "default_value": "1.1",
       "name": "param_float",
       "type": "float"
     },
     {
-      "default_value": 1,
+      "default_value": "1",
       "name": "param_int",
       "type": "int"
     },
@@ -71,7 +71,7 @@
       "type": "list"
     },
     {
-      "default_value": "['list_str', 'space in elem', '3']",
+      "default_value": "[\"list_str\", \"space in elem\", \"3\"]",
       "name": "param_list_str",
       "type": "list"
     },

@@ -184,7 +184,7 @@ def test_containerize_render():
         ref_script = ref_containerized.build_script(
             containerizer.file_extension
             )
-        assert script == ref_script
+        assert ref_script == script
 
         # Dockerfile
         dockerfile = containerizer.build_docker()

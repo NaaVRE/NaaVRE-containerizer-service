@@ -4,10 +4,10 @@ from urllib.parse import quote
 
 import requests
 from fastapi.testclient import TestClient
+from nbformat import v4, write
 
 from app.main import app
 from app.models.workflow_cell import Cell
-from nbformat import v4, write
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -32,10 +32,6 @@ def test_extract_cell():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'minio-data-retriever' not in cell_dir:
-            # Skipping minio-data-retriever test for now
-            print(f"Skipping test for {cell_dir}")
-            continue
         notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
@@ -55,18 +51,16 @@ def test_extract_cell():
         save_as_jupyter_notebook(notebook, f'{cell_name}.ipynb')
 
         extractor_json_payload['data']['notebook'] = notebook
-
+        auth_token = os.getenv('AUTH_TOKEN')
         cell_extractor_response = client.post(
             '/extract_cell/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=extractor_json_payload,
         )
         if cell_extractor_response.status_code != 200:
             print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == 200
         cell_dict = cell_extractor_response.json()
-        ddd = json.dumps(cell_dict)
-        print(ddd)
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
@@ -106,8 +100,8 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_outputs,
                                       expected_cell_outputs):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
 
         returned_cell_params = sorted(returned_cell.params,
                                       key=lambda x: x['name'])
@@ -120,8 +114,9 @@ def test_extract_cell():
 
         for returned, expected in zip(returned_cell_params,
                                       expected_cell_params):
-            assert returned['name'] == expected['name']
-            assert returned['type'] == expected['type']
+            assert expected['name'] == returned['name']
+            assert expected['type'] == returned['type']
+            assert expected['default_value'] == returned['default_value']
 
         returned_cell_secrets = sorted(returned_cell.secrets,
                                        key=lambda x: x['name'])
