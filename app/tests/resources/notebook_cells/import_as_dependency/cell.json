@@ -5,7 +5,12 @@
     "runtime" : "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "inputs" : [ ],
-  "outputs" : [ ],
+  "outputs": [
+    {
+      "name": "myvar",
+      "type": null
+    }
+  ],
   "params" : [ ],
   "secrets" : [ ],
   "confs" : [ ],

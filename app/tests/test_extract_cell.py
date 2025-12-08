@@ -51,10 +51,10 @@ def test_extract_cell():
         save_as_jupyter_notebook(notebook, f'{cell_name}.ipynb')
 
         extractor_json_payload['data']['notebook'] = notebook
-
+        auth_token = os.getenv('AUTH_TOKEN')
         cell_extractor_response = client.post(
             '/extract_cell/',
-            headers={'Authorization': 'Bearer ' + os.getenv('AUTH_TOKEN')},
+            headers={'Authorization': 'Bearer ' + auth_token},
             json=extractor_json_payload,
         )
         if cell_extractor_response.status_code != 200:

@@ -27,3 +27,6 @@ myvar = pd.DataFrame(mydataset)
 
 print(myvar)
 
+file_myvar = open("/tmp/myvar_" + id + ".json", "w")
+file_myvar.write(json.dumps(myvar))
+file_myvar.close()
