@@ -23,6 +23,9 @@ class ExtractPrefixedVar(RVisitor):
             if (self.params[var_id]['value'] is None or var_id not in
                     self.params):
                 expr = self.visit(ctx.expr(1))
+                # Check if we have a signe before a number
+                if isinstance(ctx.expr(1), RParser.UnaryContext):
+                    expr = ctx.expr(1).getText()
                 # If returned expression is empty e.g. in case of unaccessible
                 # env variables, do not specify type.
                 if expr != "":
