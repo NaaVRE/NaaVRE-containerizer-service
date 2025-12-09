@@ -36,7 +36,6 @@ def test_extract_cell():
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
             notebook = json.load(f)
-
         payload_path = os.path.join(cell_dir, 'payload_extract_cell.json')
         with open(payload_path) as f:
             print('                with payload: ' + payload_path)
