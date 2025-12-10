@@ -1,0 +1,42 @@
+{
+  "title": "printer-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+    {
+      "name": "io",
+      "type": "int"
+    }
+  ],
+  "outputs": [],
+  "params": [
+    {
+      "name": "param_neg_string",
+      "type": "str",
+      "default_value": "-1"
+    },
+    {
+      "name": "param_neg_num",
+      "type": "int",
+      "default_value": "-2"
+    },
+    {
+      "name": "param_neg_decimal",
+      "type": "float",
+      "default_value": "-1.5"
+    }
+  ],
+  "secrets": [
+  ],
+  "confs": [
+  ],
+  "dependencies": [
+  ],
+  "kernel": "IRkernel",
+  "original_source": "print(param_neg_string)\nprint(io)\nprint(param_neg_num)\nprint(param_neg_decimal)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
