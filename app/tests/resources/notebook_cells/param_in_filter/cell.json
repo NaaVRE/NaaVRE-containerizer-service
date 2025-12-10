@@ -1,0 +1,109 @@
+{
+  "title": "species-occurrence-data-cleaner-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+    {
+      "name": "data_as_csv_filename",
+      "type": null
+    },
+    {
+      "name": "metadata_as_csv_filename",
+      "type": null
+    },
+    {
+      "name": "number_of_validation_errors",
+      "type": null
+    }
+  ],
+  "outputs": [],
+  "params": [
+    {
+      "name": "param_years",
+      "type": "int",
+      "default_value": "7"
+    },
+    {
+      "name": "param_latitude_south",
+      "type": "float",
+      "default_value": "25.0000"
+    },
+    {
+      "name": "param_latitude_north",
+      "type": "float",
+      "default_value": "90.0000"
+    },
+    {
+      "name": "param_longitude_east",
+      "type": "float",
+      "default_value": "70.0000"
+    },
+    {
+      "name": "param_longitude_west",
+      "type": "float",
+      "default_value": "00.0000"
+    },
+    {
+      "name": "param_first_month",
+      "type": "str",
+      "default_value": "1"
+    },
+    {
+      "name": "param_last_month",
+      "type": "int",
+      "default_value": "3"
+    },
+    {
+      "name": "param_upper_limit_max_depth",
+      "type": "int",
+      "default_value": "0"
+    },
+    {
+      "name": "param_lower_limit_max_depth",
+      "type": "int",
+      "default_value": "50"
+    },
+    {
+      "name": "param_upper_limit_min_depth",
+      "type": "int",
+      "default_value": "0"
+    },
+    {
+      "name": "param_lower_limit_min_depth",
+      "type": "int",
+      "default_value": "50"
+    }
+  ],
+  "secrets": [
+  ],
+  "confs": [
+    {
+      "assignation": "conf_temporary_data_directory<-\"/tmp/data\"",
+      "name": "conf_temporary_data_directory"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SecretsProvider",
+      "asname": "",
+      "module": ""
+    },
+    {
+      "name": "aws.s3",
+      "asname": "",
+      "module": ""
+    },
+    {
+      "name": "readxl",
+      "asname": "",
+      "module": ""
+    }
+  ],
+  "kernel": "IRkernel",
+  "original_source": "library(dplyr)\nlibrary(tidyr)\n\nprint(paste(deparse(substitute(number_of_validation_errors)), number_of_validation_errors, sep=\" = \"))\n\nvalidate_dataframe_has_data <- function(dataframe, dataframe_name) {\n    if (nrow(dataframe) == 0) {\n    stop(paste0(dataframe_name, \" has no rows (0 rows). Halting execution.\"))\n  } else {\n    sprintf(\"%s has %i rows.\", dataframe_name, nrow(dataframe))\n    }\n}\n\n# Report on parameters set\n# print(sprintf(\"Filtering sites with %i or more years of data.\", param_years))\n# print(sprintf(\"Filtering for data within the coordinates %s south, %s north, %s east and %s west.\", param_latitude_south, param_latitude_north, param_longitude_east, param_longitude_west))\n# print(sprintf(\"Filtering for data within upper_limit_max_depth %i, lower_limit_max_depth %i, upper_limit_min_depth %i, lower_limit_min_depth %i.\", param_upper_limit_max_depth, param_lower_limit_max_depth, param_upper_limit_min_depth, param_lower_limit_min_depth))\n# print(sprintf(\"Filtering for data between the month %i and month %i.\", param_first_month, param_last_month))\n\n# Assign dummy variables to prevent false Input/Output detection by the NaaVRE cell analyzer\ndatecollected = \"\"\nsiteid = \"\"\ndecimallatitude = \"\"\ndecimallongitude = \"\"\n\n# Read (meta)data from files\nmd <- read.csv(paste(conf_temporary_data_directory, metadata_as_csv_filename, sep=\"/\"), sep=\",\")\ndata <- read.csv(paste(conf_temporary_data_directory, data_as_csv_filename, sep=\"/\"), sep=\",\")\nvalidate_dataframe_has_data(data, \"data read from csv\")\nvalidate_dataframe_has_data(md, \"metadata read from csv\")\n\n###### Years filter ######\n###### The \"number of sampled years\" could be changed by the user (default = 7) ######\n# Create a table with sites with more than 7 sampling years\nsites <- data %>% \n  group_by(siteid) %>%\n  summarise(nyear = n_distinct(substr(datecollected, 1, 4))) %>%\n  filter(nyear > param_years)\n\nmd <- merge(md,sites, by = \"siteid\")\nvalidate_dataframe_has_data(md, \"metadata merged by siteid\")\nvalidate_dataframe_has_data(data, \"data after first years filter\")\n\n###### Coordinates filter ######\n###### The \"geographical boundaries\" could be changed by the user (default = latitude (25:90), longitude (-45:70)). The default values correspond to European continental waters. ######\n# Keep sites within the study area [our boundaries are latitude (25:90), longitude (-45:70)]\nmetadata_coordinates <- md %>% select(siteid, decimallatitude, decimallongitude)\nprint(metadata_coordinates)\n\nmd <- dplyr::filter(md, decimallatitude >= param_latitude_south, decimallatitude <= param_latitude_north, \n                 decimallongitude >= param_longitude_west, decimallongitude <= param_longitude_east)\nprint(paste0(\"Number of sites found within the specified geolocation: \", nrow(md)))\n\ndata <- data %>% # Keep data from these sites\n  filter(siteid %in% md$siteid)\nvalidate_dataframe_has_data(data, \"data filtered by coordinates\")\n\n###### Depth filter ######\n###### The \"depth\" could be changed by the user (default = 0 to 50 meters). It should be given in absolute value. ######\n#(in this case is not necessary, but for other taxonomic groups is possible that the sample were taken at different depths. The code keeps the NAs in case that information is not known)\ndata <- data %>% filter((maximumdepthinmeters >= param_upper_limit_max_depth & maximumdepthinmeters <= param_lower_limit_max_depth) %>% tidyr::replace_na(TRUE))\ndata <- data %>% filter((minimumdepthinmeters >= param_upper_limit_min_depth & minimumdepthinmeters <= param_lower_limit_min_depth) %>% tidyr::replace_na(TRUE))\nvalidate_dataframe_has_data(data, \"data filtered by depth\")\n\n###### Season filter ######\n###### The \"season\" could be changed by the user (default = 1:3). The default values correspond to winter.\n# The period does not need to be three months, can be 1:12 for the whole year. It cannot choose months from different years (for example, November to January) ######\n# In this case, most of the sampling campaigns were conducted in winter\n# One was conducted in summer and should be removed since the sampling season is not consistent\ndata$month <- as.numeric(format(as.Date(data$datecollected), \"%m\")) # Create a column with the sampling month\n\nseason <- c(param_first_month:param_last_month)\ndata <- data %>%\n  filter(month %in% season) #Remove those samples in non-consistent seasons (in this case keeps the months 1, 2 and 3, this is January, February and March)\nvalidate_dataframe_has_data(data, \"data filtered by season\")\n\n# Note that some time series can have more than one sampling campaign per year and even per season (not in this case)\n# For our analysis, we are only keeping one sampling campaign per year\n\n###### Years filter ######\n###### Note that this step is repeated ######\n# Update the table with sites with more than the number of sampled years\n# After removing inconsistent sampling campaigns, some time series may become shorter than 8 years\nsites <- data %>% \n  group_by(siteid) %>%\n  summarise(nyear = n_distinct(substr(datecollected, 1, 4))) %>%\n  filter(nyear > param_years)\n\ndata <- data %>% # Keep data from these sites\n  filter(siteid %in% md$siteid)\nmd <- md %>% # Keep metadata from these sites\n  filter(siteid %in% md$siteid)\nvalidate_dataframe_has_data(data, \"data filtered by years\")\n\nmd_final <- md[,c(1:8)]\ndata_final <- data[,c(1:15)]\n\n# Write data to files\ncleaned_metadata_filename <- \"metadata_Example.csv\"\ncleaned_data_filename <- \"data_Example.csv\"\ncleaned_metadata_path <- paste(conf_temporary_data_directory, cleaned_metadata_filename, sep=\"/\")\ncleaned_data_path <- paste(conf_temporary_data_directory, cleaned_data_filename, sep=\"/\")\nprint(sprintf(\"Storing metadata in: %s, and data in %s\", cleaned_metadata_path, cleaned_data_path))\nwrite.csv(md_final, file = cleaned_metadata_path)\nwrite.csv(data_final, file =  cleaned_data_path)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
