@@ -67,7 +67,8 @@ def test_extract_cell():
             print(cell_extractor_response.text)
         assert cell_extractor_response.status_code == \
                responses_dict['extract_cell']['code']
-        if cell_extractor_response.status_code != 200:
+        if cell_extractor_response.status_code != 200 and \
+                responses_dict['extract_cell']['code'] != 200:
             continue
         cell_dict = cell_extractor_response.json()
         returned_cell = Cell.model_validate(cell_dict)
