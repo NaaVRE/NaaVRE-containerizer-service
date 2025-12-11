@@ -79,7 +79,7 @@ def test_extract_cell():
         expected_cell_inputs = sorted(expected_cell.inputs,
                                       key=lambda x: x['name'])
 
-        assert (len(returned_cell_inputs) == len(expected_cell_inputs)), \
+        assert (len(expected_cell_inputs) == len(returned_cell_inputs)), \
             f"Expected {expected_cell_inputs}, " \
             f"but got {returned_cell_inputs}"
 

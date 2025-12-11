@@ -54,6 +54,7 @@ jobs:
           echo $MATRIX
           echo "test_list=$MATRIX" >> $GITHUB_OUTPUT
 
+
   call-pytest:
     uses: ./.github/workflows/run-tests.yml
     needs: [ configure-workflow,split-tests ]
@@ -64,16 +65,12 @@ jobs:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
       runs-on: ${{ needs.configure-workflow.outputs.runner }}
-      configuration: ${{ vars.CONFIG_FILE }}
       debug: ${{ vars.DEBUG }}
-      oidc_configuration_url: ${{ vars.OIDC_CONFIGURATION_URL }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
-      root_path: ${{ vars.ROOT_PATH }}
       test: ${{ matrix.test }}
       pytest_extra_options: '--containerize-github-all'
     secrets:
-      auth_token: ${{ secrets.AUTH_TOKEN }}
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
 
