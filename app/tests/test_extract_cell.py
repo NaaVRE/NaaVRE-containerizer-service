@@ -32,8 +32,6 @@ def test_extract_cell():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'starts_with_number' not in cell_dir:
-            continue
         notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
@@ -53,14 +51,24 @@ def test_extract_cell():
 
         extractor_json_payload['data']['notebook'] = notebook
         auth_token = os.getenv('AUTH_TOKEN')
+        # Check if responses.json exists
+        responses_dict = {'extract_cell': {'code': 200, 'message': 'OK'}}
+        if os.path.exists(os.path.join(cell_dir, 'responses.json')):
+            with open(os.path.join(cell_dir, 'responses.json')) as f:
+                responses_dict = json.load(f)
+
         cell_extractor_response = client.post(
             '/extract_cell/',
             headers={'Authorization': 'Bearer ' + auth_token},
             json=extractor_json_payload,
         )
-        if cell_extractor_response.status_code != 200:
+        if cell_extractor_response.status_code != \
+                responses_dict['extract_cell']['code']:
             print(cell_extractor_response.text)
-        assert cell_extractor_response.status_code == 200
+        assert cell_extractor_response.status_code == \
+               responses_dict['extract_cell']['code']
+        if cell_extractor_response.status_code != 200:
+            continue
         cell_dict = cell_extractor_response.json()
         returned_cell = Cell.model_validate(cell_dict)
         expected_cell = Cell.model_validate(expected_cell_dict)
