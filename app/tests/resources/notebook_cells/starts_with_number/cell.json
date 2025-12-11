@@ -1,0 +1,21 @@
+{
+  "confs": [],
+  "dependencies": [],
+  "inputs": [
+  ],
+  "kernel": "ipython",
+  "outputs": [
+    {
+      "name": "list1",
+      "type": "list"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "title": "3-items-input-data-python-user",
+  "original_source": "list1 = [\"0001\", \"0010\", \"0011\"]",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  }
+}

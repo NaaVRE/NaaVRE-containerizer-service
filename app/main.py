@@ -2,6 +2,8 @@ import datetime
 import json
 import logging
 import os
+import time
+from threading import Thread
 from typing import Annotated
 from urllib.parse import urlparse
 
@@ -9,6 +11,7 @@ import cachetools.func
 import jwt
 import requests
 import uvicorn
+from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -17,6 +20,8 @@ from app.models.extractor_payload import ExtractorPayload
 from app.models.vl_config import VLConfig
 from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.cell_extractor.extractor import DummyExtractor
+from app.services.cell_extractor.notebook_sanity_checks import \
+    NotebookSanityChecks
 from app.services.cell_extractor.py_extractor import PyExtractor
 from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
 from app.services.cell_extractor.r_extractor import RExtractor
@@ -29,9 +34,6 @@ from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
-from cachetools import TTLCache
-from threading import Thread
-import time
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
@@ -223,6 +225,8 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
         raise HTTPException(status_code=422,
                             detail='Cell is not a code cell, cannot extract')
     try:
+        nb_checks = NotebookSanityChecks(extractor_payload.data)
+        nb_checks.run_all()
         cell = extractor.get_cell()
     except ValueError as e:
         raise HTTPException(status_code=422,
