@@ -8,7 +8,7 @@ from slugify import slugify
 from app.models.notebook_data import NotebookData
 from app.models.workflow_cell import Cell
 from app.services.base_image.base_image_tags import BaseImageTags
-from app.services.cell_extractor.cell_sanity_checks import CellSanityChecker
+from app.services.cell_extractor.cell_sanity_checker import CellSanityChecker
 
 
 class Extractor(abc.ABC):

@@ -119,20 +119,40 @@ class GithubService(GitRepository, ABC):
         logger.debug('Content updated: ' + str(content_updated))
         return {"content_updated": content_updated, 'commit_sha': commit_sha}
 
+    def __get_main_commit_sha(self) -> str | None:
+        """Return the commit SHA of the `main` branch using PyGithub."""
+        try:
+            self.wait_for_github_api_resources()
+            branch = self.gh_repository.get_branch("main")
+            return branch.commit.sha
+        except github.GithubException as e:
+            logger.exception("Failed to get main branch commit SHA: %s", e)
+            return None
+
     def dispatch_containerization_workflow(self, title=None,
-                                           image_version=None):
+                                           image_version=None,
+                                           commit_sha=None):
         count = 0
-        while not self.__is_context_available(title):
+        # wait for commit_sha and main to be the same
+        main_sha = self.__get_main_commit_sha()
+        while commit_sha != main_sha:
+            logger.debug('Waiting for commit to be on main branch')
+            sleep(5)
+            count += 1
+            if count > 10:
+                raise Exception('Commit ' + str(commit_sha) +
+                                ' is not on main branch')
+            main_sha = self.__get_main_commit_sha()
+        count = 0
+        while not self.__is_context_available(title, ref=commit_sha):
             logger.debug('Waiting for context to be available')
             sleep(5)
             count += 1
             if count > 10:
                 raise Exception('Context in ' + title + ' is not available')
         wf_id = str(uuid.uuid4())
-        git_resp = requests.post(
-            url=self.dispatches_url,
-            json={
-                'ref': 'refs/heads/main',
+        json_data = {
+                'ref': 'main',
                 'inputs': {
                     'build_dir': title,
                     'dockerfile': 'Dockerfile',
@@ -141,7 +161,10 @@ class GithubService(GitRepository, ABC):
                     'id': wf_id,
                     'image_version': image_version,
                 }
-            },
+            }
+        git_resp = requests.post(
+            url=self.dispatches_url,
+            json=json_data,
             verify=False,
             headers={'Accept': 'application/vnd.github.v3+json',
                      'Authorization': 'token ' + self.token}
@@ -247,12 +270,12 @@ class GithubService(GitRepository, ABC):
                     return job
         return None
 
-    def __is_context_available(self, path=None):
+    def __is_context_available(self, path=None, ref=None):
         found_docker = False
         found_env = False
         found_task = False
         try:
-            contents = self.gh_repository.get_contents(path)
+            contents = self.gh_repository.get_contents(path, ref=ref)
             for content in contents:
                 if content.name == 'Dockerfile':
                     found_docker = True
