@@ -1,10 +1,10 @@
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-built_in = ["T", "F", "pi", "is.numeric", "mu", "round"]
+built_in = ['T', 'F', 'pi', 'is.numeric', 'mu', 'round']
 
 
-class ExtractUndefined(RVisitor):
+class UndefinedExtractor(RVisitor):
     def __init__(self, defs, scoped):
         self.undefined = set()
         self.defs = defs
@@ -59,6 +59,8 @@ class ExtractUndefined(RVisitor):
         self.visitChildren(ctx)
 
     def visitForm(self, ctx: RParser.FormContext):
+        if not hasattr(ctx.ID(), 'getText'):
+            print('ctx.ID() has no getText method')
         self.scoped.add(ctx.ID().getText())
         if isinstance(ctx.expr(), RParser.IdContext):
             self.visit(ctx.expr())

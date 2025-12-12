@@ -4,7 +4,7 @@ from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
 
-class ExtractPrefixedVar(RVisitor):
+class PrefixedVarExtractor(RVisitor):
     def __init__(self, prefix):
         self.prefix = prefix + '_'
         self.params = {}

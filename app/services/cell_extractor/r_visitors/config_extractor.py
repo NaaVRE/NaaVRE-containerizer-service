@@ -2,7 +2,7 @@ from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
 
-class ExtractConfigs(RVisitor):
+class ConfigExtractor(RVisitor):
     def __init__(self):
         self.configs = {}
 

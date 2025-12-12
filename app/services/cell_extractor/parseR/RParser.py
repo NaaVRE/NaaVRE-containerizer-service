@@ -2342,21 +2342,20 @@ class RParser(Parser):
                 return visitor.visitChildren(self)
 
     def form(self):
-
-        localctx = RParser.FormContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 8, self.RULE_form)
+        local_ctx = RParser.FormContext(self, self._ctx, self.state)
+        self.enterRule(local_ctx, 8, self.RULE_form)
         try:
             self.state = 184
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input, 11, self._ctx)
             if la_ == 1:
-                self.enterOuterAlt(localctx, 1)
+                self.enterOuterAlt(local_ctx, 1)
                 self.state = 178
                 self.match(RParser.ID)
                 pass
 
             elif la_ == 2:
-                self.enterOuterAlt(localctx, 2)
+                self.enterOuterAlt(local_ctx, 2)
                 self.state = 179
                 self.match(RParser.ID)
                 self.state = 180
@@ -2366,23 +2365,23 @@ class RParser(Parser):
                 pass
 
             elif la_ == 3:
-                self.enterOuterAlt(localctx, 3)
+                self.enterOuterAlt(local_ctx, 3)
                 self.state = 182
                 self.match(RParser.T__54)
                 pass
 
             elif la_ == 4:
-                self.enterOuterAlt(localctx, 4)
+                self.enterOuterAlt(local_ctx, 4)
                 self.state = 183
                 self.match(RParser.T__52)
                 pass
         except RecognitionException as re:
-            localctx.exception = re
+            local_ctx.exception = re
             self._errHandler.reportError(self, re)
             self._errHandler.recover(self, re)
         finally:
             self.exitRule()
-        return localctx
+        return local_ctx
 
     class SublistContext(ParserRuleContext):
         __slots__ = 'parser'
