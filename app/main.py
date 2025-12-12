@@ -20,8 +20,6 @@ from app.models.extractor_payload import ExtractorPayload
 from app.models.vl_config import VLConfig
 from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.cell_extractor.extractor import DummyExtractor
-from app.services.cell_extractor.notebook_sanity_checks import \
-    NotebookSanityChecks
 from app.services.cell_extractor.py_extractor import PyExtractor
 from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
 from app.services.cell_extractor.r_extractor import RExtractor
@@ -225,8 +223,6 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
         raise HTTPException(status_code=422,
                             detail='Cell is not a code cell, cannot extract')
     try:
-        nb_checks = NotebookSanityChecks(extractor_payload.data)
-        nb_checks.run_all()
         cell = extractor.get_cell()
     except ValueError as e:
         raise HTTPException(status_code=422,
@@ -279,7 +275,8 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if commit_resp['content_updated'] or force_containerize:
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
-            image_version=image_version)
+            image_version=image_version,
+            commit_sha=commit_sha)
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         workflow_id = containerization_workflow_resp.get('workflow_id')
         if workflow_id:
