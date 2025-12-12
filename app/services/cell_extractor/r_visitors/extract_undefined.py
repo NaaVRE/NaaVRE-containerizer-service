@@ -1,10 +1,10 @@
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-built_in = ["T", "F", "pi", "is.numeric", "mu", "round"]
+built_in = ['T', 'F', 'pi', 'is.numeric', 'mu', 'round']
 
 
-class ExtractUndefined(RVisitor):
+class UndefinedExtractor(RVisitor):
     def __init__(self, defs, scoped):
         self.undefined = set()
         self.defs = defs
@@ -59,9 +59,14 @@ class ExtractUndefined(RVisitor):
         self.visitChildren(ctx)
 
     def visitForm(self, ctx: RParser.FormContext):
-        self.scoped.add(ctx.ID().getText())
-        if isinstance(ctx.expr(), RParser.IdContext):
-            self.visit(ctx.expr())
+        if ctx.ID():
+            self.scoped.add(ctx.ID().getText())
+        elif self.isEllipsis(ctx):
+            self.scoped.add("...")
+            return None
+        if ctx.expr():
+            return self.visit(ctx.expr())
+        return None
 
     def visitFor(self, ctx: RParser.ForContext):
         # Iterator variable is scoped
@@ -75,3 +80,6 @@ class ExtractUndefined(RVisitor):
         if (id not in self.defs and id not in self.scoped and id
                 not in built_in):
             self.undefined.add(ctx.getText())
+
+    def isEllipsis(self, ctx):
+        return ctx.getText() == "..."
