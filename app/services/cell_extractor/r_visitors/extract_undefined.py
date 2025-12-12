@@ -59,11 +59,14 @@ class UndefinedExtractor(RVisitor):
         self.visitChildren(ctx)
 
     def visitForm(self, ctx: RParser.FormContext):
-        if not hasattr(ctx.ID(), 'getText'):
-            print('ctx.ID() has no getText method')
-        self.scoped.add(ctx.ID().getText())
-        if isinstance(ctx.expr(), RParser.IdContext):
-            self.visit(ctx.expr())
+        if ctx.ID():
+            self.scoped.add(ctx.ID().getText())
+        elif self.isEllipsis(ctx):
+            self.scoped.add("...")
+            return None
+        if ctx.expr():
+            return self.visit(ctx.expr())
+        return None
 
     def visitFor(self, ctx: RParser.ForContext):
         # Iterator variable is scoped
@@ -77,3 +80,6 @@ class UndefinedExtractor(RVisitor):
         if (id not in self.defs and id not in self.scoped and id
                 not in built_in):
             self.undefined.add(ctx.getText())
+
+    def isEllipsis(self, ctx):
+        return ctx.getText() == "..."
