@@ -122,7 +122,7 @@ class GithubService(GitRepository, ABC):
     def dispatch_containerization_workflow(self, title=None,
                                            image_version=None):
         count = 0
-        while not self.is_context_available(title):
+        while not self.__is_context_available(title):
             logger.debug('Waiting for context to be available')
             sleep(5)
             count += 1
@@ -247,7 +247,7 @@ class GithubService(GitRepository, ABC):
                     return job
         return None
 
-    def is_context_available(self, path=None):
+    def __is_context_available(self, path=None):
         found_docker = False
         found_env = False
         found_task = False
