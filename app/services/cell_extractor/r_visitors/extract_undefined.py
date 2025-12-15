@@ -52,7 +52,9 @@ class UndefinedExtractor(RVisitor):
             self.visit(ctx.expr())
 
     def visitFunction(self, ctx: RParser.FunctionContext):
-        self.visit(ctx.formlist())
+        form_list_ctx = ctx.formlist()
+        if form_list_ctx is not None:
+            self.visit(form_list_ctx)
         self.visit(ctx.expr())
 
     def visitFormlist(self, ctx: RParser.FormlistContext):
