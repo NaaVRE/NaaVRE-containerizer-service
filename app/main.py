@@ -2,6 +2,8 @@ import datetime
 import json
 import logging
 import os
+import time
+from threading import Thread
 from typing import Annotated
 from urllib.parse import urlparse
 
@@ -9,6 +11,7 @@ import cachetools.func
 import jwt
 import requests
 import uvicorn
+from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -29,9 +32,6 @@ from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
-from cachetools import TTLCache
-from threading import Thread
-import time
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
@@ -275,7 +275,8 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     if commit_resp['content_updated'] or force_containerize:
         containerization_workflow_resp = gh.dispatch_containerization_workflow(
             title=containerize_payload.cell.title,
-            image_version=image_version)
+            image_version=image_version,
+            commit_sha=commit_sha)
         wf_creation_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         workflow_id = containerization_workflow_resp.get('workflow_id')
         if workflow_id:

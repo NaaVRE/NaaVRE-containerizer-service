@@ -8,11 +8,11 @@ from rpy2.robjects.packages import importr
 
 from .extractor import Extractor
 from .parseR.parsing import parse_text
-from .r_visitors.extract_configs import ExtractConfigs
-from .r_visitors.extract_defined import ExtractDefined
-from .r_visitors.extract_names import ExtractNames
-from .r_visitors.extract_prefixed_var import ExtractPrefixedVar
-from .r_visitors.extract_undefined import ExtractUndefined
+from .r_visitors.config_extractor import ConfigExtractor
+from .r_visitors.defined_extractor import DefinedExtractor
+from .r_visitors.extract_undefined import UndefinedExtractor
+from .r_visitors.names_extractor import NamesExtractor
+from .r_visitors.prefixed_var_extractor import PrefixedVarExtractor
 from ...models.notebook_data import NotebookData
 
 # Create an R environment
@@ -131,8 +131,10 @@ class RExtractor(Extractor):
                                                             'secret')
         self.undefined = dict()
         for source in sources:
-            self.undefined.update(self.__extract_cell_undefined(source))
-
+            try:
+                self.undefined.update(self.__extract_cell_undefined(source))
+            except Exception as e:
+                print(f"Error extracting undefined variables: {e}")
         super().__init__(notebook_data, base_image_tags_url)
 
     def __extract_imports(self, sources: list[str]) -> dict:
@@ -190,7 +192,7 @@ class RExtractor(Extractor):
         configurations = {}
         for s in sources:
             tree = parse_text(s)
-            visitor = ExtractConfigs()
+            visitor = ConfigExtractor()
             output = visitor.visit(tree)
             for o in output:
                 configurations[o] = output[o]
@@ -205,7 +207,7 @@ class RExtractor(Extractor):
         extracted_vars = dict()
         for s in sources:
             tree = parse_text(s)
-            visitor = ExtractPrefixedVar(prefix)
+            visitor = PrefixedVarExtractor(prefix)
             variable_names = visitor.visit(tree)
             for variable_name in variable_names:
                 if variable_name.startswith(prefix + '_'):
@@ -260,15 +262,15 @@ class RExtractor(Extractor):
 
     def __extract_cell_names(self, source) -> dict:
         tree = parse_text(source)
-        visitor = ExtractNames()
+        visitor = NamesExtractor()
         vars_r = visitor.visit(tree)
         return vars_r
 
     def __extract_cell_undefined(self, cell_source) -> dict:
         tree = parse_text(cell_source)
-        visitor = ExtractDefined()
+        visitor = DefinedExtractor()
         defs, scoped = visitor.visit(tree)
-        visitor = ExtractUndefined(defs, scoped)
+        visitor = UndefinedExtractor(defs, scoped)
         undefs = visitor.visit(tree)
         undef_vars = {
             name: {

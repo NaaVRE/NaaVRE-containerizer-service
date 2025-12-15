@@ -1,0 +1,24 @@
+{
+  "confs": [
+  ],
+  "dependencies": [],
+  "inputs": [
+  ],
+  "kernel": "IRkernel",
+  "outputs": [],
+  "params": [
+    {
+      "default_value": "bar",
+      "name": "param_foo",
+      "type": "str"
+    }
+  ],
+  "secrets": [
+  ],
+  "title": "default-value-null-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "original_source": "if (param_foo) {}"
+}

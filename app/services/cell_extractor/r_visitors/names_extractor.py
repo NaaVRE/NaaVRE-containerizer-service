@@ -2,7 +2,7 @@ from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
 
-class ExtractNames(RVisitor):
+class NamesExtractor(RVisitor):
     # Get all names and try to infer their types.
     def __init__(self):
         self.names = {}

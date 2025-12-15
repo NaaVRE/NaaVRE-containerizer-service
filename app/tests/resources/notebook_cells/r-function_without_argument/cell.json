@@ -1,0 +1,21 @@
+{
+  "confs": [
+
+  ],
+  "dependencies": [],
+  "inputs": [
+
+  ],
+  "kernel": "IRkernel",
+  "outputs": [],
+  "params": [
+
+  ],
+  "secrets": [],
+  "title": "function-without-argument-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "original_source": "function_without_argument <- function(){\n  return (\"out generated within function\")\n}\n"
+}
