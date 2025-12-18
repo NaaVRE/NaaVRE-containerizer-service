@@ -119,30 +119,9 @@ class GithubService(GitRepository, ABC):
         logger.debug('Content updated: ' + str(content_updated))
         return {"content_updated": content_updated, 'commit_sha': commit_sha}
 
-    def __get_main_commit_sha(self) -> str | None:
-        """Return the commit SHA of the `main` branch using PyGithub."""
-        try:
-            self.wait_for_github_api_resources()
-            branch = self.gh_repository.get_branch("main")
-            return branch.commit.sha
-        except github.GithubException as e:
-            logger.exception("Failed to get main branch commit SHA: %s", e)
-            return None
-
     def dispatch_containerization_workflow(self, title=None,
                                            image_version=None,
                                            commit_sha=None):
-        count = 0
-        # wait for commit_sha and main to be the same
-        main_sha = self.__get_main_commit_sha()
-        while commit_sha != main_sha:
-            logger.debug('Waiting for commit to be on main branch')
-            sleep(5)
-            count += 1
-            if count > 10:
-                raise Exception('Commit ' + str(commit_sha) +
-                                ' is not on main branch')
-            main_sha = self.__get_main_commit_sha()
         count = 0
         while not self.__is_context_available(title, ref=commit_sha):
             logger.debug('Waiting for context to be available')
@@ -155,6 +134,7 @@ class GithubService(GitRepository, ABC):
                 'ref': 'main',
                 'inputs': {
                     'build_dir': title,
+                    'commit_sha': commit_sha,
                     'dockerfile': 'Dockerfile',
                     'image_repo': self.registry.registry_url,
                     'image_tag': title,
