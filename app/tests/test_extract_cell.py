@@ -145,7 +145,7 @@ def test_extract_cell():
                                     key=lambda x: x['name'])
         expected_cell_dependencies = sorted(expected_cell.dependencies,
                                             key=lambda x: x['name'])
-        assert (len(returned_cell_deps) == len(expected_cell_dependencies)), \
+        assert (len(expected_cell_dependencies) == len(returned_cell_deps)), \
             f"Expected {expected_cell_dependencies}, " \
             f"but got {returned_cell_deps}"
 
