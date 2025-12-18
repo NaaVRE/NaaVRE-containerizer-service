@@ -7,10 +7,6 @@
   "inputs": [
   ],
   "outputs": [
-    {
-      "name": "siteid",
-      "type": "str"
-    }
   ],
   "params": [
     {

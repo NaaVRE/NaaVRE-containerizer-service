@@ -29,6 +29,10 @@ class UndefinedExtractor(RVisitor):
 
     # TEST
     def visitUserop(self, ctx: RParser.UseropContext):
+        exp_0 = ctx.expr(0)
+        exp_1 = ctx.expr(1)
+        print(exp_0.getText())
+        print(exp_1.getText())
         if isinstance(ctx.expr(0), RParser.CallContext):
             self.visit(ctx.expr(0))
         if isinstance(ctx.expr(1), RParser.CallContext):
