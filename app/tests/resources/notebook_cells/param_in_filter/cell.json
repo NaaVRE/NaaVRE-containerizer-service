@@ -32,7 +32,7 @@
     }
   ],
   "kernel": "IRkernel",
-  "original_source": "library(dplyr)\nlibrary(tidyr)\n\ndatecollected = \"\"\nsiteid = \"\"\n\nsites <- data %>% \n  group_by(siteid) %>%\n  summarise(nyear = n_distinct(substr(datecollected, 1, 4))) %>%\n  filter(nyear > param_years)",
+  "original_source": "library(dplyr)\nlibrary(tidyr)\n\ndata = \"\"\nnyear = \"\"\n\nsites <- data %>% \n  filter(nyear > param_years)",
   "source_url": null,
   "container_image": null,
   "description": null
