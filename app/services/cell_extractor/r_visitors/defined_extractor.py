@@ -15,15 +15,12 @@ class DefinedExtractor(RVisitor):
     def visitAssign(self, ctx: RParser.AssignContext):
         # Get the identifier and the assigned value of the expr and add to dict
         id = self.visit(ctx.expr(0))
-
         if id is None:
             return None
-
         if id not in self.scoped and not self.scope:
             self.defs.add(id)
         elif self.scope:
             self.scoped.add(id)
-
         self.visit(ctx.expr(1))
 
     def visitCall(self, ctx: RParser.CallContext):

@@ -21,9 +21,13 @@ class RVisitor(ParseTreeVisitor):
     def visitParens(self, ctx: RParser.ParensContext):
         return self.visitChildren(ctx)
 
-    # Visit a parse tree produced by RParser#compare.
+    # # Visit a parse tree produced by RParser#compare.
+    # def visitCompare(self, ctx: RParser.CompareContext):
+    #     return self.visitChildren(ctx)
     def visitCompare(self, ctx: RParser.CompareContext):
-        return self.visitChildren(ctx)
+        self.visit(ctx.expr(0))
+        self.visit(ctx.expr(1))
+        return None
 
     # Visit a parse tree produced by RParser#string.
     def visitString(self, ctx: RParser.StringContext):

@@ -10,7 +10,7 @@ from .extractor import Extractor
 from .parseR.parsing import parse_text
 from .r_visitors.config_extractor import ConfigExtractor
 from .r_visitors.defined_extractor import DefinedExtractor
-from .r_visitors.extract_undefined import UndefinedExtractor
+from .r_visitors.undefined_extractor import UndefinedExtractor
 from .r_visitors.names_extractor import NamesExtractor
 from .r_visitors.prefixed_var_extractor import PrefixedVarExtractor
 from ...models.notebook_data import NotebookData

@@ -1,0 +1,40 @@
+{
+  "title": "species-occurrence-data-cleaner-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+  ],
+  "outputs": [
+  ],
+  "params": [
+    {
+      "name": "param_years",
+      "type": "int",
+      "default_value": "7"
+    }
+  ],
+  "secrets": [
+  ],
+  "confs": [
+  ],
+  "dependencies": [
+    {
+      "asname": "",
+      "module": "",
+      "name": "dplyr"
+    },
+    {
+      "asname": "",
+      "module": "",
+      "name": "tidyr"
+    }
+  ],
+  "kernel": "IRkernel",
+  "original_source": "library(dplyr)\nlibrary(tidyr)\n\ndata = \"\"\nnyear = \"\"\n\nsites <- data %>%\n  filter(nyear > param_years)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
+

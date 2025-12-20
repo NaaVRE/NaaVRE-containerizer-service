@@ -2,14 +2,21 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+	install.packages("tidyr", repos="http://cran.us.r-project.org")
+}
+library(tidyr)
 
 
 
 print('option_list')
 option_list = list(
 
-make_option(c("--param_data_filename"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--param_use_dummy_data"), action="store", default=NA, type="integer", help="my description"),
+make_option(c("--param_years"), action="store", default=NA, type="integer", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -45,27 +52,22 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving param_data_filename")
-var = opt$param_data_filename
+print("Retrieving param_years")
+var = opt$param_years
 print(var)
 var_len = length(var)
-print(paste("Variable param_data_filename has length", var_len))
+print(paste("Variable param_years has length", var_len))
 
-param_data_filename <- gsub("\"", "", opt$param_data_filename)
-print("Retrieving param_use_dummy_data")
-var = opt$param_use_dummy_data
-print(var)
-var_len = length(var)
-print(paste("Variable param_use_dummy_data has length", var_len))
-
-param_use_dummy_data = opt$param_use_dummy_data
+param_years = opt$param_years
 id <- gsub('"', '', opt$id)
 
-conf_minio_public_bucket<-"naa-vre-public"
-conf_virtual_lab_biotisan_euromarec<-"vl-biotisan-euromarec"
 
 print("Running the cell")
-if (param_use_dummy_data) {
-        file_path <- paste(conf_virtual_lab_biotisan_euromarec, param_data_filename, sep="/")
-        print(sprintf("Using dummy data for testing purposes. Set param_use_dummy_data to 0 to use your own data. Downloading data from %s / %s", conf_minio_public_bucket, file_path))
-    }
+library(dplyr)
+library(tidyr)
+
+data = ""
+nyear = ""
+
+sites <- data %>%
+  filter(nyear > param_years)

@@ -41,15 +41,9 @@ class UndefinedExtractor(RVisitor):
         self.visit(ctx.expr(0))
 
     def visitSub(self, ctx: RParser.SubContext):
-        if isinstance(ctx.expr(), RParser.IdContext):
+        if ctx.expr():
             self.visit(ctx.expr())
-        elif isinstance(ctx.expr(), RParser.AssignContext):
-            self.scoped.add(ctx.expr().expr(0).getText())
-            self.visit(ctx.expr().expr(1))
-        elif isinstance(ctx.expr(), RParser.CallContext):
-            self.visit(ctx.expr())
-        elif isinstance(ctx.expr(), RParser.FunctionContext):
-            self.visit(ctx.expr())
+        return None
 
     def visitFunction(self, ctx: RParser.FunctionContext):
         form_list_ctx = ctx.formlist()
@@ -61,6 +55,8 @@ class UndefinedExtractor(RVisitor):
         self.visitChildren(ctx)
 
     def visitForm(self, ctx: RParser.FormContext):
+        ctx_id = ctx.ID()
+        print(ctx_id)
         if ctx.ID():
             self.scoped.add(ctx.ID().getText())
         elif self.isEllipsis(ctx):
