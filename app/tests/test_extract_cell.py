@@ -221,7 +221,11 @@ def get_container_tags_from_ghcr_url(ghcr_url, token):
             data = response.json()
             if data:
                 if parts[2].endswith('latest'):
-                    return data[0]["metadata"]["container"].get("tags", [])
+                    for version in data:
+                        container = version["metadata"]["container"]
+                        if 'latest' in container["tags"]:
+                            return container["tags"]
+                    return None
                 else:
                     image_tag = parts[2].split(":")[-1]
                     for version in data:
