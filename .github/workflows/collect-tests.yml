@@ -24,7 +24,6 @@ jobs:
           auto-update-conda: true
           miniforge-version: latest
           python-version: 3.11
-          path: ${{ env.CONDA }}/envs
           environment-file: environment.yaml
           activate-environment: naavre-containerizer-service
           use-mamba: true
