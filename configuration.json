@@ -7,7 +7,14 @@
       "cell_github_url": "https://github.com/NaaVRE/cells-vl-tests.git",
       "cell_github_token": "TOKEN",
       "registry_url": "ghcr.io/naavre/naavre-cells-vl-tests",
-      "extraVolumes": [
+      "wf_engine_config": {
+        "name": "argo",
+        "api_endpoint": "https://naavre-dev.minikube.test/argowf/",
+        "access_token": "eyJhbGciOg...",
+        "service_account": "executor",
+        "namespace": "default",
+        "workdir_storage_size": "1Gi",
+        "extraVolumeMounts": [
         {
           "name": "csi-s3-naa-vre-public-bucket",
           "persistentVolumeClaim": {
@@ -20,14 +27,7 @@
             "claimName": "naa-vre-user-data"
           }
         }
-      ],
-      "wf_engine_config": {
-        "name": "argo",
-        "api_endpoint": "https://naavre-dev.minikube.test/argowf/",
-        "access_token": "eyJhbGciOg...",
-        "service_account": "executor",
-        "namespace": "default",
-        "workdir_storage_size": "1Gi"
+      ]
       }
     },
     {
