@@ -27,6 +27,7 @@ jobs:
           environment-file: environment.yaml
           activate-environment: naavre-containerizer-service
           use-mamba: true
+          conda-remove-defaults: true
 
       #      - name: Cache Conda environment
       #        uses: actions/cache@v4
