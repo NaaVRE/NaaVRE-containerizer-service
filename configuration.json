@@ -20,7 +20,7 @@
             "claimName": "naa-vre-user-data"
           }
         }
-      ]
+      ],
       "wf_engine_config": {
         "name": "argo",
         "api_endpoint": "https://naavre-dev.minikube.test/argowf/",
