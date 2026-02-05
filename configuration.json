@@ -13,7 +13,21 @@
         "access_token": "eyJhbGciOg...",
         "service_account": "executor",
         "namespace": "default",
-        "workdir_storage_size": "1Gi"
+        "workdir_storage_size": "1Gi",
+        "extraVolumeMounts": [
+        {
+          "name": "csi-s3-naa-vre-public-bucket",
+          "persistentVolumeClaim": {
+            "claimName": "csi-s3-naa-vre-public-bucket"
+          }
+        },
+        {
+          "name": "naa-vre-user-data",
+          "persistentVolumeClaim": {
+            "claimName": "naa-vre-user-data"
+          }
+        }
+      ]
       }
     },
     {

@@ -35,6 +35,7 @@ env:
   REGISTRY_TOKEN_FOR_TESTS: ${{ secrets.registry_token_for_tests }}
   CELL_GITHUB_TOKEN: ${{ secrets.cell_github_token }}
 
+
 jobs:
   test:
     runs-on: ${{ inputs.runs-on }}
@@ -67,6 +68,7 @@ jobs:
         uses: medyagh/setup-minikube@v0.0.19
         with:
           addons: ingress,ingress-dns
+          minikube-version: '1.38.0'
 
       - name: Try the cluster
         run: kubectl get pods -A
