@@ -24,10 +24,10 @@ jobs:
           auto-update-conda: true
           miniforge-version: latest
           python-version: 3.11
-          path: ${{ env.CONDA }}/envs
           environment-file: environment.yaml
           activate-environment: naavre-containerizer-service
           use-mamba: true
+          conda-remove-defaults: true
 
       #      - name: Cache Conda environment
       #        uses: actions/cache@v4
@@ -42,7 +42,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate naavre-containerizer-service
-          pip install pytest
+          mamba install -n naavre-containerizer-service -y -c conda-forge pytest
           pytest --collect-only -q app/tests ${{ inputs.pytest_extra_options }}
           pytest --collect-only -q app/tests ${{ inputs.pytest_extra_options }} | grep 'tests/' | sed 's/\([^:]*\)::\([^[]*\)\(\[.*\]\)\?/{"fullname": "\0", "module": "\1", "test": "\2", "parameter": "\3"}/g' | jq -s . > test_list.json
           cat test_list.json
