@@ -196,13 +196,14 @@ def test_containerize_render():
         # convert them to sets before comparing.
         environment = yaml.safe_load(containerizer.build_environment())
         ref_environment = yaml.safe_load(ref_containerized.build_environment())
+        ref_dependencies = ref_environment['dependencies']
         dependencies = sorted(filter(
             lambda x: not isinstance(x, dict),
             environment['dependencies']))
-        ref_dependencies = sorted(filter(
+        ref_dependencies_sorted = sorted(filter(
             lambda x: not isinstance(x, dict),
-            ref_environment['dependencies']))
-        assert dependencies == ref_dependencies
+            ref_dependencies))
+        assert dependencies == ref_dependencies_sorted
         pip_dependencies = list(filter(
             lambda x: isinstance(x, dict),
             environment['dependencies']))
