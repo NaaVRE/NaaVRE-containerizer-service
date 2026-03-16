@@ -183,4 +183,3 @@ class FoxTree:
             print("Finished writing file.")
         except IOError as e:
             print(f"Error writing file: {e}")
-
