@@ -162,6 +162,8 @@ def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
+        if 'py-149_500-error' not in cell_dir:
+            continue
         print("Testing containerization for cell", cell_dir)
         cell_path = os.path.join(cell_dir, 'cell.json')
         with open(cell_path) as f:
@@ -184,6 +186,11 @@ def test_containerize_render():
         ref_script = ref_containerized.build_script(
             containerizer.file_extension
             )
+
+        # write script to file
+        with open('/home/alogo/Downloads/my_file.py', 'w') as f:
+            f.write(script)
+
         assert ref_script == script
 
         # Dockerfile

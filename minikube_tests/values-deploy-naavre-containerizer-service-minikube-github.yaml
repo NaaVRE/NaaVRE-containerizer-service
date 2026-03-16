@@ -13,7 +13,7 @@ jupyterhub:
         module_mapping_url: https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json
 
 naavreContainerizerService:
-  enabled: false
+  enabled: true
 
 naavreWorkflowService:
   enabled: false
