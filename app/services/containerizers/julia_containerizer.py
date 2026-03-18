@@ -12,6 +12,3 @@ class JuliaContainerizer(Containerizer, ABC):
 
     def build_script(self):
         raise NotImplementedError
-
-    def build_visualization_template_cell(self):
-        raise NotImplementedError
