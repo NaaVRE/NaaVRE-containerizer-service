@@ -14,3 +14,12 @@ repos:
     rev: v2.0.0
     hooks:
       - id: flake8
+
+  - repo: local
+    hooks:
+      - id: forbid-cell-dir-check
+        name: forbid cell_dir wildcard check
+        entry: "if\\s+'\\*'\\s+not\\s+in\\s+cell_dir:"
+        language: pygrep
+        types: [python]
+        files: ^test/.*\.py$
