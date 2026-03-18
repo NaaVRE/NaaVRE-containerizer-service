@@ -22,8 +22,8 @@ _How frequently and consistently does the bug occur? Any time you take the actio
 #### Expected behavior
 _A clear and concise description of what you expected to happen._
 
-#### Screenshots / Occurences
-_If applicable, add screenshots and links to code or files that you used when the problem occured to help explain your problem._
+#### Screenshots / Occurrences
+_If applicable, add screenshots and links to code or files that you used when the problem occurred to help explain your problem._
 
 #### System
 - Url [e.g. https://staging.demo.naavre.net/vl-openlab]
