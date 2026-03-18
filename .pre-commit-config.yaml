@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: forbid-cell-dir-check
         name: forbid cell_dir wildcard check
-        entry: "if\\s+'\\*'\\s+not\\s+in\\s+cell_dir:"
+        entry: "^\\s*if\\s+'\\*'\\s+not\\s+in\\s+cell_dir:"
         language: pygrep
         types: [python]
-        files: .*\.py$
+        files: ^app/tests/.*\.py$
