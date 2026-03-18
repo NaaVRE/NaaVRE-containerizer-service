@@ -19,7 +19,9 @@ repos:
     hooks:
       - id: forbid-cell-dir-check
         name: forbid cell_dir wildcard check
-        entry: "^\\s*if\\s+'\\*'\\s+not\\s+in\\s+cell_dir:"
+        # Match any quoted literal (single or double quotes) used in the pattern
+        # e.g. if 'py-149_500-error' not in cell_dir: or if "foo" not in cell_dir:
+        entry: "^\\s*if\\s+(['\"]).+?\\1\\s+not\\s+in\\s+cell_dir:"
         language: pygrep
         types: [python]
-        files: ^app/tests/.*\.py$
+        files: app/tests/*.py
