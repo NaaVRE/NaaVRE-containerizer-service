@@ -22,4 +22,4 @@ repos:
         entry: "if\\s+'\\*'\\s+not\\s+in\\s+cell_dir:"
         language: pygrep
         types: [python]
-        files: app/test/.*\.py$
+        files: .*\.py$
