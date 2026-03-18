@@ -1,0 +1,24 @@
+{
+  "title": "untitled-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "module": "",
+      "asname": "np",
+      "name": "numpy"
+    }
+  ],
+  "kernel": "ipython",
+  "original_source": "class FoxTree:\n    def __init__(self, points_array, radius, vertical_resolution, min_pts_per_cluster):\n        \"\"\"\n        :param points_array: numpy array of shape (N, 3) containing x, y, z\n        \"\"\"\n        self.radius = radius\n        self.vertical_resolution = vertical_resolution\n        self.min_pts_seeds = min_pts_per_cluster\n        \n        self.points_data = points_array\n        self.num_pts = len(points_array)\n        \n        self.tree_ids = np.full(self.num_pts, -1, dtype=int)\n        \n        self.z_min = np.min(points_array[:, 2])\n        self.z_max = np.max(points_array[:, 2])\n        \n        self.parsed_pt_indices = [] # List of indices\n        self.next_tree_id = 0\n        \n        self.trees = {}\n\n    def generate_tree_clusters(self, pt_clusters):\n        for cluster_indices in pt_clusters:\n            current_id = self.next_tree_id\n            self.next_tree_id += 1\n            self.trees[current_id] = []\n            for idx in cluster_indices:\n                self.tree_ids[idx] = current_id\n                self.trees[current_id].append(idx)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

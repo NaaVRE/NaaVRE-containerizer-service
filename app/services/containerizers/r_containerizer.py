@@ -11,9 +11,6 @@ class RContainerizer(Containerizer, ABC):
         self.file_extension = '.R'
         self.template_script = 'R_cell_template.jinja2'
 
-    def build_visualization_template_cell(self):
-        raise NotImplementedError
-
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
         dependencies = map(
             lambda x: 'r-' + x['name'],

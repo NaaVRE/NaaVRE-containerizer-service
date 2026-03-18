@@ -33,17 +33,19 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_AugAssign(self, node):
-        # Handle augmented assignments (like +=, -=, etc.)
-        var_name = node.target.id
-        var_value = self.get_value(node.value)  # Get the actual assigned value
-        var_type = self.get_type(
-            node.value)  # Get the type of the assigned value
+        # Determine variable name
+        var_name = None
+        if isinstance(node.target, ast.Name):
+            var_name = node.target.id
+        elif isinstance(node.target, ast.Attribute):
+            var_name = self.get_full_name(node.target)
 
-        # Create a formatted augmented assignment string (e.g., "x += 3")
-        assignation_str = \
-            f"{var_name} {self.get_operator(node.op)}= {var_value}"
+        var_value = self.get_value(node.value)
+        var_type = self.get_type(node.value)
 
-        # Store the assignment information
+        assignation_str = (f"{var_name} {self.get_operator(node.op)} = "
+                           f"{var_value}")
+
         assignment_info = {
             'name': var_name,
             'value': var_value,
@@ -52,32 +54,30 @@ class Visitor(ast.NodeVisitor):
         }
         self.variables.append(assignment_info)
 
-        # Continue traversal
         self.generic_visit(node)
 
     def get_value(self, value_node):
         """ Get the assigned value as a readable string. """
         if isinstance(value_node, ast.Constant):
-            return repr(value_node.value)  # Represent constants directly
+            return repr(value_node.value)
+
         elif isinstance(value_node, ast.List):
-            # Convert list elements to a string (e.g., "[1, 2, 3]")
             return "[" + ", ".join(
                 self.get_value(el) for el in value_node.elts) + "]"
         elif isinstance(value_node, ast.Dict):
-            # Convert dict elements to a string (e.g., "{'key': 'value'}")
             keys = [self.get_value(k) for k in value_node.keys]
             values = [self.get_value(v) for v in value_node.values]
             return "{" + ", ".join(
                 f"{k}: {v}" for k, v in zip(keys, values)) + "}"
         elif isinstance(value_node, ast.BinOp):
-            # Represent binary operations as a string (e.g., "x + 2")
             left = self.get_value(value_node.left)
             op = self.get_operator(value_node.op)
             right = self.get_value(value_node.right)
             return f"({left} {op} {right})"
         elif isinstance(value_node, ast.Name):
-            # For variable references, return the variable name
             return value_node.id
+        elif isinstance(value_node, ast.Attribute):
+            return self.get_full_name(value_node)
         else:
             return "unknown"
 

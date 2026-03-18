@@ -228,9 +228,11 @@ class PyExtractor(Extractor):
                     try:
                         var_type = self.__convert_type_annotation(
                             module.resolved_annotation)
-                    except AttributeError:
+                    except AttributeError as e:
                         logger.debug(
-                            '__extract_variables failed. var_name: %s', )
+                            'Could not resolve type for var_name: %s. '
+                            'Setting var_type to None. Error: %s',
+                            var_name, e)
                 else:
                     var_type = self.notebook_variables[var_name]['type']
                 names[module.id] = {
