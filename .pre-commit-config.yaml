@@ -24,4 +24,7 @@ repos:
         entry: "^\\s*if\\s+(['\"]).+?\\1\\s+not\\s+in\\s+cell_dir:"
         language: pygrep
         types: [python]
-        files: app/tests/*.py
+        # 'files' is a regular expression (not a glob). Anchor it so it matches
+        # Python test files under the app/tests directory exactly, e.g.
+        # ^app/tests/whatever.py$
+        files: ^app/tests/.*\.py$
