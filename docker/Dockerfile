@@ -1,4 +1,4 @@
-FROM condaforge/mambaforge:24.9.0-0 AS build
+FROM condaforge/mambaforge:24.9.2-0 AS build
 
 RUN conda install -c conda-forge conda-pack
 COPY environment.yaml .
