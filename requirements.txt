@@ -15,7 +15,7 @@ pre-commit==3.8.0
 pydantic-settings==2.5.2
 jsonschema==4.23.0
 PyYAML==6.0.2
-rpy2==3.5.11
+rpy2==3.6.6
 pyflakes==2.5.0
 pytype==2023.10.31
 antlr4-python3-runtime==4.13.2
