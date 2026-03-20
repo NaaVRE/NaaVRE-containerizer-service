@@ -13,7 +13,7 @@ RUN conda-pack -n venv -o /tmp/env.tar && \
     rm /tmp/env.tar
 RUN /venv/bin/conda-unpack
 
-FROM python:3.11-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 COPY --from=build /venv/ /venv/
 ENV PATH=/venv/bin:$PATH
