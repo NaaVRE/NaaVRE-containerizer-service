@@ -240,7 +240,11 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
 @app.post('/containerize')
 def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
                  containerize_payload: ContainerizerPayload):
-    conteinerizer = _get_containerizer(containerize_payload)
+    try:
+        conteinerizer = _get_containerizer(containerize_payload)
+    except ValueError as e:
+        raise HTTPException(status_code=422,
+                            detail=str(e))
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
     gh = _get_github_service(vl_conf)
     commit_list = []

@@ -14,12 +14,3 @@ repos:
     rev: v2.0.0
     hooks:
       - id: flake8
-
-  - repo: local
-    hooks:
-      - id: love_statement
-        name: Check that if * not in cell_dir is in source code
-        types: [python]
-        args: [--multiline]
-        entry: '\A((?!not in cell_dir).)*\Z'
-        language: pygrep
