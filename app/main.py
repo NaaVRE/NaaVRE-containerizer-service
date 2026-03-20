@@ -40,6 +40,7 @@ token_validator = OpenIDValidator()
 @cachetools.func.ttl_cache(ttl=6 * 3600)
 def load_configuration(source):
     # Check if source is a URL
+    print('Loading configuration from ' + source)
     parsed_url = urlparse(source)
     if parsed_url.scheme in ("http", "https"):  # Remote URL
         response = requests.get(source)
@@ -73,7 +74,7 @@ else:
             conf = load_configuration(config_path)
             break
         current_dir = os.path.dirname(current_dir)
-
+print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
@@ -108,10 +109,6 @@ def get_base_image_tags(
 
 def _get_containerizer(containerize_payload: ContainerizerPayload):
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
-    if vl_conf is None:
-        raise ValueError('virtual lab: ' +
-                         containerize_payload.virtual_lab +
-                         ' not found in config')
     if (containerize_payload.cell.kernel.lower() == 'python' or
             containerize_payload.cell.kernel == 'ipython'):
         return PyContainerizer(containerize_payload.cell,
