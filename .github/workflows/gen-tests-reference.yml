@@ -9,15 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      runner: ${{ steps.choose-runner.outputs.runner }}
-    steps:
-      - id: choose-runner
-        uses: QCDIS/choose-action-runner@v2
-        with:
-          preferred-runner: ${{ vars.PREFERRED_ACTIONS_RUNNER }}
-          fallback-runner: ubuntu-latest
-          github-token: ${{ secrets.RUNNER_ACCESS_TOKEN }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -64,7 +55,7 @@ jobs:
       matrix:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
-      runs-on: ${{ needs.configure-workflow.outputs.runner }}
+      runs-on: ubuntu-latest
       debug: ${{ vars.DEBUG }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
