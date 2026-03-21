@@ -10,7 +10,7 @@ distro==1.9.0
 gitpython==3.1.43
 PyGitHub==2.4.0
 httpx==0.28.1
-pre-commit==3.8.0
+pre-commit==4.5.1
 # ggshield==1.32.0
 pydantic-settings==2.5.2
 jsonschema==4.23.0
