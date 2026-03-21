@@ -18,3 +18,4 @@ class Settings:
         for setting in self.service_settings.vl_configurations:
             if setting.name == virtual_lab:
                 return setting
+        raise ValueError(f"Virtual lab '{virtual_lab}' not found in settings.")

@@ -9,15 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      runner: ${{ steps.choose-runner.outputs.runner }}
     steps:
-      - id: choose-runner
-        uses: QCDIS/choose-action-runner@v2
+      - id: skip_check
+        name: Configure skip-duplicate-actions
+        uses: fkirc/skip-duplicate-actions@v5
         with:
-          preferred-runner: ${{ vars.PREFERRED_ACTIONS_RUNNER }}
-          fallback-runner: ubuntu-latest
-          github-token: ${{ secrets.RUNNER_ACCESS_TOKEN }}
+          paths_ignore: '["**/README.md"]'  # FIXME
+          do_not_skip: '["workflow_dispatch", "schedule", "release" ,"push"]'
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -64,7 +62,7 @@ jobs:
       matrix:
         test: ${{ fromJson(needs.split-tests.outputs.test_list) }}
     with:
-      runs-on: ${{ needs.configure-workflow.outputs.runner }}
+      runs-on: ubuntu-latest
       debug: ${{ vars.DEBUG }}
       verify_ssl: ${{ vars.VERIFY_SSL }}
       disable_auth: ${{ vars.DISABLE_AUTH }}
@@ -98,7 +96,8 @@ jobs:
           python -c "from app.tests.test_containerize import gen_tests_reference; gen_tests_reference()"
 
       - name: Create commit
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           file_pattern: 'app/tests/resources/notebook_cells/*/containerized_cell_source/*'
           commit_message: 'Update containerized cells reference sources for tests'
+
