@@ -96,7 +96,7 @@ jobs:
           python -c "from app.tests.test_containerize import gen_tests_reference; gen_tests_reference()"
 
       - name: Create commit
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           file_pattern: 'app/tests/resources/notebook_cells/*/containerized_cell_source/*'
           commit_message: 'Update containerized cells reference sources for tests'
