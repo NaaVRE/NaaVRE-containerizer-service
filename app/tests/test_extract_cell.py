@@ -228,7 +228,6 @@ def get_container_tag_from_ghcr_url(ghcr_url, token):
                             for tag in tags:
                                 if tag.startswith("v"):
                                     return tag
-                    print("No version tagged 'latest' found.")
                     return None
                 else:
                     image_tag = parts[2].split(":")[-1]
