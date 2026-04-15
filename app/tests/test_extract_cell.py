@@ -157,21 +157,21 @@ def test_extract_cell():
 
         assert os.getenv('REGISTRY_TOKEN_FOR_TESTS') is not None, \
             "REGISTRY_TOKEN_FOR_TESTS is not set. "
-        tags = get_container_tags_from_ghcr_url(
+        tag = get_container_tag_from_ghcr_url(
             expected_cell.base_container_image['build'],
             os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
-        # Check if the tags are not None. If None print the name of the image
-        assert tags is not None, \
-            (f"Failed to fetch tags for "
+        # Check if the tag are not None. If None print the name of the image
+        assert tag is not None, \
+            (f"Failed to fetch tag for "
              f"{expected_cell.base_container_image['build']}")
 
         expected_cell.base_container_image['build'] = \
             (expected_cell.base_container_image['build'].rsplit(":", 1)[0] +
-             f":{tags[0]}")
+             f":{tag}")
         expected_cell.base_container_image['runtime'] = \
             (expected_cell.base_container_image['runtime'].rsplit(":", 1)[0] +
-             f":{tags[0]}")
+             f":{tag}")
 
         assert (returned_cell.base_container_image == expected_cell.
                 base_container_image)
@@ -179,7 +179,7 @@ def test_extract_cell():
         # assert returned_cell.original_source == expected_cell.original_source
 
 
-def get_container_tags_from_ghcr_url(ghcr_url, token):
+def get_container_tag_from_ghcr_url(ghcr_url, token):
     """
     Given a GHCR image URL, fetch the tags of the latest version of the
     container package.
@@ -224,7 +224,11 @@ def get_container_tags_from_ghcr_url(ghcr_url, token):
                     for version in data:
                         container = version["metadata"]["container"]
                         if 'latest' in container["tags"]:
-                            return container["tags"]
+                            tags = container["tags"]
+                            for tag in tags:
+                                if tag.startswith("v"):
+                                    return tag
+                    print("No version tagged 'latest' found.")
                     return None
                 else:
                     image_tag = parts[2].split(":")[-1]
