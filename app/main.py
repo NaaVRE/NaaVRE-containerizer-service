@@ -132,7 +132,7 @@ def _get_github_service(vl_conf: VLConfig):
     if repository_url is None:
         raise ValueError('repository_url not set')
     token = vl_conf.cell_github_token
-    if token is None:
+    if not token or not token.strip():
         raise ValueError('cell_github_token is not set')
     logging.debug('Using repository URL: %s', repository_url)
     return GithubService(vl_conf)
