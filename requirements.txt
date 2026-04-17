@@ -12,7 +12,7 @@ PyGitHub==2.4.0
 httpx==0.28.1
 pre-commit==4.5.1
 # ggshield==1.32.0
-pydantic-settings==2.5.2
+pydantic-settings==2.13.1
 jsonschema==4.26.0
 PyYAML==6.0.3
 rpy2==3.5.11
