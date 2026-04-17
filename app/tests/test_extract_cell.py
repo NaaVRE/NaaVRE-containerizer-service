@@ -214,7 +214,7 @@ def get_container_tag_from_ghcr_url(ghcr_url, token):
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        # Send request
+        # Send requestCELL_GITHUB_TOKEN
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
