@@ -1,4 +1,5 @@
 version: 2
+enable-beta-ecosystems: true
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -20,3 +21,11 @@ updates:
     commit-message:
       # Prefix all commit messages with "[python] " (no colon, but a trailing whitespace)
       prefix: "[python] "
+
+  - package-ecosystem: "conda"
+    directory: "environment.yaml"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "[python] " (no colon, but a trailing whitespace)
+      prefix: "[conda] "
