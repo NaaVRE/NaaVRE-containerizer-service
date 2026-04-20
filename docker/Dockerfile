@@ -22,10 +22,6 @@ SHELL ["/bin/bash", "-c","/venv/bin/activate"]
 RUN echo "source /venv/bin/activate" >> ~/.bashrc
 SHELL ["/bin/bash", "--login", "-c"]
 
-COPY requirements.txt .
-
-# RUN pip install -r requirements.txt
-
 WORKDIR /code
 
 COPY ./app /code/app

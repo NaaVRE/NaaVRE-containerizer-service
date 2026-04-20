@@ -8,8 +8,28 @@ dependencies:
   - r-lobstr=1.1.2
   - r-purrr=1.0.2
   - r-renv=1.0.5
-  - pip
-  - pip:
-      - -r requirements.txt
-      - ggshield
+  - fastapi==0.112.2
+  - PyJWT==2.12.1
+  - requests==2.33.0
+  - uvicorn==0.30.6
+  - pydantic==2.9.2
+  - Jinja2==3.1.6
+  - autopep8==2.3.1
+  - python-slugify==8.0.4
+  - distro==1.9.0
+  - gitpython==3.1.43
+  - PyGitHub==2.4.0
+  - httpx==0.28.1
+  - pre-commit==4.5.1
+  - pydantic-settings==2.5.2
+  - jsonschema==4.26.0
+  - PyYAML==6.0.3
+  - rpy2==3.5.11
+  - pyflakes==2.5.0
+  - pytype==2024.02.09
+  - antlr4-python3-runtime==4.13.2
+  - pytest==9.0.3
+  - nbformat==5.10.4
+  - cachetools==5.5.0
+  - retry==0.9.2
 
