@@ -17,7 +17,7 @@ jsonschema==4.26.0
 PyYAML==6.0.3
 rpy2==3.5.11
 pyflakes==3.4.0
-pytype==2023.10.31
+pytype==2024.10.11
 antlr4-python3-runtime==4.13.2
 colorhash==2.3.0
 pytest==9.0.3
