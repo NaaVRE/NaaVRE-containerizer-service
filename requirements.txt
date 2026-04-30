@@ -8,7 +8,7 @@ autopep8==2.3.1
 python-slugify==8.0.4
 distro==1.9.0
 gitpython==3.1.48
-PyGitHub==2.4.0
+PyGitHub==2.9.1
 httpx==0.28.1
 pre-commit==4.5.1
 # ggshield==1.32.0
