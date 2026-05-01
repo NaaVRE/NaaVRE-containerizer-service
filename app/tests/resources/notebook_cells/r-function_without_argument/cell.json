@@ -4,12 +4,10 @@
   ],
   "dependencies": [],
   "inputs": [
-
   ],
   "kernel": "IRkernel",
   "outputs": [],
   "params": [
-
   ],
   "secrets": [],
   "title": "function-without-argument-user",
