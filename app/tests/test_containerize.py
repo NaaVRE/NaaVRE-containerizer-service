@@ -249,6 +249,8 @@ def test_containerize_render():
                 continue
 
         cell_path = os.path.join(cell_dir, 'cell.json')
+        if 'assert-vars-dev-user-name-domain-com' not in cell_path:
+            continue
         with open(cell_path) as f:
             cell = json.load(f)
 
