@@ -1,0 +1,3 @@
+[
+  "--id='1e23de8' --var_float=1.1 --var_int=1 --var_list_int='[1, 2, 3]' --var_list_str='[\"list_str\", \"space in elem\", \"3\"]' --var_string='\"var_string value\"' --var_string_with_comment='\"var_string value\"' --param_float=1.1 --param_int=1 --param_list_int='[1, 2, 3]' --param_list_str=\"['list_str', 'space in elem', '3']\" --param_string='param_string value' --param_string_with_comment='param_string value'"
+]
