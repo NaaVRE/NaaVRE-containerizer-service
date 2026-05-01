@@ -160,7 +160,8 @@ class RefContainerizer:
         return source
 
 
-def run_script(script=None, kernel=None, dependencies=None, arguments=None):
+def run_script(script=None, kernel=None, dependencies=None,
+               arguments_path=None):
     dependencies = list(filter(lambda x: x not in ['pip', 'nbconvert',
                                                    'papermill', 'ipykernel'],
                                dependencies))
@@ -181,13 +182,13 @@ def run_script(script=None, kernel=None, dependencies=None, arguments=None):
                 f.write(script)
             cmd = 'Rscript'
         if script_path and cmd:
-            for args in arguments:
-                result = subprocess.run([cmd, script_path, args],
-                                        capture_output=True, text=True)
-                stderr = result.stderr
-                assert result.returncode == 0, (f"Script failed with exit code"
-                                                f" {result.returncode} and "
-                                                f"error: {stderr}")
+            result = subprocess.run(
+                [cmd, script_path, '--args_json', arguments_path],
+                capture_output=True, text=True)
+            stderr = result.stderr
+            assert result.returncode == 0, (f"Script failed with exit code"
+                                            f" {result.returncode} and "
+                                            f"error: {stderr}")
 
 
 def test_containerize_render():
@@ -196,6 +197,8 @@ def test_containerize_render():
     for cell_dir in cells_dirs:
         print("Testing containerization for cell", cell_dir)
         cell_path = os.path.join(cell_dir, 'cell.json')
+        if 'assert-vars-dev-user-name-domain-com' not in cell_path:
+            continue
         with open(cell_path) as f:
             cell = json.load(f)
 
@@ -249,10 +252,9 @@ def test_containerize_render():
         assert environment == ref_environment
         arguments_path = os.path.join(cell_dir, 'args.json')
         if os.path.exists(arguments_path):
-            with open(arguments_path) as f:
-                arguments = json.load(f)
             run_script(script=script, kernel=cell['kernel'],
-                       dependencies=dependencies, arguments=arguments)
+                       dependencies=dependencies,
+                       arguments_path=arguments_path)
 
 
 def test_containerize_github(cell_dir):

@@ -1,3 +1,6 @@
+# NaaVRE containerizer
+# version: V0.4
+
 {% if deps|length >0 %}
 {% for d in deps %}
 {{ d }}
@@ -7,68 +10,70 @@
 import argparse
 import json
 import os
+
 arg_parser = argparse.ArgumentParser()
+
+def _load_json_args(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+def _parse_value(value, field_name, target_type, elem_type=None):
+    if target_type is list:
+        if isinstance(value, list):
+            return value
+        elif isinstance(value, str):
+            return json.loads(value)
+
+    if target_type is str:
+        return value
+
+    if target_type is int:
+        return int(value)
+
+    if target_type is float:
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            return float(value)
+
+    arg_parser.error(field_name + " has unsupported target type")
+
+
+
+arg_parser.add_argument('--args_json', action='store', type=str, required=True, dest='args_json')
+
+args = arg_parser.parse_args()
+
+raw_args = _load_json_args(args.args_json)
+
+def get_arg_value(name):
+    for arg in raw_args:
+        if arg['name'] == name:
+            return arg['value']
+    arg_parser.error("Argument '" + name + "' not found in JSON args")
+
+{% for in_var in cell.inputs|sort(attribute='name') %}
+arg_name = '{{ in_var['name'] }}'
+arg_value = get_arg_value(arg_name)
+arg_type = {{ in_var['type'] }}
+{{ in_var['name'] }} = _parse_value(arg_value, arg_name, arg_type)
+{% endfor %}
+{% for param in cell.params|sort(attribute='name') %}
+arg_name = '{{ param['name'] }}'
+arg_value = get_arg_value(arg_name)
+arg_type = {{ param['type'] }}
+{{ param['name'] }} = _parse_value(arg_value, arg_name, arg_type)
+{% endfor %}
+
+{% for conf in cell.confs|sort(attribute='name') %}
+{{ conf['assignation'] }}
+{% endfor %}
 
 {%  for secret in cell.secrets|sort(attribute='name') %}
 {{ secret['name'] }} = os.getenv('{{ secret['name'] }}')
 {% endfor %}
 
-arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
-
-{% for in_var in cell.inputs|sort(attribute='name') %}
-
-{% if in_var['type'] == list  or in_var['type'] == 'list' %}
-arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type=str, required=True, dest='{{ in_var['name'] }}')
-{% else %}
-arg_parser.add_argument('--{{ in_var['name'] }}', action='store', type={{ in_var['type'] }}, required=True, dest='{{ in_var['name'] }}')
-{% endif %}
-{% endfor %}
-
-{% for param in cell.params|sort(attribute='name') %}
-{% if param['type'] == list  or param['type'] == 'list' %}
-arg_parser.add_argument('--{{ param['name'] }}', action='store', type=str, required=True, dest='{{ param['name'] }}')
-{% else %}
-arg_parser.add_argument('--{{ param['name'] }}', action='store', type={{ param['type'] }}, required=True, dest='{{ param['name'] }}')
-{% endif %}
-{% endfor %}
-
-args = arg_parser.parse_args()
-print(args)
-
-id = args.id
-
-{% for in_var in cell.inputs|sort(attribute='name') %}
-{% if in_var['type'] == list  or in_var['type'] == 'list' %}
-{{ in_var['name']  }} = json.loads(args.{{ in_var['name']  }})
-{% else %}
-{{ in_var['name']  }} = args.{{ in_var['name']  }}
-{% endif %}
-{% endfor %}
-
-{% for param in cell.params|sort(attribute='name') %}
-{% if param['type'] == list  or param['type'] == 'list' %}
-print(args.{{ param['name']  }})
-print(type(args.{{ param['name']  }}))
-try:
-    {{ param['name']  }} = json.loads(args.{{ param['name'] }})
-except Exception as e:
-    if e.__class__.__name__ == 'JSONDecodeError':
-        import ast
-        {{ param['name'] }} = ast.literal_eval(args.{{ param['name'] }}.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
-    else:
-        raise e
-{% elif param['type'] == dict  or param['type'] == 'dict' %}
-{{ param }} = json.loads(args.{{ param }})
-{% elif param['type'] == str or  param['type'] == 'str' %}
-{{ param['name'] }} = args.{{ param['name'] }}.replace('"','')
-{% else %}
-{{ param['name'] }} = args.{{ param['name'] }}
-{% endif %}
-{% endfor %}
-
-{% for conf in confs %}
-{{ conf['name'] }} = {{ conf['assignation'] }}
-{% endfor %}
 
 {{ cell.original_source }}
 
