@@ -11,8 +11,6 @@ import argparse
 import json
 import os
 
-arg_parser = argparse.ArgumentParser()
-
 def _load_json_args(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -39,29 +37,27 @@ def _parse_value(value, field_name, target_type, elem_type=None):
 
     arg_parser.error(field_name + " has unsupported target type")
 
-
-
-arg_parser.add_argument('--args_json', action='store', type=str, required=True, dest='args_json')
-
-args = arg_parser.parse_args()
-
-raw_args = _load_json_args(args.args_json)
-
-def get_arg_value(name):
+def get_arg_value(name,args,raw_args):
     for arg in raw_args:
         if arg['name'] == name:
             return arg['value']
     arg_parser.error("Argument '" + name + "' not found in JSON args")
 
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('--args_json', action='store', type=str, required=True, dest='args_json')
+
+args = arg_parser.parse_args()
+raw_args = _load_json_args(args.args_json)
+
 {% for in_var in cell.inputs|sort(attribute='name') %}
 arg_name = '{{ in_var['name'] }}'
-arg_value = get_arg_value(arg_name)
+arg_value = get_arg_value(arg_name,args,raw_args)
 arg_type = {{ in_var['type'] }}
 {{ in_var['name'] }} = _parse_value(arg_value, arg_name, arg_type)
 {% endfor %}
 {% for param in cell.params|sort(attribute='name') %}
 arg_name = '{{ param['name'] }}'
-arg_value = get_arg_value(arg_name)
+arg_value = get_arg_value(arg_name,args,raw_args)
 arg_type = {{ param['type'] }}
 {{ param['name'] }} = _parse_value(arg_value, arg_name, arg_type)
 {% endfor %}
