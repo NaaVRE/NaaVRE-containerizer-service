@@ -212,7 +212,9 @@ def run_script(script=None,
             stderr = result.stderr
             assert result.returncode == 0, (f"Script failed with exit code"
                                             f" {result.returncode} and "
-                                            f"error: {stderr}")
+                                            f"error: {stderr} {cmd} "
+                                            f"{script_path} --args_json "
+                                            f"{arguments_path}")
             if outputs:
                 # Find ID from the arguments list of dicts
                 id_value = 0
