@@ -189,6 +189,13 @@ arg_type <- "{{ param['type'] }}"
 {{ param['name'] }} <- parse_value(arg_value, arg_name, arg_type)
 {% endfor %}
 
+{% for param in cell.params|sort(attribute='name') %}
+arg_name <- "{{ param['name'] }}"
+arg_value <- get_arg_value(arg_name, opt, raw_args_list)
+arg_type <- "{{ param['type'] }}"
+{{ param['name'] }} <- parse_value(arg_value, arg_name, arg_type)
+{% endfor %}
+
 opt = parse_args(OptionParser(option_list=option_list))
 
 var_serialization <- function(var){
