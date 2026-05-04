@@ -1,3 +1,27 @@
 [
-  "--id=0"
+  {
+    "name": "id",
+    "type": "str",
+    "value": "1e23de8"
+  },
+  {
+    "name": "io",
+    "type": "int",
+    "value": "1"
+  },
+    {
+      "name": "param_neg_string",
+      "type": "str",
+      "value": "-1"
+    },
+    {
+      "name": "param_neg_num",
+      "type": "int",
+      "value": "-2"
+    },
+    {
+      "name": "param_neg_decimal",
+      "type": "float",
+      "value": "-1.5"
+    }
 ]

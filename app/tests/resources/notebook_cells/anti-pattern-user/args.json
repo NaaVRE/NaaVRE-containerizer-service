@@ -1,3 +1,18 @@
 [
-  "--id=0"
+  {
+    "name": "id",
+    "type": "str",
+    "value": "1e23de8"
+  },
+  {
+    "name": "count",
+    "type": "int",
+    "value": "1"
+  },
+  {
+    "name": "a",
+    "type": "int",
+    "value": "10"
+  }
+
 ]
