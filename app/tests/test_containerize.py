@@ -188,7 +188,9 @@ def run_script(script=None, kernel=None, dependencies=None,
             stderr = result.stderr
             assert result.returncode == 0, (f"Script failed with exit code"
                                             f" {result.returncode} and "
-                                            f"error: {stderr}")
+                                            f"error: {stderr} {cmd} "
+                                            f"{script_path} --args_json "
+                                            f"{arguments_path}")
 
 
 def test_containerize_render():
