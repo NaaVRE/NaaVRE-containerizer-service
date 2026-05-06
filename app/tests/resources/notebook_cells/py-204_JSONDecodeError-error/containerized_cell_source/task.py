@@ -1,3 +1,4 @@
+import json
 
 import argparse
 import json
@@ -51,6 +52,7 @@ arg_parser.add_argument('--args_json', action='store', type=str, required=True, 
 args = arg_parser.parse_args()
 
 expected_arg_names = set()
+expected_arg_names.add('json_str')
 expected_arg_names.add('id')
 
 raw_args = _load_json_args(args.args_json)
@@ -66,14 +68,17 @@ for arg in raw_args:
             if 'assignation' not in arg or arg['assignation'] is None:
                 arg_parser.error("Argument '" + arg['name'] + "' has no assignation in JSON args")
 
+arg_name = 'json_str'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = str
+json_str = _parse_value(arg_value, arg_name, arg_type)
 
 
 
 arg_value = get_arg_value('id',args,raw_args)
 id = _parse_value(arg_value, 'id', str)
 
-list1 = ["0001", "0010", "0011"]
+deserialized_data = json.loads(json_str)
 
-file_list1 = open("/tmp/list1_" + id + ".json", "w")
-file_list1.write(json.dumps(list1))
-file_list1.close()
+print(deserialized_data)
+
