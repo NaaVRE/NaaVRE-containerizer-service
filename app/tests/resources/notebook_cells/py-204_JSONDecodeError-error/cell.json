@@ -1,8 +1,8 @@
 {
   "title": "use-the-json-user",
   "base_container_image": {
-    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:v0.3.0",
-    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.3.0"
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
   },
   "inputs": [
     {
@@ -22,9 +22,8 @@
     }
   ],
   "kernel": "ipython",
-  "original_source": "data = json.loads(json_str)\n\nprint(data)\n\noriginal_data = {\"task\": \"Write Python\", \"number\": 1, \"skills\": [\"python\", \"sql\"]}\nassert data == original_data",
+  "original_source": "deserialized_data = json.loads(json_str)\n\nprint(deserialized_data)",
   "source_url": null,
   "container_image": null,
-  "description": null,
-  "template_format": "v2"
+  "description": null
 }
