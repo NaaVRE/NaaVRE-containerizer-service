@@ -33,6 +33,9 @@ from app.services.repositories.github_service import (GithubService,
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
 
+from app import __version__
+
+
 security = HTTPBearer()
 token_validator = OpenIDValidator()
 
@@ -78,7 +81,8 @@ print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
-                                  '/NaaVRE-containerizer-service'))
+                                  '/NaaVRE-containerizer-service'),
+              version=__version__)
 
 
 if os.getenv('DEBUG', 'false').lower() == 'true':
@@ -221,6 +225,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                             detail='Cell is not a code cell, cannot extract')
     try:
         cell = extractor.get_cell()
+        cell.containerizer_service_version = ""
     except ValueError as e:
         raise HTTPException(status_code=422,
                             detail='Error extracting cell: ' + str(e))
@@ -300,6 +305,11 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
             'source_url': source_url}
+
+
+@app.get('/version')
+def get_version():
+    return {'version': __version__}
 
 
 @app.get('/status/{virtual_lab}/{workflow_id}/')

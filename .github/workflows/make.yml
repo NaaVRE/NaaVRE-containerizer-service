@@ -77,8 +77,40 @@ jobs:
       cell_github_token: ${{ secrets.CELL_GITHUB_TOKEN }}
       registry_token_for_tests: ${{ secrets.REGISTRY_TOKEN_FOR_TESTS }}
 
-  call-build-container:
+  set-version:
     needs: [ call-pytest ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Commit version
+        id: set-version
+        run: |
+          # Extract tag version (strip refs/tags/ prefix)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+          # Update the version in app/__init__.py which defines __version__() -> return 'vX.Y.Z'
+          # This replaces the return line with the new version string from the tag.
+          sed -i "s/\(return \).*/\1'${VERSION}'/" app/__init__.py
+
+          # Commit and push the change back to the branch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/__init__.py || true
+          git commit -m "Set version to ${VERSION} in app/__init__.py [skip ci]" || echo "No changes to commit"
+          if [ -n "${GITHUB_REF}" ] && [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            BRANCH=${GITHUB_REF#refs/heads/}
+            git push origin HEAD:refs/heads/${BRANCH}
+          else
+            # fallback
+            git push || true
+          fi          
+
+  call-build-container:
+    needs: [ set-version ]
     uses: ./.github/workflows/build-container.yml
     with:
       oci_tag: ghcr.io/naavre/naavre-containerizer-service
