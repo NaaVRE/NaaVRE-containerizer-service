@@ -14,6 +14,7 @@ import uvicorn
 from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from packaging.version import Version
 
 from app import __version__
 from app.models.containerizer_payload import ContainerizerPayload
@@ -36,6 +37,8 @@ from app.utils.openid import OpenIDValidator
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
+
+SUPPORTS_JSON_ARGS_VERSION = 'v0.4.7'
 
 
 @cachetools.func.ttl_cache(ttl=6 * 3600)
@@ -304,7 +307,9 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
             'source_url': source_url,
-            'nnaavre_containerizer_service_version': VERSION}
+            'nnaavre_containerizer_service_version': VERSION,
+            'json_args_supported': Version(VERSION) >= Version(
+                SUPPORTS_JSON_ARGS_VERSION)}
 
 
 @app.get('/version')
