@@ -16,6 +16,7 @@ from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app import __version__
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
 from app.models.vl_config import VLConfig
@@ -33,9 +34,6 @@ from app.services.repositories.github_service import (GithubService,
                                                       get_content_hash)
 from app.settings.service_settings import Settings
 from app.utils.openid import OpenIDValidator
-
-from app import __version__
-
 
 security = HTTPBearer()
 token_validator = OpenIDValidator()
@@ -87,10 +85,11 @@ with open(config_file, "r", encoding="utf-8") as file:
 
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
+VERSION = __version__()
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'),
-              version=__version__)
+              version=VERSION, title='NaaVRE-containerizer-service')
 
 
 if os.getenv('DEBUG', 'false').lower() == 'true':
@@ -240,7 +239,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                             detail='Cell is not a code cell, cannot extract')
     try:
         cell = extractor.get_cell()
-        cell.containerizer_service_version = ""
+        cell.nnaavre_containerizer_service_version = VERSION
     except ValueError as e:
         raise HTTPException(status_code=422,
                             detail='Error extracting cell: ' + str(e))
@@ -319,12 +318,13 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
     return {'workflow_id': containerization_workflow_resp['workflow_id'],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
-            'source_url': source_url}
+            'source_url': source_url,
+            'nnaavre_containerizer_service_version': VERSION}
 
 
 @app.get('/version')
 def get_version():
-    return {'version': __version__}
+    return {'version': VERSION}
 
 
 @app.get('/status/{virtual_lab}/{workflow_id}/')
