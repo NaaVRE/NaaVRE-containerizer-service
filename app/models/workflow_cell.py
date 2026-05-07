@@ -21,7 +21,7 @@ class Cell(BaseModel):
     source_url: Optional[str] | None = None
     container_image: Optional[str] | None = None
     description: Optional[str] | None = None
-    containerizer_service_version: Optional[str] | None = None
+    nnaavre_containerizer_service_version: Optional[str] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
