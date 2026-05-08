@@ -18,7 +18,8 @@ def get_module_name_mapping(module_mapping_url: str = None):
 
 class Containerizer:
 
-    def __init__(self, cell: Cell, module_mapping_url=None):
+    def __init__(self, cell: Cell, module_mapping_url=None,
+                 service_version=None, template_format_version=None):
         self.cell = cell
         loader = PackageLoader('app', 'templates')
         self.template_env = Environment(loader=loader, trim_blocks=True,
@@ -31,6 +32,8 @@ class Containerizer:
         self.template_conda_env = 'conda_env_template.jinja2'
         self.dockerfile_template = 'dockerfile_template_conda.jinja2'
         self.module_mapping_url = module_mapping_url
+        self.__service_version = service_version
+        self.__template_format = template_format_version
 
     @abstractmethod
     def build_script(self):

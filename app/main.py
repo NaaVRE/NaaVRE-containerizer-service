@@ -15,7 +15,7 @@ from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app import __service_version, __template_format_version
+from app import __service_version, __template_version
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
 from app.models.vl_config import VLConfig
@@ -25,8 +25,6 @@ from app.services.cell_extractor.py_extractor import PyExtractor
 from app.services.cell_extractor.py_header_extractor import PyHeaderExtractor
 from app.services.cell_extractor.r_extractor import RExtractor
 from app.services.cell_extractor.r_header_extractor import RHeaderExtractor
-from app.services.containerizers.c_containerizer import CContainerizer
-from app.services.containerizers.julia_containerizer import JuliaContainerizer
 from app.services.containerizers.py_containerizer import PyContainerizer
 from app.services.containerizers.r_containerizer import RContainerizer
 from app.services.repositories.github_service import (GithubService,
@@ -114,18 +112,16 @@ def _get_containerizer(containerize_payload: ContainerizerPayload):
     vl_conf = settings.get_vl_config(containerize_payload.virtual_lab)
     if (containerize_payload.cell.kernel.lower() == 'python' or
             containerize_payload.cell.kernel == 'ipython'):
-        return PyContainerizer(containerize_payload.cell,
-                               vl_conf.module_mapping_url)
+        return PyContainerizer(cell=containerize_payload.cell,
+                               module_mapping_url=vl_conf.module_mapping_url,
+                               service_version=__service_version(),
+                               template_format_version=__template_version())
     elif (containerize_payload.cell.kernel.lower() == 'r' or
           containerize_payload.cell.kernel.lower() == 'irkernel'):
-        return RContainerizer(containerize_payload.cell,
-                              vl_conf.module_mapping_url)
-    elif containerize_payload.cell.kernel.lower() == 'julia':
-        return JuliaContainerizer(containerize_payload.cell,
-                                  vl_conf.module_mapping_url)
-    elif containerize_payload.cell.kernel.lower() == 'c':
-        return CContainerizer(containerize_payload.cell,
-                              vl_conf.module_mapping_url)
+        return RContainerizer(cell=containerize_payload.cell,
+                              module_mapping_url=vl_conf.module_mapping_url,
+                              service_version=__service_version(),
+                              template_format_version=__template_version())
     else:
         raise ValueError('Unsupported kernel')
 
@@ -224,7 +220,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                             detail='Cell is not a code cell, cannot extract')
     try:
         cell = extractor.get_cell()
-        cell.template_format = __template_format_version()
+        cell.template_format = __template_version()
     except ValueError as e:
         raise HTTPException(status_code=422,
                             detail='Error extracting cell: ' + str(e))
@@ -304,7 +300,7 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
             'source_url': source_url,
-            'template_format': __template_format_version()}
+            'template_format': __template_version()}
 
 
 @app.get('/version')

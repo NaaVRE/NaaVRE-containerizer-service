@@ -6,8 +6,11 @@ from app.services.containerizers.containerizer import Containerizer
 
 class RContainerizer(Containerizer, ABC):
 
-    def __init__(self, cell: Cell, module_mapping_url=None):
-        super().__init__(cell, module_mapping_url)
+    def __init__(self, cell: Cell, module_mapping_url=None,
+                 service_version=None, template_format_version=None):
+        super().__init__(cell=cell, module_mapping_url=module_mapping_url,
+                         service_version=service_version,
+                         template_format_version=template_format_version)
         self.file_extension = '.R'
         self.template_script = 'R_cell_template.jinja2'
 
@@ -37,4 +40,6 @@ class RContainerizer(Containerizer, ABC):
             r_dependencies.append(install_packages)
             library = 'library(' + dep['name'] + ')'
             r_dependencies.append(library)
-        return template_script.render(cell=self.cell, deps=r_dependencies)
+        return template_script.render(cell=self.cell, deps=r_dependencies,
+                                      __service_version=self.__service_version,
+                                      __template_format=self.__template_format)
