@@ -12,8 +12,11 @@ from app.services.containerizers.containerizer import Containerizer
 
 class PyContainerizer(Containerizer, ABC):
 
-    def __init__(self, cell: Cell, module_mapping_url=None):
-        super().__init__(cell, module_mapping_url)
+    def __init__(self, cell: Cell, module_mapping_url=None,
+                 service_version=None, template_format_version=None):
+        super().__init__(cell=cell, module_mapping_url=module_mapping_url,
+                         service_version=service_version,
+                         template_format_version=template_format_version)
         self.file_extension = '.py'
         if self.visualization_cell:
             self.template_script = 'vis_cell_template.jinja2'
@@ -75,4 +78,6 @@ class PyContainerizer(Containerizer, ABC):
             resolves.append(resolve_to)
         return template_script.render(cell=self.cell,
                                       deps=resolves,
-                                      confs=conf)
+                                      confs=conf,
+                                      __service_version=self.__service_version,
+                                      __template_format=self.__template_format)
