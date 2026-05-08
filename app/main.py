@@ -16,6 +16,7 @@ from cachetools import TTLCache
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app import __service_version, __template_format_version
 from app.models.containerizer_payload import ContainerizerPayload
 from app.models.extractor_payload import ExtractorPayload
 from app.models.vl_config import VLConfig
@@ -82,11 +83,11 @@ with open(config_file, "r", encoding="utf-8") as file:
 
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
-VERSION = __version__()
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'),
-              version=__version__)
+              version=__service_version(),
+              title='NaaVRE-containerizer-service')
 
 
 if os.getenv('DEBUG', 'false').lower() == 'true':
@@ -234,7 +235,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
                             detail='Cell is not a code cell, cannot extract')
     try:
         cell = extractor.get_cell()
-        cell.containerizer_service_version = ""
+        cell.template_format = __template_format_version()
     except ValueError as e:
         raise HTTPException(status_code=422,
                             detail='Error extracting cell: ' + str(e))
@@ -314,7 +315,9 @@ def containerize(access_token: Annotated[dict, Depends(valid_access_token)],
             'dispatched_github_workflow': commit_resp['content_updated'],
             'container_image': container_image,
             'source_url': source_url,
-            'template_format': __template_version()}
+            'nnaavre_containerizer_service_version': VERSION,
+            'json_args_supported': Version(VERSION) >= Version(
+                SUPPORTS_JSON_ARGS_VERSION)}
 
 
 @app.get('/version')
