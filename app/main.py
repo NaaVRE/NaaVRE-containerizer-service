@@ -83,7 +83,6 @@ with open(config_file, "r", encoding="utf-8") as file:
 
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
-VERSION = __version__()
 
 app = FastAPI(root_path=os.getenv('ROOT_PATH',
                                   '/NaaVRE-containerizer-service'),
