@@ -1,5 +1,5 @@
 {
-  "title": "use-the-json-user",
+  "title": "r-deserialize-the-json-string-user",
   "base_container_image": {
     "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
     "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
@@ -7,7 +7,7 @@
   "inputs": [
     {
       "name": "json_str",
-      "type": "str"
+      "type": null
     }
   ],
   "outputs": [],
@@ -16,14 +16,15 @@
   "confs": [],
   "dependencies": [
     {
-      "module": "",
-      "asname": null,
-      "name": "json"
+      "name": "jsonlite",
+      "asname": "",
+      "module": ""
     }
   ],
-  "kernel": "ipython",
-  "original_source": "deserialized_data = json.loads(json_str)\n\nprint(deserialized_data)",
+  "kernel": "IRkernel",
+  "original_source": "deserialized_data <- fromJSON(json_str)\n\nprint(deserialized_data)\n\n\noriginal_data <- list(\n  task = \"Write Python\",\n  number = 1,\n  skills = c(\"python\", \"sql\")\n)\n\nstopifnot(identical(deserialized_data, original_data))",
   "source_url": null,
   "container_image": null,
-  "description": null
+  "description": null,
+  "template_format": "v2"
 }
