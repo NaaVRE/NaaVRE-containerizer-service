@@ -6,3 +6,4 @@ dependencies:
   - nbconvert
   - papermill
   - ipykernel
+  - r-jsonlite
