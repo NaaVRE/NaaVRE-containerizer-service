@@ -78,7 +78,10 @@ json_str = _parse_value(arg_value, arg_name, arg_type)
 arg_value = get_arg_value('id',args,raw_args)
 id = _parse_value(arg_value, 'id', str)
 
-deserialized_data = json.loads(json_str)
+data = json.loads(json_str)
 
-print(deserialized_data)
+print(data)
+
+original_data = {"task": "Write Python", "number": 1, "skills": ["python", "sql"]}
+assert data == original_data
 
