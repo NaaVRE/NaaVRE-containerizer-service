@@ -78,6 +78,4 @@ class PyContainerizer(Containerizer, ABC):
             resolves.append(resolve_to)
         return template_script.render(cell=self.cell,
                                       deps=resolves,
-                                      confs=conf,
-                                      __service_version=self.__service_version,
-                                      __template_format=self.__template_format)
+                                      confs=conf)

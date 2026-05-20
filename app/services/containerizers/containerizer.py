@@ -32,8 +32,8 @@ class Containerizer:
         self.template_conda_env = 'conda_env_template.jinja2'
         self.dockerfile_template = 'dockerfile_template_conda.jinja2'
         self.module_mapping_url = module_mapping_url
-        self.__service_version = service_version
-        self.__template_format = template_format_version
+        self._service_version = service_version
+        self._template_format = template_format_version
 
     @abstractmethod
     def build_script(self):
