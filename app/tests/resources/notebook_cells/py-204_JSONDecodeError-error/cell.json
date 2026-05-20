@@ -22,8 +22,9 @@
     }
   ],
   "kernel": "ipython",
-  "original_source": "deserialized_data = json.loads(json_str)\n\nprint(deserialized_data)",
+  "original_source": "data = json.loads(json_str)\n\nprint(data)\n\noriginal_data = {\"task\": \"Write Python\", \"number\": 1, \"skills\": [\"python\", \"sql\"]}\nassert data == original_data",
   "source_url": null,
   "container_image": null,
-  "description": null
+  "description": null,
+  "template_format": "v2"
 }
