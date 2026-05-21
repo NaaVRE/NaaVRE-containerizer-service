@@ -221,7 +221,7 @@ def extract_cell(access_token: Annotated[dict, Depends(valid_access_token)],
     try:
         cell = extractor.get_cell()
         cell.template_format = __template_version()
-    except ValueError as e:
+    except (ValueError, IOError) as e:
         raise HTTPException(status_code=422,
                             detail='Error extracting cell: ' + str(e))
 
