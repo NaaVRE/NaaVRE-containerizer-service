@@ -129,6 +129,7 @@ class GithubService(GitRepository, ABC):
                                            image_version=None,
                                            commit_sha=None):
         count = 0
+        print('commit_sha: ' + str(commit_sha))
         while not self.__is_context_available(title, ref=commit_sha):
             logger.debug('Waiting for context to be available')
             sleep(5)
