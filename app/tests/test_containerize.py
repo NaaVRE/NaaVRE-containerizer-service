@@ -163,6 +163,15 @@ def test_containerize_render():
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
         print("Testing containerization for cell", cell_dir)
+        # Check if responses.json exists
+        if os.path.exists(os.path.join(cell_dir, 'responses.json')):
+            with open(os.path.join(cell_dir, 'responses.json')) as f:
+                responses_dict = json.load(f)
+            # If the cell extraction is suppose to fail continue
+            if (responses_dict and
+                    responses_dict['extract_cell']['code'] != 200):
+                continue
+
         cell_path = os.path.join(cell_dir, 'cell.json')
         with open(cell_path) as f:
             cell = json.load(f)
@@ -220,6 +229,18 @@ def test_containerize_render():
 def test_containerize_github(cell_dir):
     os.environ['DEBUG'] = 'True'
     cell_path = os.path.join(cell_dir, 'cell.json')
+    # Check if responses.json exists
+    if os.path.exists(os.path.join(cell_dir, 'responses.json')):
+        with open(os.path.join(cell_dir, 'responses.json')) as f:
+            responses_dict = json.load(f)
+        # If the cell extraction is supposed to fail continue
+        if responses_dict['extract_cell']['code'] != 200:
+            print(
+                f"Skipping containerization test for cell {cell_dir} because "
+                f"cell extraction failed with code "
+                f""f"{responses_dict['extract_cell']['code']}")
+            pass
+
     with open(cell_path) as f:
         print('Testing containerize for cell: ' + cell_path)
         cell = json.load(f)
