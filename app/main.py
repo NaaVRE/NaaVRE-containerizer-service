@@ -187,13 +187,11 @@ def _get_extractor(extractor_payload: ExtractorPayload):
             extractor = PyHeaderExtractor(extractor_payload.data,
                                           vl_settings.base_image_tags_url)
         if not extractor.is_complete():
-            if kernel.lower() == 'irkernel':
-                built_in_function_url = (
+            if kernel.lower() == 'irkernel':built_in_function_url = (
                     settings.get_built_in_function_url())
                 code_extractor = RExtractor(extractor_payload.data,
                                             vl_settings.base_image_tags_url,
-                                            built_in_function_url)
-            elif kernel == 'ipython' or kernel == 'python':
+            built_in_function_url)elif kernel == 'ipython' or kernel == 'python':
                 code_extractor = PyExtractor(extractor_payload.data,
                                              vl_settings.base_image_tags_url)
             else:
