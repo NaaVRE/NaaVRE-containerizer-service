@@ -167,7 +167,7 @@ def test_containerize_render():
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
                 responses_dict = json.load(f)
-            # If the cell extraction is suppose to fail continue
+            # If the cell extraction is supposed to fail continue
             if (responses_dict and
                     responses_dict['extract_cell']['code'] != 200):
                 continue
