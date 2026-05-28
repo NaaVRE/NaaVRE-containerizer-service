@@ -1,7 +1,7 @@
 import re
 
 
-def check_cell_raw_title(title):
+def check_cell_title(title):
     """
     Example check: ensure notebook title does not start with a digit.
     """
@@ -15,8 +15,8 @@ def check_cell_raw_title(title):
         raise ValueError('Title: ' + title + ' is not a valid. Title should '
                                              'start with a letter.')
     # Tile should not contain special characters
-    if re.search(r'[^\w\s.-]', title):
+    if re.search(r'[^\w\s.:-]', title):
         raise ValueError(
             'Title: ' + title + ' is not a valid. Title should not'
                                 ' contain special characters except'
-                                ' for - , . and _')
+                                ' for - , . , _ and :')

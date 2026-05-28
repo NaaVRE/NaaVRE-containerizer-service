@@ -9,7 +9,7 @@ from app.models.notebook_data import NotebookData
 from app.models.workflow_cell import Cell
 from app.services.base_image.base_image_tags import BaseImageTags
 from app.services.cell_extractor.cell_sanity_checker import \
-    check_cell_raw_title
+    check_cell_title
 
 
 class Extractor(abc.ABC):
@@ -44,11 +44,10 @@ class Extractor(abc.ABC):
 
     def get_cell(self) -> Cell:
         title = self.cell_source.partition('\n')[0].strip()
-        if title and title[0] == "#":
-            check_cell_raw_title(title)
-        else:
+        if not title or title[0] != "#":
             title = "Untitled"
         title = slugify(title)
+        check_cell_title(title)
         title += '-' + slugify(self.user_name)
         title = title.lower()
         base_image_tags = BaseImageTags(self.base_image_tags_url)
