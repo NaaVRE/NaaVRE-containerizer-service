@@ -24,6 +24,16 @@
       "name": "readr",
       "asname": "",
       "module": ""
+    },
+    {
+      "name": "tibble",
+      "asname": "",
+      "module": ""
+    },
+    {
+      "name": "base",
+      "asname": "",
+      "module": ""
     }
   ],
   "kernel": "IRkernel",

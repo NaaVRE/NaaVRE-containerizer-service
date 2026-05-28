@@ -1,14 +1,28 @@
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-built_in = ['T', 'F', 'pi', 'is.numeric', 'mu', 'round', 'sum']
+DEFAULT_BUILT_IN = {
+    'T', 'F', 'TRUE', 'FALSE',
+    'NULL', 'NA', 'NaN', 'Inf',
+    'pi',
+    'sum', 'mean', 'min', 'max', 'median', 'sd', 'var',
+    'length', 'nrow', 'ncol',
+    'round', 'abs',
+    'is.numeric', 'is.character', 'is.logical',
+    'as.numeric', 'as.character', 'as.logical',
+    'c', 'list', 'data.frame',
+    'mu',
+}
 
 
 class UndefinedExtractor(RVisitor):
-    def __init__(self, defs, scoped):
+    def __init__(self, defs, scoped, built_in=None):
         self.undefined = set()
         self.defs = defs
         self.scoped = scoped
+        self.built_in = set(DEFAULT_BUILT_IN)
+        if built_in:
+            self.built_in.update(built_in)
 
     def visitProg(self, ctx: RParser.ProgContext):
         self.visitChildren(ctx)
@@ -76,7 +90,7 @@ class UndefinedExtractor(RVisitor):
     def visitId(self, ctx: RParser.IdContext):
         node_id = ctx.ID().getText()
         if (node_id not in self.defs and node_id not in self.scoped and node_id
-                not in built_in):
+                not in self.built_in):
             self.undefined.add(ctx.getText())
 
     def isEllipsis(self, ctx):

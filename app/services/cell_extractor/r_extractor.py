@@ -114,7 +114,8 @@ class RExtractor(Extractor):
     notebook_secrets: list[dict]
     undefined: dict
 
-    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str,
+                 r_built_in=None):
         notebook = notebook_data.notebook
         sources = [nbcell.source for nbcell in notebook.cells if
                    nbcell.cell_type == 'code' and len(nbcell.source) > 0]
@@ -130,6 +131,7 @@ class RExtractor(Extractor):
         self.notebook_secrets = self.__extract_prefixed_var(sources,
                                                             'secret')
         self.undefined = dict()
+        self.r_built_in = set(r_built_in or [])
         for source in sources:
             try:
                 self.undefined.update(self.__extract_cell_undefined(source))
@@ -270,7 +272,7 @@ class RExtractor(Extractor):
         tree = parse_text(cell_source)
         visitor = DefinedExtractor()
         defs, scoped = visitor.visit(tree)
-        visitor = UndefinedExtractor(defs, scoped)
+        visitor = UndefinedExtractor(defs, scoped, self.r_built_in)
         undefs = visitor.visit(tree)
         undef_vars = {
             name: {
