@@ -179,7 +179,6 @@ def test_containerize_render():
         payload_path = os.path.join(cell_dir, 'payload_containerize.json')
         with open(payload_path) as f:
             containerize_payload = json.load(f)
-
         containerize_payload['cell'] = cell
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
