@@ -9,6 +9,7 @@ def check_cell_raw_title(title):
     # Remove first '#' from title
     if title[0] == '#':
         title = title[1:]
+    title = title.strip()
     # Title should start only with letters
     if re.match(r'^[^a-zA-Z]', title):
         raise ValueError('Title: ' + title + ' is not a valid. Title should '
