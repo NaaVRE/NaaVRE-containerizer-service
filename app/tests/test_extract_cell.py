@@ -67,7 +67,6 @@ def test_extract_cell():
             continue
         cell_dict = cell_extractor_response.json()
         returned_cell = Cell.model_validate(cell_dict)
-        # json_returned_cell = json.dumps(cell_dict)
         cell_path = os.path.join(cell_dir, 'cell.json')
         with open(cell_path) as f:
             print('              expecting cell: ' + cell_path)
