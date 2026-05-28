@@ -46,8 +46,8 @@ class Extractor(abc.ABC):
         title = self.cell_source.partition('\n')[0].strip()
         if not title or title[0] != "#":
             title = "Untitled"
-        title = slugify(title)
         check_cell_title(title)
+        title = slugify(title)
         title += '-' + slugify(self.user_name)
         title = title.lower()
         base_image_tags = BaseImageTags(self.base_image_tags_url)
