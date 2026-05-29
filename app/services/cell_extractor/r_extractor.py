@@ -272,7 +272,8 @@ class RExtractor(Extractor):
         tree = parse_text(cell_source)
         visitor = DefinedExtractor()
         defs, scoped = visitor.visit(tree)
-        visitor = UndefinedExtractor(defs, scoped, self.r_built_in)
+        visitor = UndefinedExtractor(defs, scoped, self.r_built_in,
+                                     set(self.notebook_names.keys()))
         undefs = visitor.visit(tree)
         undef_vars = {
             name: {
