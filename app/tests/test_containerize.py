@@ -1,9 +1,7 @@
 import json
 import logging
 import os
-import subprocess
 import uuid
-from pathlib import Path
 from time import sleep
 
 import requests
