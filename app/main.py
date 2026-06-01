@@ -182,7 +182,7 @@ def _get_extractor(extractor_payload: ExtractorPayload):
         if kernel.lower() == 'irkernel':
             code_extractor = RExtractor(extractor_payload.data,
                                         vl_settings.base_image_tags_url,
-                                        settings.get_r_built_in())
+                                        settings.get_built_in_function_names())
         elif kernel == 'ipython' or kernel == 'python':
             code_extractor = PyExtractor(extractor_payload.data,
                                          vl_settings.base_image_tags_url)

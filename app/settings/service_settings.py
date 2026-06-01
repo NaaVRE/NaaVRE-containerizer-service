@@ -7,7 +7,7 @@ from app.models.vl_config import VLConfig
 
 
 class ServiceSettings(BaseSettings):
-    r_built_in: List[str] = Field(default_factory=list)
+    r_built_in_function_names: List[str] = Field(default_factory=list)
     vl_configurations: List[VLConfig]
 
 
@@ -22,5 +22,5 @@ class Settings:
                 return setting
         raise ValueError(f"Virtual lab '{virtual_lab}' not found in settings.")
 
-    def get_r_built_in(self) -> List[str]:
-        return self.service_settings.r_built_in
+    def get_built_in_function_names(self) -> List[str]:
+        return self.service_settings.r_built_in_function_names

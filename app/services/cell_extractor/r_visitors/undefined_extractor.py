@@ -1,7 +1,7 @@
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-DEFAULT_BUILT_IN = {
+DEFAULT_BUILT_IN_FUNCTION_NAMES = {
     'T', 'F', 'TRUE', 'FALSE',
     'NULL', 'NA', 'NaN', 'Inf',
     'pi',
@@ -16,13 +16,15 @@ DEFAULT_BUILT_IN = {
 
 
 class UndefinedExtractor(RVisitor):
-    def __init__(self, defs, scoped, built_in=None):
+    def __init__(self, defs=None, scoped=None, built_in_function_names=None,
+                 notebook_var_names=None):
         self.undefined = set()
         self.defs = defs
+        self.notebook_var_names = notebook_var_names
         self.scoped = scoped
-        self.built_in = set(DEFAULT_BUILT_IN)
-        if built_in:
-            self.built_in.update(built_in)
+        self.built_in = set(DEFAULT_BUILT_IN_FUNCTION_NAMES)
+        if built_in_function_names:
+            self.built_in.update(built_in_function_names)
 
     def visitProg(self, ctx: RParser.ProgContext):
         self.visitChildren(ctx)
