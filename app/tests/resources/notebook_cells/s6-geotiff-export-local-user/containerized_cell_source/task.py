@@ -19,7 +19,7 @@ print(args)
 
 id = args.id
 
-S5_done = args.S5_done.replace('"','')
+S5_done = args.S5_done
 
 
 conf_local_path_geotiff = conf_local_path_geotiff = os.path.join(pathlib.Path('/tmp/data').as_posix(), 'geotiff')
