@@ -272,25 +272,25 @@ class RExtractor(Extractor):
         tree = parse_text(cell_source)
         visitor = DefinedExtractor()
         function_names = self.built_in_function_names
-        defs, scoped = visitor.visit(tree)
-        visitor = UndefinedExtractor(defs=defs,
-                                     scoped=scoped,
-                                     built_in_function_names=function_names,
-                                     notebook_var_names=self.notebook_names)
-        undefs = visitor.visit(tree)
+        defined_notebook_vars, scoped = visitor.visit(tree)
+        visitor = UndefinedExtractor(
+            defined_notebook_vars=defined_notebook_vars,
+            scoped=scoped,
+            built_in_function_names=function_names)
+        undefined_notebook_vars = visitor.visit(tree)
         # Build dictionary of undefined variables with their types
-        undef_vars = {}
-        for name in undefs:
+        undefined_cell_vars = {}
+        for name in undefined_notebook_vars:
             var_type = None
             if name in self.notebook_names:
                 var_type = self.notebook_names[name]['type']
 
-            undef_vars[name] = {
+            undefined_cell_vars[name] = {
                 'name': name,
                 'type': var_type,
             }
 
-        return undef_vars
+        return undefined_cell_vars
 
     def get_cell_params(self) -> list[dict]:
         param = {}

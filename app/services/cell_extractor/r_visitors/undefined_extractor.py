@@ -1,3 +1,5 @@
+from fastapi import logger
+
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
@@ -5,7 +7,7 @@ DEFAULT_BUILT_IN_FUNCTION_NAMES = {
     'T', 'F', 'TRUE', 'FALSE',
     'NULL', 'NA', 'NaN', 'Inf',
     'pi',
-    'sum', 'mean', 'min', 'max', 'median', 'sd', 'var',
+    'mean', 'min', 'max', 'median', 'sd', 'var',
     'length', 'nrow', 'ncol',
     'round', 'abs',
     'is.numeric', 'is.character', 'is.logical',
@@ -16,11 +18,10 @@ DEFAULT_BUILT_IN_FUNCTION_NAMES = {
 
 
 class UndefinedExtractor(RVisitor):
-    def __init__(self, defs=None, scoped=None, built_in_function_names=None,
-                 notebook_var_names=None):
+    def __init__(self, defined_notebook_vars=None, scoped=None,
+                 built_in_function_names=None):
         self.undefined = set()
-        self.defs = defs
-        self.notebook_var_names = notebook_var_names
+        self.defined_notebook_vars = defined_notebook_vars
         self.scoped = scoped
         self.built_in = set(DEFAULT_BUILT_IN_FUNCTION_NAMES)
         if built_in_function_names:
@@ -72,9 +73,8 @@ class UndefinedExtractor(RVisitor):
 
     def visitForm(self, ctx: RParser.FormContext):
         ctx_id = ctx.ID()
-        print(ctx_id)
-        if ctx.ID():
-            self.scoped.add(ctx.ID().getText())
+        if ctx_id:
+            self.scoped.add(ctx_id.getText())
         elif self.isEllipsis(ctx):
             self.scoped.add("...")
             return None
@@ -91,7 +91,22 @@ class UndefinedExtractor(RVisitor):
 
     def visitId(self, ctx: RParser.IdContext):
         node_id = ctx.ID().getText()
-        if (node_id not in self.defs and node_id not in self.scoped and node_id
+
+        # Debug output: print the source line currently being parsed.
+        start_token = getattr(ctx, "start", None)
+        input_stream = start_token.getInputStream() if start_token else None
+        source_text = getattr(input_stream, "strdata", None)
+        if source_text and start_token and start_token.line:
+            source_lines = source_text.splitlines()
+            line_index = start_token.line - 1
+            if 0 <= line_index < len(source_lines):
+                msg = (f"[UndefinedExtractor] line {start_token.line}: "
+                       f"{source_lines[line_index]}")
+                print(msg)
+                logger.logger.debug(msg)
+
+        if (node_id not in self.defined_notebook_vars
+                and node_id not in self.scoped and node_id
                 not in self.built_in):
             self.undefined.add(ctx.getText())
 
