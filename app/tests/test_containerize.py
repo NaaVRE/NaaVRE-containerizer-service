@@ -194,6 +194,7 @@ def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
+        print("Testing containerization for cell", cell_dir)
         # Check if responses.json exists
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
@@ -214,15 +215,16 @@ def test_containerize_render():
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
         containerizer = _get_containerizer(containerize_payload)
-        script = containerizer.build_script()
+
         # Helper to load saved references for containerized cell source
         ref_containerized = RefContainerizer(cell_dir)
 
         # Compare uild script (task.py or task.R)
+        script = containerizer.build_script()
         ref_script = ref_containerized.build_script(
             containerizer.file_extension
             )
-
+        # Format
         assert script == ref_script
 
         # Dockerfile
