@@ -1,7 +1,9 @@
 import json
 import logging
 import os
+import subprocess
 import uuid
+from pathlib import Path
 from time import sleep
 
 import requests
@@ -158,11 +160,40 @@ class RefContainerizer:
         return source
 
 
+def run_script(script=None, kernel=None, dependencies=None, arguments=None):
+    dependencies = list(filter(lambda x: x not in ['pip', 'nbconvert',
+                                                   'papermill', 'ipykernel'],
+                               dependencies))
+    if not dependencies:
+        # Create /tmp/data/ folder
+        Path('/tmp/data/').mkdir(exist_ok=True)
+        script_path = ''
+        cmd = ''
+        if kernel == 'python' or kernel == 'ipython':
+            script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.py'
+            with open(script_path, 'w') as f:
+                f.write(script)
+            cmd = 'python'
+        elif kernel == 'IRkernel':
+            script = script.replace('setwd(\'/app\')', '')
+            script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.R'
+            with open(script_path, 'w') as f:
+                f.write(script)
+            cmd = 'Rscript'
+        if script_path and cmd:
+            for args in arguments:
+                result = subprocess.run([cmd, script_path, args],
+                                        capture_output=True, text=True)
+                stderr = result.stderr
+                assert result.returncode == 0, (f"Script failed with exit code"
+                                                f" {result.returncode} and "
+                                                f"error: {stderr}")
+
+
 def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        print("Testing containerization for cell", cell_dir)
         # Check if responses.json exists
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
@@ -183,16 +214,15 @@ def test_containerize_render():
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
         containerizer = _get_containerizer(containerize_payload)
-
+        script = containerizer.build_script()
         # Helper to load saved references for containerized cell source
         ref_containerized = RefContainerizer(cell_dir)
 
         # Compare uild script (task.py or task.R)
-        script = containerizer.build_script()
         ref_script = ref_containerized.build_script(
             containerizer.file_extension
             )
-        # Format
+
         assert script == ref_script
 
         # Dockerfile
@@ -223,6 +253,12 @@ def test_containerize_render():
         del environment['dependencies']
         del ref_environment['dependencies']
         assert environment == ref_environment
+        arguments_path = os.path.join(cell_dir, 'args.json')
+        if os.path.exists(arguments_path):
+            with open(arguments_path) as f:
+                arguments = json.load(f)
+            run_script(script=script, kernel=cell['kernel'],
+                       dependencies=dependencies, arguments=arguments)
 
 
 def test_containerize_github(cell_dir):

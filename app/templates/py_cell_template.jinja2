@@ -40,8 +40,6 @@ id = args.id
 {% for in_var in cell.inputs|sort(attribute='name') %}
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
 {{ in_var['name']  }} = json.loads(args.{{ in_var['name']  }})
-{% elif in_var['type'] == str or  in_var['type'] == 'str' %}
-{{ in_var['name']  }} = args.{{ in_var['name']  }}.replace('"','')
 {% else %}
 {{ in_var['name']  }} = args.{{ in_var['name']  }}
 {% endif %}
