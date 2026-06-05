@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -7,7 +7,6 @@ from app.models.vl_config import VLConfig
 
 
 class ServiceSettings(BaseSettings):
-    r_built_in_function_names: List[str] = Field(default_factory=list)
     vl_configurations: List[VLConfig]
 
 
