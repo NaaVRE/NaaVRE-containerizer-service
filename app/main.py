@@ -8,6 +8,7 @@ from typing import Annotated
 from urllib.parse import urlparse
 
 import cachetools.func
+import jsonschema
 import jwt
 import requests
 import uvicorn
@@ -168,28 +169,32 @@ def _get_extractor(extractor_payload: ExtractorPayload):
         raise HTTPException(status_code=400,
                             detail='module_mapping_url for: ' +
                             extractor_payload.virtual_lab + ' not found')
-    if notebook.cells[cell_index].cell_type != 'code':
-        # dummy extractor for non-code cells (e.g. markdown)
-        extractor = DummyExtractor(extractor_payload.data,
-                                   vl_settings.base_image_tags_url)
-    elif 'r' in kernel.lower():
-        extractor = RHeaderExtractor(extractor_payload.data,
-                                     vl_settings.base_image_tags_url)
-    elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
-        extractor = PyHeaderExtractor(extractor_payload.data,
-                                      vl_settings.base_image_tags_url)
-    if not extractor.is_complete():
-        if kernel.lower() == 'irkernel':
-            code_extractor = RExtractor(extractor_payload.data,
-                                        vl_settings.base_image_tags_url)
-        elif kernel == 'ipython' or kernel == 'python':
-            code_extractor = PyExtractor(extractor_payload.data,
+    try:
+        if notebook.cells[cell_index].cell_type != 'code':
+            # dummy extractor for non-code cells (e.g. markdown)
+            extractor = DummyExtractor(extractor_payload.data,
+                                       vl_settings.base_image_tags_url)
+        elif 'r' in kernel.lower():
+            extractor = RHeaderExtractor(extractor_payload.data,
                                          vl_settings.base_image_tags_url)
-        else:
-            raise HTTPException(status_code=400,
-                                detail='Unsupported kernel: ' + kernel)
-        extractor.add_missing_values(code_extractor)
-    return extractor
+        elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
+            extractor = PyHeaderExtractor(extractor_payload.data,
+                                          vl_settings.base_image_tags_url)
+        if not extractor.is_complete():
+            if kernel.lower() == 'irkernel':
+                code_extractor = RExtractor(extractor_payload.data,
+                                            vl_settings.base_image_tags_url)
+            elif kernel == 'ipython' or kernel == 'python':
+                code_extractor = PyExtractor(extractor_payload.data,
+                                             vl_settings.base_image_tags_url)
+            else:
+                raise HTTPException(status_code=400,
+                                    detail='Unsupported kernel: ' + kernel)
+            extractor.add_missing_values(code_extractor)
+        return extractor
+    except (ValueError, jsonschema.ValidationError) as e:
+        raise HTTPException(status_code=422,
+                            detail='Error extracting cell: ' + str(e))
 
 
 def _query_github_job_id(workflow_id, gh_service, wf_creation_utc):
