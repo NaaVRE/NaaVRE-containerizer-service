@@ -187,13 +187,13 @@ def _get_extractor(extractor_payload: ExtractorPayload):
                 code_extractor = RExtractor(extractor_payload.data,
                                             vl_settings.base_image_tags_url,
                                             built_in_function_names)
-        elif kernel == 'ipython' or kernel == 'python':
-            code_extractor = PyExtractor(extractor_payload.data,
-                                         vl_settings.base_image_tags_url)
-        else:
-            raise HTTPException(status_code=400,
-                                detail='Unsupported kernel: ' + kernel)
-        extractor.add_missing_values(code_extractor)
+            elif kernel == 'ipython' or kernel == 'python':
+                code_extractor = PyExtractor(extractor_payload.data,
+                                             vl_settings.base_image_tags_url)
+            else:
+                raise HTTPException(status_code=400,
+                                    detail='Unsupported kernel: ' + kernel)
+            extractor.add_missing_values(code_extractor)
         return extractor
     except (ValueError, jsonschema.ValidationError) as e:
         raise HTTPException(status_code=422,

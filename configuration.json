@@ -1,7 +1,4 @@
 {
-  "build_in_r_function_names": [
-    "some_function"
-  ],
   "vl_configurations": [
     {
       "name": "openlab",

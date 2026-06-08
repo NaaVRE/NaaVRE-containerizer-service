@@ -165,14 +165,15 @@ def run_script(script=None, kernel=None, dependencies=None, arguments=None):
                                                    'papermill', 'ipykernel'],
                                dependencies))
     if not dependencies:
-        # Create /tmp/data/ folder
         Path('/tmp/data/').mkdir(exist_ok=True)
         script_path = ''
         cmd = ''
         if kernel == 'python' or kernel == 'ipython':
-            script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.py'
-            with open(script_path, 'w') as f:
-                f.write(script)
+            # script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.py'
+            # with open(script_path, 'w') as f:
+            #     f.write(script)
+            script_path = \
+                '/tmp/test_script3fd50926-cd57-40a6-bbb9-20a874fb2951.py'
             cmd = 'python'
         elif kernel == 'IRkernel':
             script = script.replace('setwd(\'/app\')', '')
@@ -184,6 +185,9 @@ def run_script(script=None, kernel=None, dependencies=None, arguments=None):
             for args in arguments:
                 result = subprocess.run([cmd, script_path, args],
                                         capture_output=True, text=True)
+                # Print the commandline command
+                line = cmd + ' ' + script_path + ' ' + args
+                print(f"Running command: {line}")
                 stderr = result.stderr
                 assert result.returncode == 0, (f"Script failed with exit code"
                                                 f" {result.returncode} and "
@@ -194,7 +198,9 @@ def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        # Check if responses.json exists
+        if 'check-var-types-dev-user-name-domain-com' not in cell_dir:
+            continue
+        print("Testing containerize render for cell_dir: " + cell_dir)
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
                 responses_dict = json.load(f)

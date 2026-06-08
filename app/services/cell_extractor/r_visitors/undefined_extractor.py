@@ -1,31 +1,35 @@
-from fastapi import logger
-
 from app.services.cell_extractor.parseR.RParser import RParser
 from app.services.cell_extractor.r_visitors.r_visitor import RVisitor
 
-DEFAULT_BUILT_IN_FUNCTION_NAMES = {
+DEFAULT_BUILT_IN_FUNCTION_NAMES = [
     'T', 'F', 'TRUE', 'FALSE',
     'NULL', 'NA', 'NaN', 'Inf',
     'pi',
-    'mean', 'min', 'max', 'median', 'sd', 'var',
+    'sum', 'mean', 'min', 'max', 'median', 'sd', 'var',
     'length', 'nrow', 'ncol',
     'round', 'abs',
     'is.numeric', 'is.character', 'is.logical',
     'as.numeric', 'as.character', 'as.logical',
     'c', 'list', 'data.frame',
-    'mu',
-}
+    'mu'
+]
 
 
 class UndefinedExtractor(RVisitor):
     def __init__(self, defined_notebook_vars=None, scoped=None,
-                 built_in_function_names=None):
+                 built_in_function_names=None, cell_vars=None):
         self.undefined = set()
         self.defined_notebook_vars = defined_notebook_vars
         self.scoped = scoped
         self.built_in = set(DEFAULT_BUILT_IN_FUNCTION_NAMES)
         if built_in_function_names:
             self.built_in.update(built_in_function_names)
+        updated_function_names = set()
+        for cell_var in cell_vars:
+            for function_name in self.built_in:
+                if cell_var != function_name:
+                    updated_function_names.add(function_name)
+        self.built_in = updated_function_names
 
     def visitProg(self, ctx: RParser.ProgContext):
         self.visitChildren(ctx)
@@ -91,20 +95,6 @@ class UndefinedExtractor(RVisitor):
 
     def visitId(self, ctx: RParser.IdContext):
         node_id = ctx.ID().getText()
-
-        # Debug output: print the source line currently being parsed.
-        start_token = getattr(ctx, "start", None)
-        input_stream = start_token.getInputStream() if start_token else None
-        source_text = getattr(input_stream, "strdata", None)
-        if source_text and start_token and start_token.line:
-            source_lines = source_text.splitlines()
-            line_index = start_token.line - 1
-            if 0 <= line_index < len(source_lines):
-                msg = (f"[UndefinedExtractor] line {start_token.line}: "
-                       f"{source_lines[line_index]}")
-                print(msg)
-                logger.logger.debug(msg)
-
         if (node_id not in self.defined_notebook_vars
                 and node_id not in self.scoped and node_id
                 not in self.built_in):
