@@ -9,6 +9,7 @@ from time import sleep
 import requests
 import yaml
 from fastapi.testclient import TestClient
+from packaging.version import Version
 
 from app.main import app, _get_containerizer
 from app.models.containerizer_payload import ContainerizerPayload
@@ -19,6 +20,8 @@ elif os.path.exists('app/tests/resources/'):
     base_path = 'app/tests/resources/'
 else:
     raise RuntimeError('cannot find test resources')
+
+json_args_supported_version = Version('v2')
 
 client = TestClient(app)
 
@@ -160,7 +163,8 @@ class RefContainerizer:
         return source
 
 
-def run_script(script=None, kernel=None, dependencies=None, arguments=None):
+def run_script(script=None, kernel=None, dependencies=None,
+               arguments_file=None, template_format=None):
     dependencies = list(filter(lambda x: x not in ['pip', 'nbconvert',
                                                    'papermill', 'ipykernel'],
                                dependencies))
@@ -168,12 +172,26 @@ def run_script(script=None, kernel=None, dependencies=None, arguments=None):
         Path('/tmp/data/').mkdir(exist_ok=True)
         script_path = ''
         cmd = ''
+        cmd_args = []
+        if template_format and Version(
+                template_format) >= json_args_supported_version:
+            cmd_args.append('--args_json ' + arguments_file)
+        else:
+            # convert arguments in the json file as command line arguments
+            with open(arguments_file) as f:
+                arguments = json.load(f)
+            for arg in arguments:
+                name = arg.get('name')
+                value = arg.get('value')
+                arg_type = arg.get('type')
+                if arg_type == 'list':
+                    value = value.strip()
+                line = f"--{name}={value}"
+                cmd_args.append(line)
         if kernel == 'python' or kernel == 'ipython':
-            # script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.py'
-            # with open(script_path, 'w') as f:
-            #     f.write(script)
-            script_path = \
-                '/tmp/test_script3fd50926-cd57-40a6-bbb9-20a874fb2951.py'
+            script_path = '/tmp/test_script' + str(uuid.uuid4()) + '.py'
+            with open(script_path, 'w') as f:
+                f.write(script)
             cmd = 'python'
         elif kernel == 'IRkernel':
             script = script.replace('setwd(\'/app\')', '')
@@ -182,24 +200,20 @@ def run_script(script=None, kernel=None, dependencies=None, arguments=None):
                 f.write(script)
             cmd = 'Rscript'
         if script_path and cmd:
-            for args in arguments:
-                result = subprocess.run([cmd, script_path, args],
-                                        capture_output=True, text=True)
-                # Print the commandline command
-                line = cmd + ' ' + script_path + ' ' + args
-                print(f"Running command: {line}")
-                stderr = result.stderr
-                assert result.returncode == 0, (f"Script failed with exit code"
-                                                f" {result.returncode} and "
-                                                f"error: {stderr}")
+            args = [cmd, script_path] + cmd_args
+            result = subprocess.run(args, capture_output=True, text=True)
+            # Print the commandline command
+            print(f"Running command: {args}")
+            stderr = result.stderr
+            assert result.returncode == 0, (f"Script failed with exit code"
+                                            f" {result.returncode} and "
+                                            f"error: {stderr}")
 
 
 def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'check-var-types-dev-user-name-domain-com' not in cell_dir:
-            continue
         print("Testing containerize render for cell_dir: " + cell_dir)
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
@@ -261,10 +275,9 @@ def test_containerize_render():
         assert environment == ref_environment
         arguments_path = os.path.join(cell_dir, 'args.json')
         if os.path.exists(arguments_path):
-            with open(arguments_path) as f:
-                arguments = json.load(f)
             run_script(script=script, kernel=cell['kernel'],
-                       dependencies=dependencies, arguments=arguments)
+                       dependencies=dependencies,
+                       arguments_file=arguments_path)
 
 
 def test_containerize_github(cell_dir):
