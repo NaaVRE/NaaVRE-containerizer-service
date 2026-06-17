@@ -64,6 +64,7 @@ config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
 conf = None
 if os.path.exists(config_file):
     conf = load_configuration(config_file)
+    print("Found config_file: "+config_file)
 else:
     # Start going up the directory tree until we find the configuration file
     current_dir = os.getcwd()
@@ -73,8 +74,11 @@ else:
                                              'configuration.json'))
         if os.path.exists(config_path):
             conf = load_configuration(config_path)
+            print("Found config_file: " + config_file)
             break
         current_dir = os.path.dirname(current_dir)
+
+print("config_file: "+config_file)
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
