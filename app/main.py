@@ -63,6 +63,7 @@ config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
                                            'main/conf.json')
 
 conf = None
+config_path = None
 if os.path.exists(config_file):
     conf = load_configuration(config_file)
     print("Found config_file: "+config_file)
@@ -81,6 +82,10 @@ else:
 
 print("config_file: "+config_file)
 print("config_path: " + config_path)
+# Print contents of conf for debugging
+with open(config_path, "r", encoding="utf-8") as file:
+    print(file.read())
+
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
