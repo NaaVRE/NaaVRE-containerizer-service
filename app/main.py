@@ -50,10 +50,11 @@ def load_configuration(source):
         with open(source, "r", encoding="utf-8") as file:
             data_dict = json.load(file)
         file.close()
+        if not data_dict:
+            raise Exception('Configuration data_dict is empty')
         return data_dict
-
     else:
-        raise Exception('Invalid configuration source')
+        raise Exception('Configuration source: ' + source + ' not found')
 
 
 config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
@@ -79,6 +80,7 @@ else:
         current_dir = os.path.dirname(current_dir)
 
 print("config_file: "+config_file)
+print("config_path: " + config_path)
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
