@@ -83,6 +83,8 @@ jobs:
           chmod +x setup-tests.sh
           mv setup-tests.sh minikube_tests/
           ./minikube_tests/setup-tests.sh -f minikube_tests/values-deploy-naavre-containerizer-service-minikube-github.yaml -d -n -u -p -v -c "${{ matrix.chart }}"
+          pwd 
+          ls -lah 
           ls -lah minikube_configuration.json
           cat minikube_configuration.json
 
