@@ -565,9 +565,13 @@ fi
 configuration_json_path="../configuration.json"
 if [ -f "$configuration_json_path" ]; then
   echo "Found configuration.json at $configuration_json_path"
+  echo "------------------------------------"
+  exit 1
 else
-  configuration_json_path = "./configuration.json"
+  configuration_json_path="./configuration.json"
   ls -lah $configuration_json_path
+  echo "configuration.json not found at $configuration_json_path"
+  exit 1
 fi
 
 
@@ -684,16 +688,16 @@ export_variables_to_github_env() {
   done < dev-setup.env
 }
 
-setup_minikube
-
-deploy_naavre
-
-setup_authentication
-
-setup_argo
-
-get_argo_token
-
+#setup_minikube
+#
+#deploy_naavre
+#
+#setup_authentication
+#
+#setup_argo
+#
+#get_argo_token
+#
 setup_configuration_json
 
 get_auth_token
