@@ -689,7 +689,7 @@ export_variables_to_github_env() {
 
 setup_minikube
 
-#deploy_naavre
+deploy_naavre
 #
 #setup_authentication
 #
