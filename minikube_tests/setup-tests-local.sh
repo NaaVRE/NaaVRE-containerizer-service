@@ -562,7 +562,7 @@ if [ -f "dev.env" ]; then
 fi
 
 # if configuration.json exists add the values, else skip
-configuration_json_path = "../configuration.json"
+configuration_json_path="../configuration.json"
 if [ -f "$configuration_json_path" ]; then
   echo "Found configuration.json at $configuration_json_path"
 else
