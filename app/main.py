@@ -81,9 +81,8 @@ else:
         current_dir = os.path.dirname(current_dir)
 
 print("config_file: "+config_file)
-print("config_path: " + config_path)
 # Print contents of conf for debugging
-with open(config_path, "r", encoding="utf-8") as file:
+with open(config_file, "r", encoding="utf-8") as file:
     print(file.read())
 
 print('configuration loaded: ', conf)
