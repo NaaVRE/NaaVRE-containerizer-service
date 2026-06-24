@@ -596,7 +596,6 @@ if [ -f $configuration_json_path ]; then
   jq --arg secrets_creator_api_endpoint "$SECRETS_CREATOR_API_ENDPOINT" --arg vl "$VIRTUAL_LAB_NAME" '.vl_configurations |= map(if .name == $vl then .wf_engine_config.secrets_creator_api_endpoint = $secrets_creator_api_endpoint else . end)' minikube_configuration.json > tmp.json && mv tmp.json minikube_configuration.json
 
   export CONFIG_FILE_URL="minikube_configuration.json"
-  cp minikube_configuration.json ../minikube_configuration.json
 else
     echo "configuration.json does not exist, skipping update"
 fi
@@ -605,6 +604,7 @@ fi
 if [ -f "$CONFIG_FILE_URL" ]; then
   echo "Configuration file minikube_configuration.json exists."
   ls -lah $CONFIG_FILE_URL
+  cat $CONFIG_FILE_URL
 else
   echo "Configuration file $CONFIG_FILE_URL does not exist."
   pwd
@@ -690,13 +690,13 @@ export_variables_to_github_env() {
 setup_minikube
 
 deploy_naavre
-#
-#setup_authentication
-#
-#setup_argo
-#
-#get_argo_token
-#
+
+setup_authentication
+
+setup_argo
+
+get_argo_token
+
 setup_configuration_json
 
 get_auth_token
