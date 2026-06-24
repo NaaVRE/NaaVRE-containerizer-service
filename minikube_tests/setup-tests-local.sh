@@ -561,22 +561,17 @@ if [ -f "dev.env" ]; then
   source dev.env
 fi
 
-# if configuration.json exists add the values, else skip
+# Find the configuration.json file in the parent directory and copy it to the current directory if it exists
 configuration_json_path="../configuration.json"
 if [ -f "$configuration_json_path" ]; then
   echo "Found configuration.json at $configuration_json_path"
-  echo "------------------------------------"
-  exit 1
+  cp $configuration_json_path .
 else
   configuration_json_path="./configuration.json"
-  ls -lah $configuration_json_path
-  echo "configuration.json not found at $configuration_json_path"
-  exit 1
 fi
 
 
-if [ -f "../configuration.json" ]; then
-  cp "../configuration.json" .
+if [ -f $configuration_json_path ]; then
   export VIRTUAL_LAB_NAME="${VIRTUAL_LAB_NAME:-openlab}"
   jq --arg token "$ARGO_TOKEN" --arg vl "$VIRTUAL_LAB_NAME" '.vl_configurations |= map(if .name == $vl then .wf_engine_config.access_token = $token else . end)' configuration.json > tmp.json && mv tmp.json minikube_configuration.json
   # Set namespace in minikube_configuration.json in the openlab
