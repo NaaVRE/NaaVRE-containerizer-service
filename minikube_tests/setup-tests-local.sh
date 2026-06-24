@@ -572,6 +572,7 @@ fi
 
 
 if [ -f $configuration_json_path ]; then
+  echo "Creating minikube_configuration.json from $configuration_json_path"
   export VIRTUAL_LAB_NAME="${VIRTUAL_LAB_NAME:-openlab}"
   jq --arg token "$ARGO_TOKEN" --arg vl "$VIRTUAL_LAB_NAME" '.vl_configurations |= map(if .name == $vl then .wf_engine_config.access_token = $token else . end)' configuration.json > tmp.json && mv tmp.json minikube_configuration.json
   # Set namespace in minikube_configuration.json in the openlab
@@ -602,9 +603,12 @@ fi
 
 # Check if CONFIG_FILE_URL exists
 if [ -f "$CONFIG_FILE_URL" ]; then
-    echo "Configuration file $CURRENT_DIR/minikube_configuration.json exists."
+  echo "Configuration file minikube_configuration.json exists."
+  ls -lah $CONFIG_FILE_URL
 else
-  export CONFIG_FILE_URL="minikube_configuration.json"
+  echo "Configuration file $CONFIG_FILE_URL does not exist."
+  pwd
+  ls -lah .
 fi
 }
 
@@ -685,14 +689,14 @@ export_variables_to_github_env() {
 
 setup_minikube
 
-deploy_naavre
-
-setup_authentication
-
-setup_argo
-
-get_argo_token
-
+#deploy_naavre
+#
+#setup_authentication
+#
+#setup_argo
+#
+#get_argo_token
+#
 setup_configuration_json
 
 get_auth_token
