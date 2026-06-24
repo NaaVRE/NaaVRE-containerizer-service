@@ -683,16 +683,16 @@ export_variables_to_github_env() {
   done < dev-setup.env
 }
 
-#setup_minikube
-#
-#deploy_naavre
-#
-#setup_authentication
-#
-#setup_argo
-#
-#get_argo_token
-#
+setup_minikube
+
+deploy_naavre
+
+setup_authentication
+
+setup_argo
+
+get_argo_token
+
 setup_configuration_json
 
 get_auth_token
