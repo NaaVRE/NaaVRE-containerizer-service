@@ -50,20 +50,20 @@ def load_configuration(source):
         with open(source, "r", encoding="utf-8") as file:
             data_dict = json.load(file)
         file.close()
+        if not data_dict:
+            raise Exception('Configuration data_dict is empty')
         return data_dict
-
     else:
-        raise Exception('Invalid configuration source')
+        raise Exception('Configuration source: ' + source + ' not found')
 
 
-config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
-                                           'naavrehub/'
-                                           'NaaVRE-containerizer-service/'
-                                           'main/conf.json')
+config_file = os.getenv('CONFIG_FILE_URL', 'configuration.json')
 
 conf = None
+config_path = None
 if os.path.exists(config_file):
     conf = load_configuration(config_file)
+    print("Found config_file: "+config_file)
 else:
     # Start going up the directory tree until we find the configuration file
     current_dir = os.getcwd()
@@ -73,8 +73,15 @@ else:
                                              'configuration.json'))
         if os.path.exists(config_path):
             conf = load_configuration(config_path)
+            print("Found config_file: " + config_file)
             break
         current_dir = os.path.dirname(current_dir)
+
+print("config_file: "+config_file)
+# Print contents of conf for debugging
+with open(config_file, "r", encoding="utf-8") as file:
+    print(file.read())
+
 print('configuration loaded: ', conf)
 settings = Settings(config=conf)
 
@@ -182,8 +189,11 @@ def _get_extractor(extractor_payload: ExtractorPayload):
                                           vl_settings.base_image_tags_url)
         if not extractor.is_complete():
             if kernel.lower() == 'irkernel':
+                built_in_function_names = (
+                    settings.get_built_in_function_names())
                 code_extractor = RExtractor(extractor_payload.data,
-                                            vl_settings.base_image_tags_url)
+                                            vl_settings.base_image_tags_url,
+                                            built_in_function_names)
             elif kernel == 'ipython' or kernel == 'python':
                 code_extractor = PyExtractor(extractor_payload.data,
                                              vl_settings.base_image_tags_url)
