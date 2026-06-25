@@ -57,10 +57,7 @@ def load_configuration(source):
         raise Exception('Configuration source: ' + source + ' not found')
 
 
-config_file = os.getenv('CONFIG_FILE_URL', 'https://raw.githubusercontent.com/'
-                                           'naavrehub/'
-                                           'NaaVRE-containerizer-service/'
-                                           'main/conf.json')
+config_file = os.getenv('CONFIG_FILE_URL', 'configuration.json')
 
 conf = None
 config_path = None
