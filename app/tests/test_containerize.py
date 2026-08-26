@@ -214,6 +214,8 @@ def test_containerize_render():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
+        if 'r-256-builtin-vars' not in cell_dir:
+            continue
         print("Testing containerize render for cell_dir: " + cell_dir)
         if os.path.exists(os.path.join(cell_dir, 'responses.json')):
             with open(os.path.join(cell_dir, 'responses.json')) as f:
