@@ -1,4 +1,12 @@
 {
+  "build_in_r_function_names": [
+    "NA_integer_",
+    "NA_real_",
+    "NA_complex_",
+    "NA_character_",
+    ".env",
+    ".data"
+  ],
   "vl_configurations": [
     {
       "name": "openlab",
