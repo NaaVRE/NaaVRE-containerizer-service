@@ -1,12 +1,5 @@
 {
-  "build_in_r_function_names": [
-    "NA_integer_",
-    "NA_real_",
-    "NA_complex_",
-    "NA_character_",
-    ".env",
-    ".data"
-  ],
+  "built_in_function_url": "https://raw.githubusercontent.com/NaaVRE/NaaVRE-containerizer-service/refs/heads/256-builtin-r-variables-and-special-constructs-cause-unwanted-inputs-in-cell-analyzer/build_in_r_function_names.json",
   "vl_configurations": [
     {
       "name": "openlab",
