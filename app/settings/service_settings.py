@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from pydantic_settings import BaseSettings
 
@@ -6,7 +6,7 @@ from app.models.vl_config import VLConfig
 
 
 class ServiceSettings(BaseSettings):
-    build_in_r_function_names: Optional[List[str]] = None
+    build_in_r_function_url: str = None
     vl_configurations: List[VLConfig]
 
 
@@ -21,5 +21,5 @@ class Settings:
                 return setting
         raise ValueError(f"Virtual lab '{virtual_lab}' not found in settings.")
 
-    def get_built_in_function_names(self):
-        return self.service_settings.build_in_r_function_names
+    def get_built_in_function_url(self):
+        return self.service_settings.build_in_r_function_url
