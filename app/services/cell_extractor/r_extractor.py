@@ -2,6 +2,8 @@ import os
 import tempfile
 from typing import Literal
 
+import cachetools
+import requests
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
 from rpy2.robjects.packages import importr
@@ -115,14 +117,15 @@ class RExtractor(Extractor):
     undefined: dict
 
     def __init__(self, notebook_data: NotebookData, base_image_tags_url: str,
-                 built_in_function_names: list[str]):
+                 built_in_function_url: list[str]):
         notebook = notebook_data.notebook
         sources = [nbcell.source for nbcell in notebook.cells if
                    nbcell.cell_type == 'code' and len(nbcell.source) > 0]
         self.cell_vars = self.__extract_cell_names(
             '\n'.join(sources)
         )
-        self.built_in_function_names = built_in_function_names
+        self.built_in_function_names = self.get_built_in_function_names(
+            built_in_function_url)
         self.imports = self.__extract_imports(sources)
         self.notebook_configurations = (
             self.__extract_configurations(sources))
@@ -369,6 +372,14 @@ class RExtractor(Extractor):
             return candidate_variable
         # Otherwise, keep existing variable
         return existing_variable
+
+    @cachetools.func.ttl_cache(ttl=6 * 3600)
+    def get_built_in_function_names(self, built_in_function_url):
+        try:
+            return requests.get(built_in_function_url).json()
+        except Exception as e:
+            raise ValueError('Failed to load module mapping from ' +
+                             built_in_function_url) from e
 
 
 class StreamList:
