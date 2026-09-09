@@ -2,6 +2,10 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
 
 
 
@@ -47,15 +51,16 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-dummy_n1 <- list()
-dummy_n1 <- c("zxcv")
-# capturing outputs
-print('Serialization of dummy_n1')
-file <- file(paste0('/tmp/dummy_n1_', id, '.json'))
-type = 'list'
-if (type == 'list'){
-    writeLines(toJSON(dummy_n1, auto_unbox=FALSE), file)
-} else {
-    writeLines(toJSON(dummy_n1, auto_unbox=TRUE), file)
-}
-close(file)
+library(dplyr)
+m <- 10
+var <- TRUE
+var <- FALSE
+var <- NULL
+var <- Inf
+var <- NaN
+var <- NA
+var <- NA_integer_
+var <- NA_real_
+var <- NA_complex_
+var <- NA_character_
+var <- mtcars %>% mutate(disp = .data$disp * .env$m)
