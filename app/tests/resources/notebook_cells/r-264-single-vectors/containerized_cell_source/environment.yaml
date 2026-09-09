@@ -4,5 +4,6 @@ channels:
 dependencies:
   - ipykernel
   - nbconvert
+  - numpy
   - papermill
   - pip
