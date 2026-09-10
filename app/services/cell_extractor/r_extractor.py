@@ -240,10 +240,12 @@ class RExtractor(Extractor):
         cell_undef = self.__extract_cell_undefined(self.cell_source)
         cell_outputs = []
         for var_name, properties in cell_names.items():
-            if (var_name not in cell_undef and
-                    var_name not in self.imports and
-                    var_name in self.undefined and
-                    self.not_reserved(var_name)):
+            if (
+                var_name not in cell_undef
+                and var_name not in self.imports
+                and var_name in self.undefined
+                and self.not_reserved(var_name)
+            ):
                 cell_outputs.append(properties)
         return cell_outputs
 
