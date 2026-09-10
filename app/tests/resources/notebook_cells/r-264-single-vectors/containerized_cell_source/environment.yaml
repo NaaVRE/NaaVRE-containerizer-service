@@ -6,4 +6,3 @@ dependencies:
   - nbconvert
   - papermill
   - pip
-  - r-purrr

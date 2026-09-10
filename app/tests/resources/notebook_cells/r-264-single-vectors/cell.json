@@ -15,11 +15,6 @@
   "secrets": [],
   "confs": [],
   "dependencies": [
-    {
-      "name": "purrr",
-      "asname": "",
-      "module": ""
-    }
   ],
   "kernel": "IRkernel",
   "original_source": "dummy_n1 <- list()\ndummy_n1 <- c(\"zxcv\")",
