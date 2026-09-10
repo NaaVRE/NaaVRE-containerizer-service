@@ -81,10 +81,8 @@ print(var)
 var_len = length(var)
 print(paste("Variable param_list_int has length", var_len))
 
-print("------------------------Running var_serialization for param_list_int-----------------------")
 print(opt$param_list_int)
 param_list_int = var_serialization(opt$param_list_int)
-print("---------------------------------------------------------------------------------")
 
 print("Retrieving param_list_str")
 var = opt$param_list_str
@@ -92,10 +90,8 @@ print(var)
 var_len = length(var)
 print(paste("Variable param_list_str has length", var_len))
 
-print("------------------------Running var_serialization for param_list_str-----------------------")
 print(opt$param_list_str)
 param_list_str = var_serialization(opt$param_list_str)
-print("---------------------------------------------------------------------------------")
 
 print("Retrieving param_string")
 var = opt$param_string
@@ -131,10 +127,8 @@ print(var)
 var_len = length(var)
 print(paste("Variable var_list_int has length", var_len))
 
-print("------------------------Running var_serialization for var_list_int-----------------------")
 print(opt$var_list_int)
 var_list_int = var_serialization(opt$var_list_int)
-print("---------------------------------------------------------------------------------")
 
 print("Retrieving var_list_str")
 var = opt$var_list_str
@@ -142,10 +136,8 @@ print(var)
 var_len = length(var)
 print(paste("Variable var_list_str has length", var_len))
 
-print("------------------------Running var_serialization for var_list_str-----------------------")
 print(opt$var_list_str)
 var_list_str = var_serialization(opt$var_list_str)
-print("---------------------------------------------------------------------------------")
 
 print("Retrieving var_string")
 var = opt$var_string

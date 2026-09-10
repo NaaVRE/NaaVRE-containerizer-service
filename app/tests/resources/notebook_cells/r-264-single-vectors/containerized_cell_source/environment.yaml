@@ -2,8 +2,8 @@ name: venv
 channels:
   - conda-forge
 dependencies:
-  - pip
-  - nbconvert
-  - numpy
-  - papermill
   - ipykernel
+  - nbconvert
+  - papermill
+  - pip
+  - r-purrr

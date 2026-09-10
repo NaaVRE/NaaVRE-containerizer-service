@@ -50,10 +50,8 @@ print(var)
 var_len = length(var)
 print(paste("Variable list_of_paths has length", var_len))
 
-print("------------------------Running var_serialization for list_of_paths-----------------------")
 print(opt$list_of_paths)
 list_of_paths = var_serialization(opt$list_of_paths)
-print("---------------------------------------------------------------------------------")
 
 id <- gsub('"', '', opt$id)
 
