@@ -153,21 +153,12 @@ expected_arg_names <- unique(c(expected_arg_names, "conf_string"))
 expected_arg_names <- unique(c(expected_arg_names, "conf_string_with_comment"))
 expected_arg_names <- unique(c(expected_arg_names, "id"))
 
+print(opt$param_list_int)
+param_list_int = var_serialization(opt$param_list_int)
 
 
-for (arg in raw_args_list) {
-  if (is.null(arg[["name"]])) {
-    stop("Argument with no name found in JSON args")
-  }
-  name <- if (!is.null(arg[["name"]])) arg[["name"]] else NULL
-  if (is.null(name) && is.atomic(arg) && !is.null(names(arg))) {
-    # pick the first named element
-    nm <- names(arg)[1]
-    name <- arg[[nm]]
-  }
-  if (!(name %in% expected_arg_names)) {
-    arg_error(paste0("Unexpected argument '", name, "' found in JSON args"))
-  }
+print(opt$param_list_str)
+param_list_str = var_serialization(opt$param_list_str)
 
   if (!startsWith(name, "conf")) {
     if (is.null(arg$value)) {
@@ -231,6 +222,44 @@ arg_value <- get_arg_value(arg_name, opt, raw_args_list)
 arg_type <- "str"
 param_string_with_comment <- parse_value(arg_value, arg_name, arg_type)
 
+var_int = opt$var_int
+print("Retrieving var_list_int")
+var = opt$var_list_int
+print(var)
+var_len = length(var)
+print(paste("Variable var_list_int has length", var_len))
+
+print(opt$var_list_int)
+var_list_int = var_serialization(opt$var_list_int)
+
+print("Retrieving var_list_str")
+var = opt$var_list_str
+print(var)
+var_len = length(var)
+print(paste("Variable var_list_str has length", var_len))
+
+print(opt$var_list_str)
+var_list_str = var_serialization(opt$var_list_str)
+
+print("Retrieving var_string")
+var = opt$var_string
+print(var)
+var_len = length(var)
+print(paste("Variable var_string has length", var_len))
+
+var_string <- gsub("\"", "", opt$var_string)
+print("Retrieving var_string_with_comment")
+var = opt$var_string_with_comment
+print(var)
+var_len = length(var)
+print(paste("Variable var_string_with_comment has length", var_len))
+
+var_string_with_comment <- gsub("\"", "", opt$var_string_with_comment)
+id <- gsub('"', '', opt$id)
+
+conf_string = 'param_string value'
+conf_string_with_comment = 'param_string value'
+conf_int = 1
 conf_float = 1.1
 conf_int = 1
 conf_list_int = list(1, 2, 3)
