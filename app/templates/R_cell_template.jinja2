@@ -74,10 +74,8 @@ var_len = length(var)
 print(paste("Variable {{ in_var['name'] }} has length", var_len))
 
 {% if in_var['type'] == list  or in_var['type'] == 'list' %}
-print("------------------------Running var_serialization for {{ in_var['name'] }}-----------------------")
 print(opt${{ in_var['name'] }})
 {{ in_var['name'] }} = var_serialization(opt${{ in_var['name'] }})
-print("---------------------------------------------------------------------------------")
 
 {% elif in_var['type'] == str or  in_var['type'] == 'str' %}
 {{ in_var['name'] }} <- gsub("\"", "", opt${{ in_var['name'] }})
