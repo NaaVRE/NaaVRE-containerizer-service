@@ -123,5 +123,10 @@ print(paste("Func time: ", func_time))
 # capturing outputs
 print('Serialization of run_time')
 file <- file(paste0('/tmp/run_time_', id, '.json'))
-writeLines(toJSON(run_time, auto_unbox=TRUE), file)
+type = 'None'
+if (type == 'list'){
+    writeLines(toJSON(run_time, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(run_time, auto_unbox=TRUE), file)
+}
 close(file)

@@ -163,8 +163,13 @@ class RefContainerizer:
         return source
 
 
-def run_script(script=None, kernel=None, dependencies=None,
-               arguments_file=None, template_format=None):
+def run_script(script=None,
+               kernel=None,
+               dependencies=None,
+               arguments_file=None,
+               template_format=None,
+               outputs=None,
+               expected_outputs=None):
     dependencies = list(filter(lambda x: x not in ['pip', 'nbconvert',
                                                    'papermill', 'ipykernel'],
                                dependencies))
@@ -208,6 +213,26 @@ def run_script(script=None, kernel=None, dependencies=None,
             assert result.returncode == 0, (f"Script failed with exit code"
                                             f" {result.returncode} and "
                                             f"error: {stderr}")
+            if outputs:
+                # Find ID from the arguments list of dicts
+                id_value = 0
+                for arg in arguments:
+                    if arg['name'] == 'id':
+                        id_value = arg['value']
+                        break
+                for output in outputs:
+                    output_path = ('/tmp/' + output['name'] + '_' +
+                                   str(id_value) + '.json')
+                    assert os.path.exists(output_path), (
+                        f"Output file {output_path} does not exist.")
+                    if expected_outputs:
+                        for expected_output in expected_outputs:
+                            if expected_output['name'] == output['name']:
+                                with open(output_path) as f:
+                                    output_data = json.load(f)
+                                assert output_data == expected_output['value']
+                                assert (type(output_data).__name__ ==
+                                        expected_output['type'])
 
 
 def test_containerize_render():
@@ -274,10 +299,17 @@ def test_containerize_render():
         del ref_environment['dependencies']
         assert environment == ref_environment
         arguments_path = os.path.join(cell_dir, 'args.json')
+        expected_outputs_path = os.path.join(cell_dir, 'expected_outputs.json')
+        expected_outputs = None
+        if os.path.exists(expected_outputs_path):
+            with open(expected_outputs_path) as f:
+                expected_outputs = json.load(f)
         if os.path.exists(arguments_path):
             run_script(script=script, kernel=cell['kernel'],
                        dependencies=dependencies,
-                       arguments_file=arguments_path)
+                       arguments_file=arguments_path,
+                       outputs=cell.get('outputs'),
+                       expected_outputs=expected_outputs)
 
 
 def test_containerize_github(cell_dir):

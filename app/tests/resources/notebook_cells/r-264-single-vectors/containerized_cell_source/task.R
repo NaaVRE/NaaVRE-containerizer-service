@@ -8,7 +8,6 @@ library(jsonlite)
 print('option_list')
 option_list = list(
 
-make_option(c("--list_of_paths"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -44,19 +43,19 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving list_of_paths")
-var = opt$list_of_paths
-print(var)
-var_len = length(var)
-print(paste("Variable list_of_paths has length", var_len))
-
-print(opt$list_of_paths)
-list_of_paths = var_serialization(opt$list_of_paths)
-
 id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-for (l in list_of_paths) {
-    print(l)
+dummy_n1 <- list()
+dummy_n1 <- c("zxcv")
+# capturing outputs
+print('Serialization of dummy_n1')
+file <- file(paste0('/tmp/dummy_n1_', id, '.json'))
+type = 'list'
+if (type == 'list'){
+    writeLines(toJSON(dummy_n1, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(dummy_n1, auto_unbox=TRUE), file)
 }
+close(file)

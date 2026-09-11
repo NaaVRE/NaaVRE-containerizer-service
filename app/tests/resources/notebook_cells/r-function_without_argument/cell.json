@@ -1,16 +1,10 @@
 {
-  "confs": [
-
-  ],
+  "confs": [],
   "dependencies": [],
-  "inputs": [
-
-  ],
+  "inputs": [],
   "kernel": "IRkernel",
   "outputs": [],
-  "params": [
-
-  ],
+  "params": [],
   "secrets": [],
   "title": "function-without-argument-user",
   "base_container_image": {
