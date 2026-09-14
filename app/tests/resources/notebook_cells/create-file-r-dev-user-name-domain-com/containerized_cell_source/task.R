@@ -60,5 +60,10 @@ print(onlyfiles)
 # capturing outputs
 print('Serialization of file_path')
 file <- file(paste0('/tmp/file_path_', id, '.json'))
-writeLines(toJSON(file_path, auto_unbox=TRUE), file)
+type = 'None'
+if (type == 'list'){
+    writeLines(toJSON(file_path, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(file_path, auto_unbox=TRUE), file)
+}
 close(file)

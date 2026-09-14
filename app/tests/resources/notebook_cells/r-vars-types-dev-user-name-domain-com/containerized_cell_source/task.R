@@ -57,25 +57,55 @@ print(class(var_list_int))
 # capturing outputs
 print('Serialization of var_string_with_comment')
 file <- file(paste0('/tmp/var_string_with_comment_', id, '.json'))
-writeLines(toJSON(var_string_with_comment, auto_unbox=TRUE), file)
+type = 'str'
+if (type == 'list'){
+    writeLines(toJSON(var_string_with_comment, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_string_with_comment, auto_unbox=TRUE), file)
+}
 close(file)
 print('Serialization of var_string')
 file <- file(paste0('/tmp/var_string_', id, '.json'))
-writeLines(toJSON(var_string, auto_unbox=TRUE), file)
+type = 'str'
+if (type == 'list'){
+    writeLines(toJSON(var_string, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_string, auto_unbox=TRUE), file)
+}
 close(file)
 print('Serialization of var_int')
 file <- file(paste0('/tmp/var_int_', id, '.json'))
-writeLines(toJSON(var_int, auto_unbox=TRUE), file)
+type = 'int'
+if (type == 'list'){
+    writeLines(toJSON(var_int, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_int, auto_unbox=TRUE), file)
+}
 close(file)
 print('Serialization of var_float')
 file <- file(paste0('/tmp/var_float_', id, '.json'))
-writeLines(toJSON(var_float, auto_unbox=TRUE), file)
+type = 'float'
+if (type == 'list'){
+    writeLines(toJSON(var_float, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_float, auto_unbox=TRUE), file)
+}
 close(file)
 print('Serialization of var_list_int')
 file <- file(paste0('/tmp/var_list_int_', id, '.json'))
-writeLines(toJSON(var_list_int, auto_unbox=TRUE), file)
+type = 'list'
+if (type == 'list'){
+    writeLines(toJSON(var_list_int, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_list_int, auto_unbox=TRUE), file)
+}
 close(file)
 print('Serialization of var_list_str')
 file <- file(paste0('/tmp/var_list_str_', id, '.json'))
-writeLines(toJSON(var_list_str, auto_unbox=TRUE), file)
+type = 'list'
+if (type == 'list'){
+    writeLines(toJSON(var_list_str, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(var_list_str, auto_unbox=TRUE), file)
+}
 close(file)
