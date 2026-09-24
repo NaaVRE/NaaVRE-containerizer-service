@@ -148,7 +148,7 @@ class Visitor(ast.NodeVisitor):
                 alias_name = node.module.split('.')[-1] if node.module else ''
             else:
                 alias_name = alias.name
-            alias_name = alias.name
+            # alias_name = alias.name
             code_import = {
                 alias_name: {'module': node.module, 'asname': alias.asname,
                              'name': alias_name}}
