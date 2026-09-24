@@ -251,13 +251,20 @@ class PyExtractor(Extractor):
         if rep._stderr():
             raise SyntaxError("Flakes reported the following error:"
                               "\n{}".format('\t' + '\t'.join(rep._stderr())))
-        p = r"'(.+?)'"
+        # p = r"'(.+?)'"
+        undef_pattern = re.compile(r"\bundefined name '([^']+)'\b")
         out = rep._stdout()
         undef_vars = dict()
 
-        for line in filter(lambda a: a != '\n' and 'undefined name' in a, out):
-            var_search = re.search(p, line)
-            var_name = var_search.group(1)
+        # for line in filter(lambda a: a != '\n' and 'undefined name' in a,
+        # out):
+        for line in out:
+            m = undef_pattern.search(line)
+            # var_search = re.search(p, line)
+            # var_name = var_search.group(1)
+            if not m:
+                continue
+            var_name = m.group(1)
             undef_vars[var_name] = {
                 'name': var_name,
                 'type': self.notebook_variables[var_name]['type'],

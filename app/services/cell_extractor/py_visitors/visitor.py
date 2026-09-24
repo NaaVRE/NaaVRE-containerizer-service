@@ -143,9 +143,15 @@ class Visitor(ast.NodeVisitor):
     def visit_ImportFrom(self, node):
         # For relative imports (e.g., from os import path)s
         for alias in node.names:
+            # Skip wildcard imports: they do not map to a concrete symbol name.
+            if alias.name == '*':
+                alias_name = node.module.split('.')[-1] if node.module else ''
+            else:
+                alias_name = alias.name
+            alias_name = alias.name
             code_import = {
-                alias.name: {'module': node.module, 'asname': alias.asname,
-                             'name': alias.name}}
+                alias_name: {'module': node.module, 'asname': alias.asname,
+                             'name': alias_name}}
             self.imports.update(code_import)
         self.generic_visit(node)
 
