@@ -173,7 +173,6 @@ class PyExtractor(Extractor):
         return dependencies
 
     @staticmethod
-    @lru_cache
     def __get_annotated_ast(cell_source):
         return annotate_ast.annotate_source(
             cell_source, ast, pytype_config.Options.create())
@@ -214,6 +213,7 @@ class PyExtractor(Extractor):
         logging.getLogger(__name__).debug(f'Unmatched type: {type_annotation}')
         return None
 
+    @lru_cache
     def __extract_variables(self, cell_source, infer_types=False):
         names = dict()
         if infer_types:
@@ -242,15 +242,7 @@ class PyExtractor(Extractor):
         return names
 
     def __extract_cell_undefined(self, source) -> dict:
-        flakes_stdout = StreamList()
-        flakes_stderr = StreamList()
-        rep = pyflakes_reporter.Reporter(
-            flakes_stdout.reset(),
-            flakes_stderr.reset())
-        pyflakes_api.check(source, filename="temp", reporter=rep)
-        if rep._stderr():
-            raise SyntaxError("Flakes reported the following error:"
-                              "\n{}".format('\t' + '\t'.join(rep._stderr())))
+        rep = self.check_code(source)
         p = r"'(.+?)'"
         out = rep._stdout()
         undef_vars = dict()
@@ -316,6 +308,19 @@ class PyExtractor(Extractor):
         }
         configurations.update(resolved_configurations)
         return configurations
+
+    @lru_cache
+    def check_code(self, source):
+        flakes_stdout = StreamList()
+        flakes_stderr = StreamList()
+        rep = pyflakes_reporter.Reporter(
+            flakes_stdout.reset(),
+            flakes_stderr.reset())
+        pyflakes_api.check(source, filename="temp", reporter=rep)
+        if rep._stderr():
+            raise SyntaxError("Flakes reported the following error:"
+                              "\n{}".format('\t' + '\t'.join(rep._stderr())))
+        return rep
 
 
 class StreamList:

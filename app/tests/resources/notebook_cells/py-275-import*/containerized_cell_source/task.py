@@ -19,6 +19,3 @@ id = args.id
 
 
 
-file_foo = open("/tmp/foo_" + id + ".json", "w")
-file_foo.write(json.dumps(foo))
-file_foo.close()
