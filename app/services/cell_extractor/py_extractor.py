@@ -24,7 +24,11 @@ class PyExtractor(Extractor):
     notebook_secrets: dict
     undefined: dict
 
-    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
+    def __init__(self, notebook_data: NotebookData,
+                 base_image_tags_url: str,
+                 cell_vars=None):
+        if cell_vars is not None:
+            self.cell_vars = cell_vars
         notebook = notebook_data.notebook
         notebook_sources = []
         for nb_cell in notebook.cells:
@@ -134,6 +138,9 @@ class PyExtractor(Extractor):
         return extracted_vars
 
     def get_cell_outputs(self) -> list[dict]:
+        # if (self.cell_vars is not None and
+        #         'outputs' in self.cell_vars is not None):
+        #     return self.cell_vars['outputs']
         cell_variables = self.__extract_variables(self.cell_source)
         cell_outputs = []
         for var_name, properties in cell_variables.items():
@@ -146,6 +153,9 @@ class PyExtractor(Extractor):
         return cell_outputs
 
     def get_cell_inputs(self) -> list[dict]:
+        # if self.cell_vars is not None and
+        # 'inputs' in self.cell_vars is not None:
+        #     return self.cell_vars['inputs']
         cell_undefined = self.__extract_cell_undefined(self.cell_source)
         cell_inputs = []
         for var_name, properties in cell_undefined.items():
@@ -158,6 +168,9 @@ class PyExtractor(Extractor):
         return cell_inputs
 
     def get_cell_dependencies(self, confs):
+        # if (self.cell_vars is not None and
+        #         'dependencies' in self.cell_vars is not None):
+        #     return self.cell_vars['dependencies']
         dependencies = []
         names = self.__extract_variables(self.cell_source)
         for ck in confs:
@@ -265,6 +278,9 @@ class PyExtractor(Extractor):
         return undef_vars
 
     def get_cell_params(self) -> list[dict]:
+        # if self.cell_vars is not None and
+        # 'params' in self.cell_vars is not None:
+        #     return self.cell_vars['params']
         param = {}
         cell_params = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -277,6 +293,9 @@ class PyExtractor(Extractor):
         return cell_params
 
     def get_cell_secrets(self) -> list[dict]:
+        # if self.cell_vars is not None and
+        # 'secrets' in self.cell_vars is not None:
+        #     return self.cell_vars['secrets']
         secret = {}
         cell_secrets = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
@@ -289,6 +308,9 @@ class PyExtractor(Extractor):
         return cell_secrets
 
     def get_cell_confs(self) -> list[dict]:
+        # if self.cell_vars is not None and
+        # 'confs' in self.cell_vars is not None:
+        #     return self.cell_vars['confs']
         conf = {}
         cell_confs = []
         cell_unds = self.__extract_cell_undefined(self.cell_source)
