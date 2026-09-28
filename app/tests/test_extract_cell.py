@@ -9,6 +9,7 @@ from nbformat import v4, write
 from app.main import app
 from app.models.workflow_cell import Cell
 
+
 if os.path.exists('resources'):
     base_path = 'resources'
 elif os.path.exists('app/tests/resources/'):

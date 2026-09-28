@@ -7,8 +7,8 @@ from typing import Literal, Union
 import jsonschema
 import yaml
 
-from models.notebook_data import NotebookData
 from .extractor import Extractor
+from ...models.notebook_data import NotebookData
 
 
 class HeaderExtractor(Extractor):
