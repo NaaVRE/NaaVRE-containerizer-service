@@ -48,7 +48,6 @@ class HeaderExtractor(Extractor):
     schema: dict
     re_yaml_doc_in_comment: re.Pattern
     cell_header: Union[dict, None]
-    cell_vars: dict
 
     def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         self.re_yaml_doc_in_comment = re.compile(
@@ -66,7 +65,6 @@ class HeaderExtractor(Extractor):
         self.cell_source = (
             notebook_data.notebook.cells[notebook_data.cell_index].source)
         self.cell_header = self._extract_header()
-        self.cell_vars = {}
         super().__init__(notebook_data, base_image_tags_url)
 
     @staticmethod
@@ -209,7 +207,6 @@ class HeaderExtractor(Extractor):
             self.cell_header,
             'inputs',
         )
-        self.cell_vars['inputs'] = inputs
         return inputs
 
     def get_cell_outputs(self) -> list[dict] | None:
@@ -217,7 +214,6 @@ class HeaderExtractor(Extractor):
             self.cell_header,
             'outputs',
         )
-        self.cell_vars['outputs'] = outputs
         return outputs
 
     def get_cell_params(self) -> list[dict] | None:
@@ -225,7 +221,6 @@ class HeaderExtractor(Extractor):
             self._extract_header(),
             'params',
         )
-        self.cell_vars['params'] = params
         return params
 
     def get_cell_secrets(self) -> list[dict] | None:
@@ -233,46 +228,28 @@ class HeaderExtractor(Extractor):
             self._extract_header(),
             'secrets',
         )
-        self.cell_vars['secrets'] = secrets
         return secrets
 
     def get_cell_confs(self) -> list[dict] | None:
-        confs = {}
         if self.cell_header is None:
             return None
         items = self.cell_header['NaaVRE']['cell'].get('confs')
         if items is None:
             return None
-        confs = []
-        for item in items:
-            for name, values in item.items():
-                confs.append({
-                    'name': name,
-                    'assignation': values['assignation'],
-                })
-        self.cell_vars['confs'] = confs
-        return confs
+        return [{'name': k, 'assignation': v['assignation']} for it in items
+                for k, v in it.items()]
 
     def get_cell_dependencies(self, confs) -> list[dict] | None:
-        deps = []
         if self.cell_header is None:
             return None
         items = self.cell_header['NaaVRE']['cell'].get(
             'dependencies')
         if items is None:
             return None
-        deps = [
+        return [
             {
                 'name': it.get('name'),
                 'asname': it.get('asname', None),
                 'module': it.get('module', ''),
             }
             for it in items]
-        self.cell_vars['dependencies'] = deps
-        return deps
-
-    def get_cell_vars(self) -> dict:
-        """ Return a dictionary with all the cell variables (inputs, outputs,
-        params, secrets, confs, dependencies) extracted from the cell header.
-        """
-        return self.cell_vars

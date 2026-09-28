@@ -186,22 +186,16 @@ def _get_extractor(extractor_payload: ExtractorPayload):
         elif 'python' in kernel.lower() or 'ipython' in kernel.lower():
             extractor = PyHeaderExtractor(extractor_payload.data,
                                           vl_settings.base_image_tags_url)
-        cell_vars = {}
-        if (isinstance(extractor, PyHeaderExtractor) or
-                isinstance(extractor, RHeaderExtractor)):
-            cell_vars = extractor.get_cell_vars()
         if not extractor.is_complete():
             if kernel.lower() == 'irkernel':
                 built_in_function_url = (
                     settings.get_built_in_function_url())
                 code_extractor = RExtractor(extractor_payload.data,
                                             vl_settings.base_image_tags_url,
-                                            built_in_function_url,
-                                            cell_vars)
+                                            built_in_function_url)
             elif kernel == 'ipython' or kernel == 'python':
                 code_extractor = PyExtractor(extractor_payload.data,
-                                             vl_settings.base_image_tags_url,
-                                             cell_vars)
+                                             vl_settings.base_image_tags_url)
             else:
                 raise HTTPException(status_code=400,
                                     detail='Unsupported kernel: ' + kernel)

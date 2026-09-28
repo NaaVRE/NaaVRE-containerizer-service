@@ -24,8 +24,7 @@ class Extractor(abc.ABC):
     kernel: str
     reserved_prefixes = ['param_', 'secret_', 'conf_']
 
-    def __init__(self, notebook_data: NotebookData,
-                 base_image_tags_url: str):
+    def __init__(self, notebook_data: NotebookData, base_image_tags_url: str):
         for cell in notebook_data.notebook.cells:
             if isinstance(cell.source, list):
                 cell.source = "\n".join(cell.source)
@@ -113,16 +112,6 @@ class Extractor(abc.ABC):
         """ Check if the cell header is complete, i.e. all required fields are
         defined in the header.
         """
-        if self.cell_outputs is None:
-            print("cell_outputs is None")
-        if self.cell_params is None:
-            print("cell_params is None")
-        if self.cell_secrets is None:
-            print("cell_secrets is None")
-        if self.cell_confs is None:
-            print("cell_confs is None")
-        if self.cell_dependencies is None:
-            print("cell_dependencies is None")
         if (self.cell_inputs is None or
                 self.cell_outputs is None or
                 self.cell_params is None or
