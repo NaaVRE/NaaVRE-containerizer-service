@@ -195,8 +195,9 @@ class GithubService(GitRepository, ABC):
 
     def wait_for_github_api_resources(self):
         rate_limit = self.github.get_rate_limit()
-        while rate_limit.core.remaining <= 0:
-            reset = rate_limit.core.reset
+        remaining = rate_limit.resources.core.remaining
+        while remaining <= 0:
+            reset = rate_limit.resources.core.reset
             # Calculate remaining time for reset
             remaining_time = (reset.timestamp() - datetime.datetime.now().
                               timestamp())
@@ -205,6 +206,7 @@ class GithubService(GitRepository, ABC):
             logger.debug(f'Sleeping for: {remaining_time + 1}')
             sleep(remaining_time + 1)
             rate_limit = self.github.get_rate_limit()
+            remaining = rate_limit.resources.core.remaining
 
     def get_github_workflow_runs(self, t_utc=None):
         workflow_runs_url = (GITHUB_API_REPOS + '/' + self.owner + '/' +
