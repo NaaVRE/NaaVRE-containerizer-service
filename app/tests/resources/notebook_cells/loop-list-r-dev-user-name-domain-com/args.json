@@ -2,11 +2,11 @@
   {
     "name": "id",
     "type": "str",
-    "value": "1e23de8"
+    "value": "000"
   },
   {
     "name": "list_of_paths",
     "type": "list",
-    "value": "['/path/to/file1', '/path/to/file2']"
+    "value": "[\"/path/to/file1.txt\", \"/path/to/file2.txt\", \"/path/to/file3.txt\"]"
   }
 ]

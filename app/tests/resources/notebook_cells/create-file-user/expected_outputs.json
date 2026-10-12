@@ -1,0 +1,7 @@
+[
+  {
+    "name": "file_path",
+    "type": "str",
+    "value": "/tmp/data/hello.txt"
+  }
+]

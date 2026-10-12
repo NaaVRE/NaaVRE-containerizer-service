@@ -1,0 +1,25 @@
+{
+  "title": "reserved-variables-in-r-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+  ],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "name": "dplyr",
+      "asname": "",
+      "module": ""
+    }
+  ],
+  "kernel": "IRkernel",
+  "original_source": "library(dplyr)\nm <- 10\nvar <- TRUE\nvar <- FALSE\nvar <- NULL\nvar <- Inf\nvar <- NaN\nvar <- NA\nvar <- NA_integer_\nvar <- NA_real_\nvar <- NA_complex_\nvar <- NA_character_\nvar <- mtcars %>% mutate(disp = .data$disp * .env$m)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

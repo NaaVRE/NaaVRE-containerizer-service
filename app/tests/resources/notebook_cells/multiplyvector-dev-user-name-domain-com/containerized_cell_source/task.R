@@ -245,5 +245,10 @@ print(paste("Run time: ", run_time))
 print(paste("Func time: ", func_time))
 # capturing outputs
 file <- file(paste0('/tmp/run_time_', id, '.json'))
-writeLines(toJSON(run_time, auto_unbox=TRUE), file)
+type = 'None'
+if (type == 'list'){
+    writeLines(toJSON(run_time, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(run_time, auto_unbox=TRUE), file)
+}
 close(file)

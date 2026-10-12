@@ -41,11 +41,6 @@ def test_extract_cell():
             print('                with payload: ' + payload_path)
             extractor_json_payload = json.load(f)
 
-        cell_path = os.path.join(cell_dir, 'cell.json')
-        with open(cell_path) as f:
-            print('              expecting cell: ' + cell_path)
-            expected_cell_dict = json.load(f)
-
         cell_name = os.path.basename(cell_dir)
         save_as_jupyter_notebook(notebook, f'{cell_name}.ipynb')
 
@@ -72,6 +67,10 @@ def test_extract_cell():
             continue
         cell_dict = cell_extractor_response.json()
         returned_cell = Cell.model_validate(cell_dict)
+        cell_path = os.path.join(cell_dir, 'cell.json')
+        with open(cell_path) as f:
+            print('              expecting cell: ' + cell_path)
+            expected_cell_dict = json.load(f)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
         returned_cell_confs = sorted(returned_cell.confs,

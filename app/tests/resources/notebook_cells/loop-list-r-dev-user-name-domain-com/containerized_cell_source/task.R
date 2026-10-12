@@ -169,6 +169,8 @@ arg_value <- get_arg_value(arg_name, opt, raw_args_list)
 arg_type <- "list"
 list_of_paths <- parse_value(arg_value, arg_name, arg_type)
 
+print(opt$list_of_paths)
+list_of_paths = var_serialization(opt$list_of_paths)
 
 
 
