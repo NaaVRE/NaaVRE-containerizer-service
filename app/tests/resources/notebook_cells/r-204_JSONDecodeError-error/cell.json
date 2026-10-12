@@ -1,0 +1,30 @@
+{
+  "title": "r-deserialize-the-json-string-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+    {
+      "name": "json_str",
+      "type": null
+    }
+  ],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "name": "jsonlite",
+      "asname": "",
+      "module": ""
+    }
+  ],
+  "kernel": "IRkernel",
+  "original_source": "deserialized_data <- fromJSON(json_str)\n\nprint(deserialized_data)\n\n\noriginal_data <- list(\n  task = \"Write Python\",\n  number = 1,\n  skills = c(\"python\", \"sql\")\n)\n\nstopifnot(identical(deserialized_data, original_data))",
+  "source_url": null,
+  "container_image": null,
+  "description": null,
+  "template_format": "v2"
+}
