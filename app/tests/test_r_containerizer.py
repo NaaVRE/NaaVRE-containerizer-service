@@ -65,7 +65,7 @@ def test_ignore_pip_dependencies():
 
 @pytest.mark.parametrize(
     'mapping_name',
-    ['r-TempSED'],
+    ['r-TempSED', 'r-tempsed', 'TempSED', 'tempsed'],
 )
 def test_map_dependencies_matches_r_mapping_case_and_prefix(mapping_name):
     cell = Cell(
