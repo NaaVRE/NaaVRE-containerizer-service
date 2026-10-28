@@ -12,15 +12,25 @@ class RContainerizer(Containerizer, ABC):
         self.template_script = 'R_cell_template.jinja2'
 
     def map_dependencies(self, dependencies=None, module_name_mapping=None):
-        dependencies = map(
-            lambda x: 'r-' + x['name'],
-            dependencies)
-        dependencies = map(
-            lambda x: module_name_mapping.get('r', {}).get(x, x),
-            dependencies)
-        conda_deps = set(dependencies)
+        def normalize_module_name(name):
+            if name.lower().startswith('r-'):
+                name = name[2:]
+            return name.casefold()
+
+        r_mapping = {
+            normalize_module_name(name): mapped_name
+            for name, mapped_name in module_name_mapping.get('r', {}).items()
+        }
+        conda_deps = set()
+        for dependency in dependencies:
+            name = dependency['name']
+            normalized_name = normalize_module_name(name)
+            if normalized_name in r_mapping:
+                conda_deps.add(r_mapping[normalized_name])
+            else:
+                conda_deps.add('r-' + name)
+
         pip_deps = set()
-        conda_deps.discard(None)
         conda_deps.discard(None)
         return {'conda_dependencies': conda_deps, 'pip_dependencies': pip_deps}
 
