@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.CONDA }}/envs
-          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yaml') }}
+          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yaml', 'requirements.txt') }}
           restore-keys: |
             conda-environment-${{ runner.os }}-
         id: cache-conda
