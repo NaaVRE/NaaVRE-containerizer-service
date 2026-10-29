@@ -196,53 +196,8 @@ arg_type <- "{{ param['type'] }}"
 {{ param['name'] }} <- parse_value(arg_value, arg_name, arg_type)
 {% endfor %}
 
-opt = parse_args(OptionParser(option_list=option_list))
-
-var_serialization <- function(var){
-    if (is.null(var)){
-        print("Variable is null")
-        exit(1)
-    }
-    tryCatch(
-        {
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
-        },
-        error=function(e) {
-            print("Error while deserializing the variable")
-            print(var)
-            var <- gsub("'", '"', var)
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
-        },
-        warning=function(w) {
-            print("Warning while deserializing the variable")
-            var <- gsub("'", '"', var)
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
-        }
-    )
-}
-
-{% for in_var in (cell.inputs + cell.params)|sort(attribute='name')  %}
-print("Retrieving {{ in_var['name'] }}")
-var = opt${{ in_var['name'] }}
-print(var)
-var_len = length(var)
-print(paste("Variable {{ in_var['name'] }} has length", var_len))
-
-{% if in_var['type'] == list  or in_var['type'] == 'list' %}
-print(opt${{ in_var['name'] }})
-{{ in_var['name'] }} = var_serialization(opt${{ in_var['name'] }})
-
-{% elif in_var['type'] == str or  in_var['type'] == 'str' %}
-{{ in_var['name'] }} <- gsub("\"", "", opt${{ in_var['name'] }})
-{% else %}
-{{ in_var['name'] }} = opt${{ in_var['name'] }}
-{% endif %}
+{% for conf in cell.confs|sort(attribute='name') %}
+{{ conf['assignation'] }}
 {% endfor %}
 
 {% for secret in cell.secrets|sort(attribute='name') %}
