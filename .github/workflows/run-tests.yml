@@ -61,9 +61,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.CONDA }}/envs
-          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yaml') }}
-          restore-keys: |
-            conda-environment-${{ runner.os }}-
+          key: conda-environment-${{ runner.os }}-${{ hashFiles('environment.yaml', 'requirements.txt') }}
         id: cache-conda
 
       - name: start Minikube
