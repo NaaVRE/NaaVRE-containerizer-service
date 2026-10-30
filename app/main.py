@@ -6,7 +6,6 @@ import time
 from threading import Thread
 from typing import Annotated
 from urllib.parse import urlparse
-
 import cachetools.func
 import jsonschema
 import jwt

@@ -1,0 +1,18 @@
+{
+  "title": "import-all-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [],
+  "kernel": "ipython",
+  "original_source": "",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
