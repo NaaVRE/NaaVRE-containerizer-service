@@ -21,6 +21,7 @@ class Cell(BaseModel):
     source_url: Optional[str] | None = None
     container_image: Optional[str] | None = None
     description: Optional[str] | None = None
+    template_format: Optional[str] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)

@@ -1,7 +1,7 @@
 [
-  {
+    {
     "name": "id",
-    "type": "str",
-    "value": "000"
+    "value": "0",
+    "type": "str"
   }
 ]

@@ -1,9 +1,7 @@
 import json
 import logging
 import os
-import subprocess
 import uuid
-from pathlib import Path
 from time import sleep
 
 import requests
@@ -212,7 +210,9 @@ def run_script(script=None,
             stderr = result.stderr
             assert result.returncode == 0, (f"Script failed with exit code"
                                             f" {result.returncode} and "
-                                            f"error: {stderr}")
+                                            f"error: {stderr} {cmd} "
+                                            f"{script_path} --args_json "
+                                            f"{arguments_path}")
             if outputs:
                 # Find ID from the arguments list of dicts
                 id_value = 0
@@ -267,7 +267,7 @@ def test_containerize_render():
         ref_script = ref_containerized.build_script(
             containerizer.file_extension
             )
-
+        # Format
         assert script == ref_script
 
         # Dockerfile

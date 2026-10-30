@@ -1,0 +1,29 @@
+{
+  "title": "use-the-json-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+    {
+      "name": "json_str",
+      "type": "str"
+    }
+  ],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [
+    {
+      "module": "",
+      "asname": null,
+      "name": "json"
+    }
+  ],
+  "kernel": "ipython",
+  "original_source": "deserialized_data = json.loads(json_str)\n\nprint(deserialized_data)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

@@ -2,7 +2,7 @@
   "virtual_lab": "openlab",
   "data": {
     "save": false,
-    "kernel": "IRkernel",
+    "kernel": "ipython",
     "cell_index": 2,
     "notebook": "[notebook.ipynb]"
   }

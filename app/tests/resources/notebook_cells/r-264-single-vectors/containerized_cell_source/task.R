@@ -2,6 +2,10 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("purrr", quietly = TRUE)) {
+	install.packages("purrr", repos="http://cran.us.r-project.org")
+}
+library(purrr)
 
 
 
