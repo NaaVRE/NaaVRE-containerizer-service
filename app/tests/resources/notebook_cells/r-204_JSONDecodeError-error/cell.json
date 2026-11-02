@@ -18,10 +18,10 @@
     {
       "module": "",
       "asname": null,
-      "name": "json"
+      "name": "jsonlite"
     }
   ],
-  "kernel": "ipython",
+  "kernel": "IRkernel",
   "original_source": "deserialized_data = json.loads(json_str)\n\nprint(deserialized_data)",
   "source_url": null,
   "container_image": null,
