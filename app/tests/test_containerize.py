@@ -150,7 +150,7 @@ class RefContainerizer:
             source = f.read()
         return source
 
-    def write_script(self, file_extension,script_contents):
+    def write_script(self, file_extension, script_contents):
         filename = os.path.join(self.source_dir, 'task' + file_extension)
         with open(filename, 'w') as f:
             f.write(script_contents)
@@ -276,7 +276,6 @@ def test_containerize_render():
         # Write script to  cell_dir/
         # ref_containerized.write_script(containerizer.file_extension, script)
         assert script == ref_script
-
 
         # Dockerfile
         dockerfile = containerizer.build_docker()
