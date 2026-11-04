@@ -1,5 +1,6 @@
 import abc
 import json
+import os
 import re
 from typing import Union
 
@@ -50,7 +51,8 @@ class Extractor(abc.ABC):
         title = slugify(title)
         title += '-' + slugify(self.user_name)
         title = title.lower()
-        base_image_tags = BaseImageTags(self.base_image_tags_url)
+        find_latest_existing_tag = os.environ.get("FIND_LATEST_EXISTING_TAG").lower() == "true"
+        base_image_tags = BaseImageTags(self.base_image_tags_url, find_latest_existing_tag=find_latest_existing_tag)
         cell_params = [
             {
                 k: json.dumps(v) if not isinstance(v, Union[str | None]) else v

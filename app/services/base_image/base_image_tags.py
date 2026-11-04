@@ -13,7 +13,8 @@ class BaseImageTags:
 
     @staticmethod
     @cachetools.func.ttl_cache(ttl=6 * 3600)
-    def _download_base_image_tags(base_image_tags_url=None):
+    def _download_base_image_tags(base_image_tags_url=None,
+                                  find_latest_existing_tag=False):
         try:
             res = requests.get(base_image_tags_url)
             res.raise_for_status()
