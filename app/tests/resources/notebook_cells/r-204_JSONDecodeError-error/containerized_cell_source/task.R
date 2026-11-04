@@ -179,15 +179,6 @@ json_str <- parse_value(arg_value, arg_name, arg_type)
 arg_value <- get_arg_value("id", opt, raw_args_list)
 id <- parse_value(arg_value, "id", "str")
 
-deserialized_data <- fromJSON(json_str)
+deserialized_data = json.loads(json_str)
 
 print(deserialized_data)
-
-
-original_data <- list(
-  task = "Write Python",
-  number = 1,
-  skills = c("python", "sql")
-)
-
-stopifnot(identical(deserialized_data, original_data))

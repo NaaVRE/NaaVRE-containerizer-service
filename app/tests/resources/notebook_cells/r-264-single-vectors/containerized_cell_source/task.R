@@ -173,6 +173,12 @@ id <- parse_value(arg_value, "id", "str")
 dummy_n1 <- list()
 dummy_n1 <- c("zxcv")
 # capturing outputs
+print('Serialization of dummy_n1')
 file <- file(paste0('/tmp/dummy_n1_', id, '.json'))
-writeLines(toJSON(dummy_n1, auto_unbox=TRUE), file)
+type = 'list'
+if (type == 'list'){
+    writeLines(toJSON(dummy_n1, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(dummy_n1, auto_unbox=TRUE), file)
+}
 close(file)

@@ -244,6 +244,7 @@ func_time <- as.numeric(end_func_time - start_func_time, units = "secs")
 print(paste("Run time: ", run_time))
 print(paste("Func time: ", func_time))
 # capturing outputs
+print('Serialization of run_time')
 file <- file(paste0('/tmp/run_time_', id, '.json'))
 type = 'None'
 if (type == 'list'){
