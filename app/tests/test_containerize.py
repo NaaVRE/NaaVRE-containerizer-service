@@ -305,10 +305,12 @@ def test_containerize_render():
             with open(expected_outputs_path) as f:
                 expected_outputs = json.load(f)
         if os.path.exists(arguments_path):
-            run_script(script=script, kernel=cell['kernel'],
+            run_script(script=script,
+                       kernel=cell['kernel'],
                        dependencies=dependencies,
                        arguments_file=arguments_path,
                        outputs=cell.get('outputs'),
+                       template_format=containerize_payload['template_format'],
                        expected_outputs=expected_outputs)
 
 

@@ -7,7 +7,7 @@
   "inputs": [
     {
       "name": "json_str",
-      "type": "str"
+      "type": null
     }
   ],
   "outputs": [],
@@ -16,9 +16,9 @@
   "confs": [],
   "dependencies": [
     {
-      "module": "",
-      "asname": null,
-      "name": "jsonlite"
+      "name": "jsonlite",
+      "asname": "",
+      "module": ""
     }
   ],
   "kernel": "IRkernel",

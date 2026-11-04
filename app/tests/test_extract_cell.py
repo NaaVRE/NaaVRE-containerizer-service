@@ -33,8 +33,6 @@ def test_extract_cell():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
     for cell_dir in cells_dirs:
-        if 'r-204_JSONDecodeError-error' not in cell_dir:
-            continue
         notebook_path = os.path.join(cell_dir, 'notebook.ipynb')
         with open(notebook_path) as f:
             print('Testing extract for notebook: ' + notebook_path)
@@ -76,6 +74,7 @@ def test_extract_cell():
             expected_cell_dict = json.load(f)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
+        assert expected_cell.template_format == returned_cell.template_format
         returned_cell_confs = sorted(returned_cell.confs,
                                      key=lambda x: x['name'])
         expected_cell_confs = sorted(expected_cell.confs,

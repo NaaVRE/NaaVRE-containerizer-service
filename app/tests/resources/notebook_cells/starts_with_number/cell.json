@@ -13,6 +13,7 @@
   "params": [],
   "secrets": [],
   "title": "3-items-input-data-python-user",
+  "template_format": "v2",
   "original_source": "list1 = [\"0001\", \"0010\", \"0011\"]",
   "base_container_image": {
     "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
