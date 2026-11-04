@@ -310,7 +310,7 @@ def test_containerize_render():
                        dependencies=dependencies,
                        arguments_file=arguments_path,
                        outputs=cell.get('outputs'),
-                       template_format=containerize_payload['template_format'],
+                       template_format=cell['template_format'],
                        expected_outputs=expected_outputs)
 
 
