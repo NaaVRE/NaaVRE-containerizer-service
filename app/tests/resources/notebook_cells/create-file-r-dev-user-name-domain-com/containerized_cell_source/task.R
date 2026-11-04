@@ -182,10 +182,5 @@ onlyfiles <- list.files(conf_data_folder, full.names = TRUE)
 print(onlyfiles)
 # capturing outputs
 file <- file(paste0('/tmp/file_path_', id, '.json'))
-type = 'None'
-if (type == 'list'){
-    writeLines(toJSON(file_path, auto_unbox=FALSE), file)
-} else {
-    writeLines(toJSON(file_path, auto_unbox=TRUE), file)
-}
+writeLines(toJSON(file_path, auto_unbox=TRUE), file)
 close(file)
