@@ -158,19 +158,19 @@ def test_extract_cell():
         assert os.getenv('REGISTRY_TOKEN_FOR_TESTS') is not None, \
             "REGISTRY_TOKEN_FOR_TESTS is not set. "
         tag = get_container_tag_from_ghcr_url(
-            expected_cell.base_container_image['build'],
+            expected_cell.base_container_image.build,
             os.getenv('REGISTRY_TOKEN_FOR_TESTS'))
 
         # Check if the tag are not None. If None print the name of the image
         assert tag is not None, \
             (f"Failed to fetch tag for "
-             f"{expected_cell.base_container_image['build']}")
+             f"{expected_cell.base_container_image.build}")
 
-        expected_cell.base_container_image['build'] = \
-            (expected_cell.base_container_image['build'].rsplit(":", 1)[0] +
+        expected_cell.base_container_image.build = \
+            (expected_cell.base_container_image.build.rsplit(":", 1)[0] +
              f":{tag}")
-        expected_cell.base_container_image['runtime'] = \
-            (expected_cell.base_container_image['runtime'].rsplit(":", 1)[0] +
+        expected_cell.base_container_image.runtime = \
+            (expected_cell.base_container_image.runtime.rsplit(":", 1)[0] +
              f":{tag}")
 
         assert (returned_cell.base_container_image == expected_cell.
