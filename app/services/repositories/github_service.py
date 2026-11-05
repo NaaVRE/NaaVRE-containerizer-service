@@ -10,6 +10,7 @@ import github
 import requests
 from github import Github
 from github import InputGitTreeElement
+from retry import retry
 
 from app.models.vl_config import VLConfig
 from app.services.container_registries.container_registry import \
@@ -62,6 +63,7 @@ class GithubService(GitRepository, ABC):
                                           token=vl_conf.cell_github_token)
         self.repository_url = cell_github_url
 
+    @retry(exceptions=Exception, tries=2)
     def commit(self, commit_list=None, force=False):
         logger.debug('Committing commit_list: ' + str(commit_list) +
                      ' force: ' + str(force))
