@@ -56,8 +56,30 @@ Then, add the token you created to the `Authorization` header to your HTTP reque
 Authorization: Bearer eyJ0eXAi...
 ```
 
-```shell
+### Running tests locally
 
+Copy `configuration.json` to `configuration-dev.json` and set `cell_github_token` for all virtual labs (if you cannot write to https://github.com/NaaVRE/cells-vl-tests, create a new repository from the template https://github.com/NaaVRE/NaaVRE-cells and set `cell_github_url` and `registry_url` accordingly).
+
+Copy `dev-example.env` to `dev.env` and set the following variables:
+
+```
+AUTH_TOKEN=<JWT generated above>
+CONFIG_FILE_URL=configuration-dev.json
+REGISTRY_TOKEN_FOR_TESTS=<token for the docker image registry used for tests>
+```
+
+Install additional dependencies:
+
+```shell
+conda install conda-forge::r-optparse r::r-jsonlite -y
+```
+
+Finally, load the environment and run pytest:
+
+```shell
+while read env; do export $env; done < dev.env
+pytest app/tests
+```
 
 ### Test on GitHub
 
