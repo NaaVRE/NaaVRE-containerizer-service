@@ -4,7 +4,8 @@ import cachetools.func
 import requests
 from jinja2 import Environment, PackageLoader
 
-from app.models.workflow_cell import Cell
+from app.models.workflow_cell import (BinderEnvironmentImage, Cell,
+                                      TwoStageFlavorImage)
 
 
 @cachetools.func.ttl_cache(ttl=6 * 3600)
@@ -29,7 +30,10 @@ class Containerizer:
         self.file_extension = ''
         self.template_script = ''
         self.template_conda_env = 'conda_env_template.jinja2'
-        self.dockerfile_template = 'dockerfile_template_conda.jinja2'
+        self.dockerfile_templates = {
+            TwoStageFlavorImage: 'dockerfile_template_flavor.jinja2',
+            BinderEnvironmentImage: 'dockerfile_template_binder.jinja2',
+        }
         self.module_mapping_url = module_mapping_url
 
     @abstractmethod
@@ -60,8 +64,9 @@ class Containerizer:
         pass
 
     def build_docker(self):
+        base_image_type = type(self.cell.base_container_image)
         template_dockerfile = self.template_env.get_template(
-            self.dockerfile_template)
+            self.dockerfile_templates[base_image_type])
         return template_dockerfile.render(
             title=self.cell.title,
             base_image=self.cell.base_container_image)
