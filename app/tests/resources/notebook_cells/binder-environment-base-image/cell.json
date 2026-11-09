@@ -19,5 +19,6 @@
   "original_source": "print(a)",
   "source_url": null,
   "container_image": null,
-  "description": null
+  "description": null,
+  "template_format": "v2"
 }
