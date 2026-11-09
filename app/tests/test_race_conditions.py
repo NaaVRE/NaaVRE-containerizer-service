@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.tests.test_containerize import replace_cell_in_containerize_payload
 
 if os.path.exists('resources'):
     base_path = 'resources'
@@ -31,7 +32,7 @@ def get_random_test_case(cells_dirs):
         print('                 with payload: ' + payload_path)
         payload = json.load(f)
 
-    payload['cell'] = cell
+    replace_cell_in_containerize_payload(payload, cell)
 
     return payload
 

@@ -1,0 +1,13 @@
+{
+  "virtual_lab": "openlab",
+  "cell": "[cell.json]",
+  "cell_patch": [
+    {
+      "op": "replace",
+      "path": "/base_container_image",
+      "value": {
+        "binder_environment": "ghcr.io/naavre/binder-builds/naavre-2dvl-2dopenlab-d7acf3:8fcfe566848b077419e0743a6eb2b00b50ec1e40"
+      }
+    }
+  ]
+}

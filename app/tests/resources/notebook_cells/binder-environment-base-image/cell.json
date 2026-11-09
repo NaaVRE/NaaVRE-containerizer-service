@@ -1,0 +1,23 @@
+{
+  "title": "print-value-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [
+    {
+      "name": "a",
+      "type": "int"
+    }
+  ],
+  "outputs": [],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [],
+  "kernel": "ipython",
+  "original_source": "print(a)",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}
