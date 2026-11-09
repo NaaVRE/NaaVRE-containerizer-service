@@ -7,7 +7,7 @@ from app.services.containerizers.r_containerizer import RContainerizer
 def test_map_r_dependency():
     cell = Cell(
         title='test-r-containerizer',
-        base_container_image={},
+        base_container_image={'build': '', 'runtime': ''},
         dependencies=[{'name': 'TempSED'}],
         kernel='IRkernel',
         original_source='',
@@ -37,7 +37,7 @@ def test_map_r_dependency():
 def test_ignore_pip_dependencies():
     cell = Cell(
         title='test-r-containerizer',
-        base_container_image={},
+        base_container_image={'build': '', 'runtime': ''},
         dependencies=[{'name': 'TempSED'}],
         kernel='IRkernel',
         original_source='',
@@ -72,7 +72,7 @@ def test_ignore_pip_dependencies():
 def test_map_dependencies_matches_r_mapping_case_and_prefix(mapping_name):
     cell = Cell(
         title='test-r-containerizer',
-        base_container_image={},
+        base_container_image={'build': '', 'runtime': ''},
         dependencies=[{'name': 'TempSED'}],
         kernel='IRkernel',
         original_source='',
@@ -93,7 +93,7 @@ def test_map_dependencies_matches_r_mapping_case_and_prefix(mapping_name):
 def test_conda_mapping_tempsed():
     cell = Cell(
         title='test-r-containerizer',
-        base_container_image={},
+        base_container_image={'build': '', 'runtime': ''},
         dependencies=[{'name': 'cli'}, {'name': 'data.table'},
                       {'name': 'devtools'}, {'name': 'dplyr'},
                       {'name': 'fasttime'}, {'name': 'generics'},

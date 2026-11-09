@@ -7,9 +7,18 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+class TwoStageFlavorImage(BaseModel):
+    build: str
+    runtime: str
+
+
+class BinderEnvironmentImage(BaseModel):
+    binder_environment: str
+
+
 class Cell(BaseModel):
     title: str
-    base_container_image: dict
+    base_container_image: TwoStageFlavorImage | BinderEnvironmentImage
     inputs: Optional[list[dict]] | None = None
     outputs: Optional[list[dict]] | None = None
     params: Optional[list[dict]] | None = None
