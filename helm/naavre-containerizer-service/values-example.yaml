@@ -15,6 +15,7 @@ conf:
   virtual_labs_configuration:
     rawJson: |    
       {
+        built_in_function_url: https://raw.githubusercontent.com/NaaVRE/NaaVRE-conf/refs/heads/main/build_in_r_function_names.json
         "vl_configurations": [
           {
             "name": "openlab",
