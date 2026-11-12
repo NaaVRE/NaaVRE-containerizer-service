@@ -3,82 +3,193 @@ library(optparse)
 library(jsonlite)
 
 
+load_json_args <- function(file_path) {
+  data <- jsonlite::fromJSON(file_path)
+  return(data)
+}
+parse_value <- function(value, field_name, target_type, elem_type = NULL) {
+  # helper to mimic arg_parser.error
+  arg_error <- function(msg) {
+    stop(msg, call. = FALSE)
+  }
 
+  # list handling
+  if (identical(target_type, "list")) {
+    if (is.list(value)) {
+      return(value)
+    } else if (is.character(value)) {
+      # try parsing as JSON
+      parsed <- tryCatch(jsonlite::fromJSON(value), error = function(e) NULL)
 
-print('option_list')
-option_list = list(
+      if (!is.null(parsed)) {
+        return(parsed)
+      } else {
+        # fallback: handle "['a', 'b', 'c']"
+        if (startsWith(value, "[") && endsWith(value, "]")) {
+          inner <- trimws(substr(value, 2, nchar(value) - 1))
 
-make_option(c("--io"), action="store", default=NA, type="integer", help="my description"),
-make_option(c("--param_neg_decimal"), action="store", default=NA, type="numeric", help="my description"),
-make_option(c("--param_neg_num"), action="store", default=NA, type="integer", help="my description"),
-make_option(c("--param_neg_string"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--id"), action="store", default=NA, type="character", help="task id")
-)
-
-
-opt = parse_args(OptionParser(option_list=option_list))
-
-var_serialization <- function(var){
-    if (is.null(var)){
-        print("Variable is null")
-        exit(1)
-    }
-    tryCatch(
-        {
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
-        },
-        error=function(e) {
-            print("Error while deserializing the variable")
-            print(var)
-            var <- gsub("'", '"', var)
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
-        },
-        warning=function(w) {
-            print("Warning while deserializing the variable")
-            var <- gsub("'", '"', var)
-            var <- fromJSON(var)
-            print("Variable deserialized")
-            return(var)
+          if (nchar(inner) > 0) {
+            elems <- strsplit(inner, ",")[[1]]
+            elems <- trimws(elems)
+            elems <- gsub("^['\"]|['\"]$", "", elems)  # strip quotes
+            return(as.list(elems))
+          } else {
+            return(list())
+          }
+        } else {
+          arg_error(paste(field_name, "is not a valid list"))
         }
-    )
+      }
+    }
+  }
+
+  # string
+  if (identical(target_type, "str")) {
+    return(as.character(value))
+  }
+
+  # integer
+  if (identical(target_type, "int")) {
+    return(as.integer(value))
+  }
+
+  # float (numeric in R)
+  if (identical(target_type, "float")) {
+    if (is.numeric(value)) {
+      return(as.numeric(value))
+    }
+    if (is.character(value)) {
+      return(as.numeric(value))
+    }
+  }
+
+  arg_error(paste(field_name, "has unsupported target type"))
 }
 
-print("Retrieving io")
-var = opt$io
-print(var)
-var_len = length(var)
-print(paste("Variable io has length", var_len))
+get_arg_value <- function(name, args, raw_args) {
+  # helper to mimic arg_parser.error
+  arg_error <- function(msg) {
+    stop(msg, call. = FALSE)
+  }
 
-io = opt$io
-print("Retrieving param_neg_decimal")
-var = opt$param_neg_decimal
-print(var)
-var_len = length(var)
-print(paste("Variable param_neg_decimal has length", var_len))
+  for (arg in raw_args) {
+    if (!is.null(arg$name) && arg$name == name) {
+      return(arg$value)
+    }
+  }
 
-param_neg_decimal = opt$param_neg_decimal
-print("Retrieving param_neg_num")
-var = opt$param_neg_num
-print(var)
-var_len = length(var)
-print(paste("Variable param_neg_num has length", var_len))
+  arg_error(paste0("Argument '", name, "' not found in JSON args"))
+}
 
-param_neg_num = opt$param_neg_num
-print("Retrieving param_neg_string")
-var = opt$param_neg_string
-print(var)
-var_len = length(var)
-print(paste("Variable param_neg_string has length", var_len))
+# normalize raw_args to a list of argument-like lists so we can safely iterate
+normalize_raw_args <- function(raw_args) {
+  if (is.data.frame(raw_args)) {
+    # each row becomes a list
+    return(lapply(seq_len(nrow(raw_args)), function(i) as.list(raw_args[i, , drop = FALSE])))
+  } else if (is.list(raw_args)) {
+    return(raw_args)
+  } else if (is.atomic(raw_args) && !is.null(names(raw_args))) {
+    # named atomic vector -> convert to list of {name, value}
+    return(lapply(names(raw_args), function(n) list(name = n, value = raw_args[[n]])))
+  } else if (is.character(raw_args)) {
+    # JSON may provide a simple array of argument strings like ["--id=0"]
+    # Parse entries like "--name=value" into list(name=name, value=value).
+    return(lapply(raw_args, function(s) {
+      if (is.na(s) || nchar(s) == 0) {
+        return(list(name = NULL, value = NULL))
+      }
+      # strip leading dashes
+      stripped <- sub('^--?', '', s)
+      if (grepl('=', stripped)) {
+        parts <- strsplit(stripped, '=', fixed = TRUE)[[1]]
+        name <- parts[1]
+        value <- paste(parts[-1], collapse = '=')
+        return(list(name = name, value = value))
+      } else {
+        # a flag without value
+        return(list(name = stripped, value = NULL))
+      }
+    }))
+  } else {
+    stop("Unsupported raw_args structure")
+  }
+}
 
-param_neg_string <- gsub("\"", "", opt$param_neg_string)
-id <- gsub('"', '', opt$id)
+# helper to mimic arg_parser.error
+arg_error <- function(msg) {
+  stop(msg, call. = FALSE)
+}
+
+option_list = list(
+make_option(c("--args_json"), action="store", default=NA, type="character", help="args json path")
+)
+
+opt = parse_args(OptionParser(option_list=option_list))
+raw_args = load_json_args(opt$args_json)
+raw_args_list <- normalize_raw_args(raw_args)
+
+# build expected arg names set and validate provided args
+expected_arg_names <- character(0)
+
+expected_arg_names <- unique(c(expected_arg_names, "io"))
+
+expected_arg_names <- unique(c(expected_arg_names, "param_neg_decimal"))
+expected_arg_names <- unique(c(expected_arg_names, "param_neg_num"))
+expected_arg_names <- unique(c(expected_arg_names, "param_neg_string"))
+
+expected_arg_names <- unique(c(expected_arg_names, "id"))
 
 
-print("Running the cell")
+
+for (arg in raw_args_list) {
+  if (is.null(arg[["name"]])) {
+    stop("Argument with no name found in JSON args")
+  }
+  name <- if (!is.null(arg[["name"]])) arg[["name"]] else NULL
+  if (is.null(name) && is.atomic(arg) && !is.null(names(arg))) {
+    # pick the first named element
+    nm <- names(arg)[1]
+    name <- arg[[nm]]
+  }
+  if (!(name %in% expected_arg_names)) {
+    arg_error(paste0("Unexpected argument '", name, "' found in JSON args"))
+  }
+
+  if (!startsWith(name, "conf")) {
+    if (is.null(arg$value)) {
+      arg_error(paste0("Argument '", name, "' has no value in JSON args"))
+    }
+  }
+
+  if (startsWith(name, "conf")) {
+    if (is.null(arg$assignation)) {
+      arg_error(paste0("Argument '", name, "' has no assignation in JSON args"))
+    }
+  }
+}
+arg_name <- "io"
+arg_value <- get_arg_value(arg_name, opt, raw_args_list)
+arg_type <- "int"
+io <- parse_value(arg_value, arg_name, arg_type)
+
+arg_name <- "param_neg_decimal"
+arg_value <- get_arg_value(arg_name, opt, raw_args_list)
+arg_type <- "float"
+param_neg_decimal <- parse_value(arg_value, arg_name, arg_type)
+arg_name <- "param_neg_num"
+arg_value <- get_arg_value(arg_name, opt, raw_args_list)
+arg_type <- "int"
+param_neg_num <- parse_value(arg_value, arg_name, arg_type)
+arg_name <- "param_neg_string"
+arg_value <- get_arg_value(arg_name, opt, raw_args_list)
+arg_type <- "str"
+param_neg_string <- parse_value(arg_value, arg_name, arg_type)
+
+
+
+arg_value <- get_arg_value("id", opt, raw_args_list)
+id <- parse_value(arg_value, "id", "str")
+
 print(param_neg_string)
 print(io)
 print(param_neg_num)

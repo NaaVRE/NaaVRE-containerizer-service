@@ -2,74 +2,147 @@
 import argparse
 import json
 import os
+
+def _load_json_args(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+def _parse_value(value, field_name, target_type, elem_type=None):
+    if target_type is list:
+        if isinstance(value, list):
+            return value
+        elif isinstance(value, str):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                # the value may be "['list_str', 'space in elem', '3']"
+                if value.startswith('[') and value.endswith(']'):
+                    value = value[1:-1].strip()  # remove the brackets and trim whitespace
+                    if value:
+                        return [elem.strip().strip("'").strip('"') for elem in value.split(',')]
+                    else:
+                        return []
+                else:
+                    arg_parser.error(field_name + " is not a valid list")
+
+    if target_type is str:
+        return value
+
+    if target_type is int:
+        return int(value)
+
+    if target_type is float:
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            return float(value)
+    arg_parser.error(field_name + " has unsupported target type")
+
+def get_arg_value(name,args,raw_args):
+    for arg in raw_args:
+        if arg['name'] == name:
+            return arg['value']
+    arg_parser.error("Argument '" + name + "' not found in JSON args")
+
 arg_parser = argparse.ArgumentParser()
-
-
-arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
-
-
-arg_parser.add_argument('--var_float', action='store', type=float, required=True, dest='var_float')
-
-arg_parser.add_argument('--var_int', action='store', type=int, required=True, dest='var_int')
-
-arg_parser.add_argument('--var_list_int', action='store', type=str, required=True, dest='var_list_int')
-
-arg_parser.add_argument('--var_list_str', action='store', type=str, required=True, dest='var_list_str')
-
-arg_parser.add_argument('--var_string', action='store', type=str, required=True, dest='var_string')
-
-arg_parser.add_argument('--var_string_with_comment', action='store', type=str, required=True, dest='var_string_with_comment')
-
-arg_parser.add_argument('--param_float', action='store', type=float, required=True, dest='param_float')
-arg_parser.add_argument('--param_int', action='store', type=int, required=True, dest='param_int')
-arg_parser.add_argument('--param_list_int', action='store', type=str, required=True, dest='param_list_int')
-arg_parser.add_argument('--param_list_str', action='store', type=str, required=True, dest='param_list_str')
-arg_parser.add_argument('--param_string', action='store', type=str, required=True, dest='param_string')
-arg_parser.add_argument('--param_string_with_comment', action='store', type=str, required=True, dest='param_string_with_comment')
+arg_parser.add_argument('--args_json', action='store', type=str, required=True, dest='args_json')
 
 args = arg_parser.parse_args()
-print(args)
 
-id = args.id
+expected_arg_names = set()
+expected_arg_names.add('var_float')
+expected_arg_names.add('var_int')
+expected_arg_names.add('var_list_int')
+expected_arg_names.add('var_list_str')
+expected_arg_names.add('var_string')
+expected_arg_names.add('var_string_with_comment')
+expected_arg_names.add('param_float')
+expected_arg_names.add('param_int')
+expected_arg_names.add('param_list_int')
+expected_arg_names.add('param_list_str')
+expected_arg_names.add('param_string')
+expected_arg_names.add('param_string_with_comment')
+expected_arg_names.add('conf_float')
+expected_arg_names.add('conf_int')
+expected_arg_names.add('conf_list_int')
+expected_arg_names.add('conf_list_str')
+expected_arg_names.add('conf_string')
+expected_arg_names.add('conf_string_with_comment')
+expected_arg_names.add('id')
 
-var_float = args.var_float
-var_int = args.var_int
-var_list_int = json.loads(args.var_list_int)
-var_list_str = json.loads(args.var_list_str)
-var_string = args.var_string.replace('"','')
-var_string_with_comment = args.var_string_with_comment.replace('"','')
+raw_args = _load_json_args(args.args_json)
+for arg in raw_args:
+    if 'name' not in arg:
+        arg_parser.error("Argument with no name found in JSON args")
+    if arg['name'] not in expected_arg_names:
+        arg_parser.error("Unexpected argument '" + arg['name'] + "' found in JSON args")
+    if not arg['name'].startswith('conf'):
+            if 'value' not in arg or arg['value'] is None:
+                arg_parser.error("Argument '" + arg['name'] + "' has no value in JSON args")
+    if arg['name'].startswith('conf'):
+            if 'assignation' not in arg or arg['assignation'] is None:
+                arg_parser.error("Argument '" + arg['name'] + "' has no assignation in JSON args")
 
-param_float = args.param_float
-param_int = args.param_int
-print(args.param_list_int)
-print(type(args.param_list_int))
-try:
-    param_list_int = json.loads(args.param_list_int)
-except Exception as e:
-    if e.__class__.__name__ == 'JSONDecodeError':
-        import ast
-        param_list_int = ast.literal_eval(args.param_list_int.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
-    else:
-        raise e
-print(args.param_list_str)
-print(type(args.param_list_str))
-try:
-    param_list_str = json.loads(args.param_list_str)
-except Exception as e:
-    if e.__class__.__name__ == 'JSONDecodeError':
-        import ast
-        param_list_str = ast.literal_eval(args.param_list_str.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
-    else:
-        raise e
-param_string = args.param_string.replace('"','')
-param_string_with_comment = args.param_string_with_comment.replace('"','')
+arg_name = 'var_float'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = float
+var_float = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'var_int'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = int
+var_int = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'var_list_int'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = list
+var_list_int = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'var_list_str'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = list
+var_list_str = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'var_string'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = str
+var_string = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'var_string_with_comment'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = str
+var_string_with_comment = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_float'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = float
+param_float = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_int'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = int
+param_int = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_list_int'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = list
+param_list_int = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_list_str'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = list
+param_list_str = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_string'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = str
+param_string = _parse_value(arg_value, arg_name, arg_type)
+arg_name = 'param_string_with_comment'
+arg_value = get_arg_value(arg_name,args,raw_args)
+arg_type = str
+param_string_with_comment = _parse_value(arg_value, arg_name, arg_type)
 
-conf_string = conf_string = 'param_string value'
-conf_string_with_comment = conf_string_with_comment = 'param_string value'
-conf_int = conf_int = 1
-conf_float = conf_float = 1.1
-conf_list_int = conf_list_int = [1, 2, 3]
-conf_list_str = conf_list_str = ['list_str', 'space in elem', '3']
+conf_float = 1.1
+conf_int = 1
+conf_list_int = [1, 2, 3]
+conf_list_str = ['list_str', 'space in elem', '3']
+conf_string = 'param_string value'
+conf_string_with_comment = 'param_string value'
+
+
+arg_value = get_arg_value('id',args,raw_args)
+id = _parse_value(arg_value, 'id', str)
 
 print('conf_string: ' + str(conf_string) + ' type: ' + str(type(conf_string)))
 print('conf_string_with_comment: ' + str(conf_string_with_comment) + ' type: ' + str(type(conf_string_with_comment)))
