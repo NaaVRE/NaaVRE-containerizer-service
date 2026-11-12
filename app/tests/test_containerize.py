@@ -7,6 +7,7 @@ from pathlib import Path
 from time import sleep
 
 import requests
+import jsonpatch
 import yaml
 from fastapi.testclient import TestClient
 from packaging.version import Version
@@ -56,6 +57,22 @@ def download_files_from_github(repo_url, download_path):
     else:
         raise Exception("Failed to fetch files. Status Code:",
                         response.status_code, "Response:", response.text)
+
+
+def replace_cell_in_containerize_payload(containerize_payload, cell):
+    """ Replace the cell field of containerize_payload with a patched cell
+
+    Replace `containerize_payload['cell']` with `cell`. If
+    `containerize_payload['cell_patch']` exists, apply it to `cell`. This
+    allows us to model the fact that the client may modify the cell it received
+    from /extract_cell before calling /containerize.
+
+    :param containerize_payload: containerize payload (modified in-place)
+    :param cell: cell to merge in
+    """
+    cell_patch = containerize_payload.pop('cell_patch', [])
+    cell = jsonpatch.apply_patch(cell, cell_patch)
+    containerize_payload['cell'] = cell
 
 
 def wait_for_containerization(workflow_id=None,
@@ -115,7 +132,7 @@ def gen_tests_reference():
         with open(payload_path) as f:
             containerize_payload = json.load(f)
 
-        containerize_payload['cell'] = cell
+        replace_cell_in_containerize_payload(containerize_payload, cell)
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
         containerizer = _get_containerizer(containerize_payload)
@@ -255,7 +272,7 @@ def test_containerize_render():
         payload_path = os.path.join(cell_dir, 'payload_containerize.json')
         with open(payload_path) as f:
             containerize_payload = json.load(f)
-        containerize_payload['cell'] = cell
+        replace_cell_in_containerize_payload(containerize_payload, cell)
         containerize_payload = ContainerizerPayload(**containerize_payload)
 
         containerizer = _get_containerizer(containerize_payload)
@@ -336,7 +353,7 @@ def test_containerize_github(cell_dir):
         print('                with payload: ' + payload_path)
         containerizer_json_payload = json.load(f)
 
-    containerizer_json_payload['cell'] = cell
+    replace_cell_in_containerize_payload(containerizer_json_payload, cell)
     containerizer_json_payload['force_containerize'] = True
     containerize_response = client.post(
         '/containerize/',
@@ -494,7 +511,7 @@ def test_containerize_github(cell_dir):
 
     workflow_id = containerize_response.json()['workflow_id']
     source_url = containerize_response.json()['source_url']
-    assert cell['title'] in source_url
+    assert containerizer_json_payload['cell']['title'] in source_url
     containerization_status_response = wait_for_containerization(
         workflow_id=workflow_id,
         virtual_lab=containerizer_json_payload['virtual_lab'],
