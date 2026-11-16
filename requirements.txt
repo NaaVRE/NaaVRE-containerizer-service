@@ -1,5 +1,5 @@
-fastapi[standard]==0.143.0
-PyJWT[crypto]==2.15.0
+fastapi[standard]==0.162.0
+PyJWT[crypto]==2.15.1
 uvicorn==0.54.0
 requests==2.34.2
 pydantic==2.13.5
@@ -16,7 +16,7 @@ pydantic-settings==2.15.0
 jsonschema==4.26.0
 PyYAML==6.0.3
 rpy2==3.5.11
-pyflakes==4.0.3
+pyflakes==4.1.0
 pytype==2023.10.31
 antlr4-python3-runtime==4.13.2
 colorhash==2.3.0
