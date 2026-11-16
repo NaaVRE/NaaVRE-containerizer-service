@@ -20,9 +20,6 @@ def get_random_test_case(cells_dirs):
     cell_dir = cells_dirs[random_index]
 
     cell_path = os.path.join(cell_dir, 'cell.json')
-    while cell_path is None or not os.path.exists(cell_path):
-        random_index = random.randint(0, len(cells_dirs) - 1)
-        cell_dir = cells_dirs[random_index]
     with open(cell_path) as f:
         print('Testing containerize for cell: ' + cell_path)
         cell = json.load(f)
@@ -39,7 +36,10 @@ def get_random_test_case(cells_dirs):
 
 def test_race_conditions():
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
-    cells_dirs = [f.path for f in os.scandir(notebook_cells_dir) if f.is_dir()]
+    cells_dirs = [
+        f.path for f in os.scandir(notebook_cells_dir)
+        if f.is_dir() and os.path.isfile(os.path.join(f.path, 'cell.json'))
+    ]
 
     # Pick random cell files
     containerizer_json_payload_1 = get_random_test_case(cells_dirs)
