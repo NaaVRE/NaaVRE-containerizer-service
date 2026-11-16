@@ -38,6 +38,19 @@ class JobNotFoundError(Exception):
 
 class GithubService(GitRepository, ABC):
 
+    @staticmethod
+    def _is_non_fast_forward_error(error: github.GithubException) -> bool:
+        if getattr(error, "status", None) != 422:
+            return False
+        error_message = str(error).lower()
+        non_fast_forward_markers = (
+            "not a fast-forward",
+            "not a fast forward",
+            "reference update failed",
+        )
+        return any(marker in error_message
+                   for marker in non_fast_forward_markers)
+
     def __init__(self, vl_conf: VLConfig):
         if vl_conf.cell_github_token is None:
             raise ValueError("GitHub token is required for GitHubService")
@@ -90,38 +103,31 @@ class GithubService(GitRepository, ABC):
                                                          sha=blob.sha))
         commit_sha = None
         if content_updated or force:
-            base_tree = self.gh_repository.get_git_tree(sha="main")
-            new_tree = self.gh_repository.create_git_tree(tree=tree_elements,
-                                                          base_tree=base_tree)
-            # Fetch and merge the latest changes from the remote branch
-            self.github.get_repo(
-                self.owner + '/' + self.repository_name).get_branch("main")
-            parent_commit = self.gh_repository.get_git_commit(
-                self.gh_repository.get_branch("main").commit.sha)
-
-            # Create a commit
             commit_message = commit_list[0]['path']
-            new_commit = (self.gh_repository.
-                          create_git_commit(message=commit_message,
-                                            tree=new_tree,
-                                            parents=[parent_commit]))
-
-            # Update the reference to point to the new commit
             main_ref = self.gh_repository.get_git_ref("heads/main")
-            try:
-                main_ref.edit(sha=new_commit.sha)
-                commit_sha = new_commit.sha
-            except github.GithubException as e:
-                # Another request may have advanced main in the meantime.
-                # Return current HEAD so downstream calls still have a valid
-                # ref.
-                commit_sha = self.gh_repository.get_branch("main").commit.sha
-                error_message = str(e).lower()
-                if ("not a fast-forward" not in error_message and
-                        "not a fast forward" not in error_message):
-                    raise Exception(
-                        "Update failed: not a fast-forward. Ensure the branch "
-                        "is up-to-date.") from e
+            max_update_attempts = 3
+            for attempt in range(max_update_attempts):
+                base_tree = self.gh_repository.get_git_tree(sha="main")
+                new_tree = self.gh_repository.create_git_tree(
+                    tree=tree_elements,
+                    base_tree=base_tree)
+                parent_commit = self.gh_repository.get_git_commit(
+                    self.gh_repository.get_branch("main").commit.sha)
+                new_commit = self.gh_repository.create_git_commit(
+                    message=commit_message,
+                    tree=new_tree,
+                    parents=[parent_commit])
+                try:
+                    main_ref.edit(sha=new_commit.sha)
+                    commit_sha = new_commit.sha
+                    break
+                except github.GithubException as e:
+                    is_last_attempt = attempt == max_update_attempts - 1
+                    if (not self._is_non_fast_forward_error(e) or
+                            is_last_attempt):
+                        raise Exception(
+                            "Update failed after retrying branch update."
+                        ) from e
         logger.debug('Content updated: ' + str(content_updated))
         return {"content_updated": content_updated, 'commit_sha': commit_sha}
 
