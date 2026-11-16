@@ -35,6 +35,7 @@ def get_random_test_case(cells_dirs):
 
 
 def test_race_conditions():
+    pass
     notebook_cells_dir = os.path.join(base_path, 'notebook_cells')
     cells_dirs = [
         f.path for f in os.scandir(notebook_cells_dir)
