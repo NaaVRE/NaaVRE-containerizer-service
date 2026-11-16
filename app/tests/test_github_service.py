@@ -83,4 +83,3 @@ def test_commit_raises_on_non_retryable_branch_update_error():
 
     with pytest.raises(Exception, match="Update failed after retrying"):
         service.commit(commit_list=_commit_payload())
-
