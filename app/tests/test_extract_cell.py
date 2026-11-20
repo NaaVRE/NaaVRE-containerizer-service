@@ -74,6 +74,7 @@ def test_extract_cell():
             expected_cell_dict = json.load(f)
         expected_cell = Cell.model_validate(expected_cell_dict)
 
+        assert expected_cell.template_format == returned_cell.template_format
         returned_cell_confs = sorted(returned_cell.confs,
                                      key=lambda x: x['name'])
         expected_cell_confs = sorted(expected_cell.confs,
