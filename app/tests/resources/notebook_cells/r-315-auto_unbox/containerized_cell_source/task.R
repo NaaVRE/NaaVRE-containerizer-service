@@ -48,3 +48,13 @@ id <- gsub('"', '', opt$id)
 
 print("Running the cell")
 str_list <- list('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l', 'm', 'n', 'o', 'p', 'r')
+# capturing outputs
+print('Serialization of str_list')
+file <- file(paste0('/tmp/str_list_', id, '.json'))
+type = 'list'
+if (type == 'list' && typeof(str_list) == 'character'){
+    writeLines(toJSON(str_list, auto_unbox=FALSE), file)
+} else {
+    writeLines(toJSON(str_list, auto_unbox=TRUE), file)
+}
+close(file)
