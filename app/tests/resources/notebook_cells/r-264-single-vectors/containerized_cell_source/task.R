@@ -53,7 +53,7 @@ dummy_n1 <- c("zxcv")
 print('Serialization of dummy_n1')
 file <- file(paste0('/tmp/dummy_n1_', id, '.json'))
 type = 'list'
-if (type == 'list'){
+if (type == 'list' && is.atomic(dummy_n1)){
     writeLines(toJSON(dummy_n1, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(dummy_n1, auto_unbox=TRUE), file)

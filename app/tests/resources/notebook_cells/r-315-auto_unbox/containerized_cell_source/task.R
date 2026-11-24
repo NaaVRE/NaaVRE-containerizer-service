@@ -52,7 +52,7 @@ str_list <- list('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l', 'm',
 print('Serialization of str_list')
 file <- file(paste0('/tmp/str_list_', id, '.json'))
 type = 'list'
-if (type == 'list' && typeof(str_list) == 'character'){
+if (type == 'list' && is.atomic(str_list)){
     writeLines(toJSON(str_list, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(str_list, auto_unbox=TRUE), file)
