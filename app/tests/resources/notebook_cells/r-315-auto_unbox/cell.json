@@ -1,0 +1,23 @@
+{
+  "title": "input-list-r-user",
+  "base_container_image": {
+    "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
+    "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "str_list",
+      "type": "list"
+    }
+  ],
+  "params": [],
+  "secrets": [],
+  "confs": [],
+  "dependencies": [],
+  "kernel": "IRkernel",
+  "original_source": "str_list <- list('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l', 'm', 'n', 'o', 'p', 'r')",
+  "source_url": null,
+  "container_image": null,
+  "description": null
+}

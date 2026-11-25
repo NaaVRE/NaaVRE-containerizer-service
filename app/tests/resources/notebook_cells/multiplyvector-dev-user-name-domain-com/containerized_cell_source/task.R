@@ -247,7 +247,7 @@ print(paste("Func time: ", func_time))
 print('Serialization of run_time')
 file <- file(paste0('/tmp/run_time_', id, '.json'))
 type = 'None'
-if (type == 'list'){
+if (type == 'list' && is.atomic(run_time)){
     writeLines(toJSON(run_time, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(run_time, auto_unbox=TRUE), file)

@@ -181,7 +181,7 @@ print(class(var_list_int))
 print('Serialization of var_string_with_comment')
 file <- file(paste0('/tmp/var_string_with_comment_', id, '.json'))
 type = 'str'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_string_with_comment)){
     writeLines(toJSON(var_string_with_comment, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_string_with_comment, auto_unbox=TRUE), file)
@@ -190,7 +190,7 @@ close(file)
 print('Serialization of var_string')
 file <- file(paste0('/tmp/var_string_', id, '.json'))
 type = 'str'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_string)){
     writeLines(toJSON(var_string, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_string, auto_unbox=TRUE), file)
@@ -199,7 +199,7 @@ close(file)
 print('Serialization of var_int')
 file <- file(paste0('/tmp/var_int_', id, '.json'))
 type = 'int'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_int)){
     writeLines(toJSON(var_int, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_int, auto_unbox=TRUE), file)
@@ -208,7 +208,7 @@ close(file)
 print('Serialization of var_float')
 file <- file(paste0('/tmp/var_float_', id, '.json'))
 type = 'float'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_float)){
     writeLines(toJSON(var_float, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_float, auto_unbox=TRUE), file)
@@ -217,7 +217,7 @@ close(file)
 print('Serialization of var_list_int')
 file <- file(paste0('/tmp/var_list_int_', id, '.json'))
 type = 'list'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_list_int)){
     writeLines(toJSON(var_list_int, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_list_int, auto_unbox=TRUE), file)
@@ -226,7 +226,7 @@ close(file)
 print('Serialization of var_list_str')
 file <- file(paste0('/tmp/var_list_str_', id, '.json'))
 type = 'list'
-if (type == 'list'){
+if (type == 'list' && is.atomic(var_list_str)){
     writeLines(toJSON(var_list_str, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(var_list_str, auto_unbox=TRUE), file)

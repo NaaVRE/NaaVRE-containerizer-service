@@ -184,7 +184,7 @@ print(onlyfiles)
 print('Serialization of file_path')
 file <- file(paste0('/tmp/file_path_', id, '.json'))
 type = 'None'
-if (type == 'list'){
+if (type == 'list' && is.atomic(file_path)){
     writeLines(toJSON(file_path, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON(file_path, auto_unbox=TRUE), file)

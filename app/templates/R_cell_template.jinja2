@@ -207,7 +207,7 @@ id <- parse_value(arg_value, "id", "str")
 print('Serialization of {{ out['name'] }}')
 file <- file(paste0('/tmp/{{out['name']}}_', id, '.json'))
 type = '{{ out['type'] }}'
-if (type == 'list'){
+if (type == 'list' && is.atomic({{out['name']}})){
     writeLines(toJSON({{out['name']}}, auto_unbox=FALSE), file)
 } else {
     writeLines(toJSON({{out['name']}}, auto_unbox=TRUE), file)
