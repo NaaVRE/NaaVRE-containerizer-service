@@ -167,6 +167,11 @@ class RefContainerizer:
             source = f.read()
         return source
 
+    def write_script(self, file_extension, script_contents):
+        filename = os.path.join(self.source_dir, 'task' + file_extension)
+        with open(filename, 'w') as f:
+            f.write(script_contents)
+
     def build_docker(self):
         filename = os.path.join(self.source_dir, 'Dockerfile')
         with open(filename) as f:
@@ -195,13 +200,13 @@ def run_script(script=None,
         script_path = ''
         cmd = ''
         cmd_args = []
+        with open(arguments_file) as f:
+            arguments = json.load(f)
         if template_format and Version(
                 template_format) >= json_args_supported_version:
-            cmd_args.append('--args_json ' + arguments_file)
+            cmd_args.append('--args_json')
+            cmd_args.append(arguments_file)
         else:
-            # convert arguments in the json file as command line arguments
-            with open(arguments_file) as f:
-                arguments = json.load(f)
             for arg in arguments:
                 name = arg.get('name')
                 value = arg.get('value')
@@ -285,6 +290,8 @@ def test_containerize_render():
             containerizer.file_extension
             )
 
+        # Write script to  cell_dir/
+        # ref_containerized.write_script(containerizer.file_extension, script)
         assert script == ref_script
 
         # Dockerfile
@@ -322,10 +329,12 @@ def test_containerize_render():
             with open(expected_outputs_path) as f:
                 expected_outputs = json.load(f)
         if os.path.exists(arguments_path):
-            run_script(script=script, kernel=cell['kernel'],
+            run_script(script=script,
+                       kernel=cell['kernel'],
                        dependencies=dependencies,
                        arguments_file=arguments_path,
                        outputs=cell.get('outputs'),
+                       template_format=cell['template_format'],
                        expected_outputs=expected_outputs)
 
 

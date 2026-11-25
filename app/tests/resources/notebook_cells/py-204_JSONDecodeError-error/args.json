@@ -1,0 +1,12 @@
+[
+  {
+    "name": "id",
+    "value": "0",
+    "type": "str"
+  },
+  {
+    "name": "json_str",
+    "type": "str",
+    "value": "{\"task\": \"Write Python\", \"number\": 1, \"skills\": [\"python\", \"sql\"]}"
+  }
+]

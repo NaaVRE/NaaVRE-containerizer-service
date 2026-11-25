@@ -113,6 +113,7 @@
     }
   ],
   "title": "r-detect-vars-print-vars-user",
+  "template_format": "v2",
   "base_container_image": {
     "build": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-build:latest",
     "runtime": "ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:latest"
