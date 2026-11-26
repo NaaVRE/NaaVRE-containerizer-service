@@ -42,5 +42,7 @@ def test_generates_r_parsers_with_antlr(tmp_path):
         'RFilterVisitor.py',
     }
 
-    missing = [name for name in generated_files if not (tmp_path / name).is_file()]
+    missing = [
+        name for name in generated_files if not (tmp_path / name).is_file()
+    ]
     assert not missing, f'ANTLR did not generate expected files: {missing}'
